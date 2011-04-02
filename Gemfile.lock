@@ -1,0 +1,27 @@
+GEM
+  remote: http://rubygems.org/
+  remote: http://gemcutter.org/
+  specs:
+    git (1.2.5)
+    jeweler (1.5.2)
+      bundler (~> 1.0.0)
+      git (>= 1.2.5)
+      rake
+    mime-types (1.16)
+    rake (0.8.7)
+    rcov (0.9.9)
+    rest-client (1.6.1)
+      mime-types (>= 1.16)
+    shoulda (2.11.3)
+    yajl-ruby (0.8.2)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bundler (~> 1.0.0)
+  jeweler (~> 1.5.2)
+  rcov
+  rest-client
+  shoulda
+  yajl-ruby

@@ -1,9 +1,10 @@
 source "http://rubygems.org"
+source "http://gemcutter.org"
 # Add dependencies required to use your gem here.
 # Example:
 #   gem "activesupport", ">= 2.3.5"
-    gem "rest_client"
-    gem "yajl"
+    gem "rest-client"
+    gem "yajl-ruby"
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.

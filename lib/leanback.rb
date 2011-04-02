@@ -6,7 +6,7 @@ module Couchdb
   def self.create(database_name)
        set_url
        begin
-         response = RestClient.put 'http://' + @url + ':' + @port + '/' + database_name, {:content_type => :json}
+         response = RestClient.put 'http://' + @url + ':' + @port + '/' + URI.escape(database_name), {:content_type => :json}
          hash = Yajl::Parser.parse(response.to_str)
        rescue => e
          hash = Yajl::Parser.parse(e.response.to_s)

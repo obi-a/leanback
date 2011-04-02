@@ -8,17 +8,26 @@ class TestLeanback < Test::Unit::TestCase
   #end
 
 
-  should "create a database if it doesn't already exist" do
- 	hash = Couchdb.create 'more_books'
-	puts hash.inspect
-  end
+  #should "create a database if it doesn't already exist" do
+ #	hash = Couchdb.create 'more_books'
+#	puts hash.inspect
+ # end
 
-  should "return error message illegal database name" do
- 	hash = Couchdb.create 'more books'
-	puts hash.inspect
-  end
- 
- 
+  #should "return error message illegal database name" do
+ #	hash = Couchdb.create 'more books'
+#	puts hash.inspect
+ # end
+
+  should "return a display a list of all databases" do
+      databases = Couchdb.all_dbs
+        databases.each do |db_name| 
+           puts db_name
+        end
+   end
+
+  
+   
+
 end
 
 

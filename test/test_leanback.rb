@@ -30,12 +30,12 @@ class TestLeanback < Test::Unit::TestCase
     #   puts hash.inspect
    #end
 
-  should "create a document" do 
-         data = {:firstname => 'Mary', :lastname =>'smith', :phone => '212-234-1234',:email =>'john@mail.com'}
-         doc = {:database => 'contacts', :doc_id => 'Mary', :data => data}
-         hash = Document.create doc
-         puts hash.inspect    
-  end
+  #should "create a document" do 
+   #      data = {:firstname => 'Mary', :lastname =>'smith', :phone => '212-234-1234',:email =>'john@mail.com'}
+    #     doc = {:database => 'contacts', :doc_id => 'Mary', :data => data}
+     #    hash = Document.create doc
+      #   puts hash.inspect    
+  #end
 
  #should "edit a document" do 
   #       data = {:firstname => 'john', :lastname =>'smith', :email => 'john@mail.com',:gender=>'male', :_rev=>'2-57e1f041838e19d91191e391970d16ce'}
@@ -44,10 +44,27 @@ class TestLeanback < Test::Unit::TestCase
      #    puts hash.inspect    
   #end
 
-   should "delete a document" do 
-         doc = {:database => 'contacts', :doc_id => 'john', :rev => '3-be02e80490f8e9e610d9a9e33d752316'}
-         Document.delete doc
-         puts hash.inspect
+   #should "delete a document" do 
+    #     doc = {:database => 'contacts', :doc_id => 'john', :rev => '3-be02e80490f8e9e610d9a9e33d752316'}
+     #    hash = Document.delete doc
+      #   puts hash.inspect
+   #end
+
+   should "display all docs in the database" do 
+      docs = Couchdb.docs_from 'monitors'
+   
+      docs.each do |d| 
+        puts "document's values:"
+          puts d["_rev"]
+          puts d["_id"]    
+          puts d["every"]
+          puts d["monitor"]
+          puts d["url"] 
+          puts d["test"]
+          puts d["contact"]
+          puts d["via"]
+          puts d["notify_interval"]
+       end
    end
   
 end

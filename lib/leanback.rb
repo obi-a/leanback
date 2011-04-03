@@ -94,6 +94,25 @@ module Couchdb
        end
  end
 
+ #return a list of all docs in the database
+def self.docs_from(database_name)
+  set_url
+  begin
+         response = RestClient.get 'http://' + @url + ':' + @port + '/' + URI.escape(database_name) + '/_all_docs?include_docs=true', {:content_type => :json}
+         hash = Yajl::Parser.parse(response.to_str)
+         rows = hash["rows"]
+         only_rows = []
+         count = 0 
+         rows.each do |row|
+            only_rows[count] = row["doc"]
+            count = count + 1
+          end
+        return only_rows
+  rescue => e
+     hash = Yajl::Parser.parse(e.response.to_s)
+  end  
+end
+
 
  class << self
        attr_accessor :url 

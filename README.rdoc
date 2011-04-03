@@ -1,10 +1,92 @@
 = leanback
 
-Bare bones Ruby Interface to CouchDB
+Simple Ruby Interface to CouchDB. 
 
-I will write a more complete README soon
+--This project is still under development. Not complete by any means. I made this Gem to use in my projects. I will expose more CouchDB features soon.
 
---Still under development 
+==Goals
+* To create a simple Ruby Interface to CouchDB
+* Expose the features of CouchDB to the Ruby Lang., 
+* Use a minimalist Ruby DSL to access CouchDB
+* provide a very easy way to persist and retrieve data
+
+==Install
+
+ gem install leanback
+
+
+==Usage
+
+Require the leanback Gem
+ require 'leanback'
+ 
+Create a CouchDB database
+ Couchdb.create 'contacts'
+ # => {"ok"=>true}
+
+Delete a database
+ Couchdb.delete 'contacts'
+ # => {"ok"=>true} 
+
+Return a list of all Databases
+ Couchdb.all
+ # => ["maps", "inventory", "monitors", "contacts", "books"]
+
+Create a new document
+ data = {:firstname => 'Linda', 
+         :lastname =>'smith', 
+         :phone => '212-234-1234',
+         :email =>'john@mail.com'}
+ doc = {:database => 'contacts', :doc_id => 'Linda', :data => data}
+ Document.create doc
+ # => {"ok"=>true, "id"=>"Linda", "rev"=>"1-6f16274513f51e922ff1f745452a92b6"} 
+
+Edit a document
+ data = {:firstname => 'john', 
+         :lastname =>'smith', 
+         :email => 'john@mail.com',
+         :gender=>'male',
+         :phone =>'718-245-5611',
+         :_rev=>'5-640daa7454fc3a0b62c2902f22cff937'}
+ doc = {:database => 'contacts', :doc_id => 'john', :data => data}
+ Document.edit doc
+ # => {"ok"=>true, "id"=>"john", "rev"=>"6-82b0a4e77863b7bbf471f7525c3c6985"}
+
+
+Delete a document
+ doc = {:database => 'contacts', :doc_id => 'john', :rev => '6-82b0a4e77863b7bbf471f7525c3c6985'}
+ Document.delete doc
+ # => {"ok"=>true, "id"=>"john", "rev"=>"7-af02d1a4397d48866ab9f9593f8b365f"} 
+
+
+Return all docs in a database
+ docs = Couchdb.docs_from 'contacts'  
+ docs.each do |d| 
+  puts "document's values:"
+  puts d["_rev"]
+  puts d["_id"]    
+  puts d["firstname"]
+  puts d["lastname"]
+  puts d["email"] 
+  puts d["phone"]
+ end  
+
+Attempting to create a database that already exists
+ Couchdb.create 'contacts'
+ # => {"error"=>"file_exists", "reason"=>"The database could not be created, the file already exists."} 
+
+Attempting to delete a database that no longer exists
+ Couchdb.delete 'more_books'
+ # => {"error"=>"not_found", "reason"=>"missing"} 
+
+Most methods return a hash value unless otherwise specified. When a database transaction goes through successfully most methods will return a hash value # => {"ok" => true ...} and when something goes wrong it returns a hash value # => {"error" => ...}
+
+You can always check this value 
+ hash = Couchdb.delete 'schools'
+ puts hash.inspect
+
+
+
 
 == Copyright
 

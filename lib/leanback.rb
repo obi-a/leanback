@@ -5,15 +5,11 @@ module Document
   
   #create a document 
   def self.create( doc)  
-      
       db_name =  doc[:database]
       doc_id = doc[:doc_id]
       data = doc[:data]
-      
       json_data = Yajl::Encoder.encode(data)
-      
       set_url
-
       begin
          response = RestClient.put 'http://' + @url + ':' + @port + '/' + URI.escape(db_name) + '/' + URI.escape(doc_id),json_data, {:content_type => :json, :accept => :json}
          hash = Yajl::Parser.parse(response.to_str)
@@ -27,11 +23,8 @@ module Document
       db_name = doc[:database]
       doc_id = doc[:doc_id]
       data = doc[:data]
-     
       json_data = Yajl::Encoder.encode(data)
-      
       set_url
-
       begin
         response = RestClient.put 'http://' + @url + ':' + @port + '/' + URI.escape(db_name) + '/' + URI.escape(doc_id), json_data, {:content_type => :json, :accept => :json}
          hash = Yajl::Parser.parse(response.to_str)
@@ -52,13 +45,11 @@ module Document
     rescue => e
      hash = Yajl::Parser.parse(e.response.to_s)
     end
-   
  end
 
    class << self
        attr_accessor :url 
        attr_accessor :port 
-     
      def set_url()
       if @url == nil && port == nil
          @url = 'localhost'
@@ -107,7 +98,6 @@ module Couchdb
  class << self
        attr_accessor :url 
        attr_accessor :port 
-     
      def set_url()
       if @url == nil && port == nil
          @url = 'localhost'

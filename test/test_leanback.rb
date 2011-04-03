@@ -19,7 +19,7 @@ class TestLeanback < Test::Unit::TestCase
  # end
 
   #should "return a display a list of all databases" do
-   #   databases = Couchdb.all_dbs
+   #   databases = Couchdb.all
     #    databases.each do |db_name| 
      #      puts db_name
       #  end
@@ -52,7 +52,7 @@ class TestLeanback < Test::Unit::TestCase
 
    should "display all docs in the database" do 
       docs = Couchdb.docs_from 'monitors'
-   
+       
       docs.each do |d| 
         puts "document's values:"
           puts d["_rev"]

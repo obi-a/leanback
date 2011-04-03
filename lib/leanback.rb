@@ -84,7 +84,7 @@ module Couchdb
  end
 
  #return a list of all databases
- def self.all_dbs
+ def self.all
       set_url
        begin
          response = RestClient.get 'http://' + @url + ':' + @port + '/_all_dbs', {:content_type => :json}

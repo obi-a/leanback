@@ -55,11 +55,10 @@ class TestLeanback < Test::Unit::TestCase
          puts hash.inspect
    end
 
-   should "display all docs in the database" do 
+   should "display all documents in the database" do 
       docs = Couchdb.docs_from 'monitors'
        
       docs.each do |d| 
-        puts "document's values:"
           puts d["_rev"]
           puts d["_id"]    
           puts d["every"]

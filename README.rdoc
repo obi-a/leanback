@@ -60,10 +60,9 @@ Delete the document
  Document.delete doc
  # => {"ok"=>true, "id"=>"Linda", "rev"=>"3-48580d1806983b32cb03f114efb064e3"} 
 
-Retrieve all docs in a database
+Retrieve all documents in a database
  docs = Couchdb.docs_from 'contacts'  
  docs.each do |d| 
-  puts "document's values:"
   puts d["_rev"]
   puts d["_id"]    
   puts d["firstname"]

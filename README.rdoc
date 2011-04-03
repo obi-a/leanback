@@ -37,27 +37,28 @@ Create a new document
          :lastname =>'smith', 
          :phone => '212-234-1234',
          :email =>'john@mail.com'}
+
  doc = {:database => 'contacts', :doc_id => 'Linda', :data => data}
  Document.create doc
  # => {"ok"=>true, "id"=>"Linda", "rev"=>"1-6f16274513f51e922ff1f745452a92b6"} 
+This will create a new document in the 'contacts' database, with document id 'Linda'.
 
-Edit a document
- data = {:firstname => 'john', 
+Lets edit that document to change the email address, phone number, and add a gender
+ data = {:firstname => 'Linda', 
          :lastname =>'smith', 
-         :email => 'john@mail.com',
-         :gender=>'male',
+         :email => 'linda@mail.com',
+         :gender=>'female',
          :phone =>'718-245-5611',
-         :_rev=>'5-640daa7454fc3a0b62c2902f22cff937'}
- doc = {:database => 'contacts', :doc_id => 'john', :data => data}
+         :_rev=>'1-6f16274513f51e922ff1f745452a92b6'}
+
+ doc = {:database => 'contacts', :doc_id => 'Linda', :data => data}
  Document.edit doc
- # => {"ok"=>true, "id"=>"john", "rev"=>"6-82b0a4e77863b7bbf471f7525c3c6985"}
+ # => {"ok"=>true, "id"=>"Linda", "rev"=>"2-e813a0e902e3ac114400ff3959a2adde"}
 
-
-Delete a document
- doc = {:database => 'contacts', :doc_id => 'john', :rev => '6-82b0a4e77863b7bbf471f7525c3c6985'}
+Delete the document
+ doc = {:database => 'contacts', :doc_id => 'Linda', :rev => '2-e813a0e902e3ac114400ff3959a2adde'}
  Document.delete doc
- # => {"ok"=>true, "id"=>"john", "rev"=>"7-af02d1a4397d48866ab9f9593f8b365f"} 
-
+ # => {"ok"=>true, "id"=>"Linda", "rev"=>"3-48580d1806983b32cb03f114efb064e3"} 
 
 Return all docs in a database
  docs = Couchdb.docs_from 'contacts'  
@@ -85,7 +86,23 @@ You can always check this value
  hash = Couchdb.delete 'schools'
  puts hash.inspect
 
+Leanback uses the default Couchdb bind address http://127.0.0.1:5984. To use a different bind address;
+ Couchdb.address = '192.168.2.16'
+ Couchdb.port = '6000'
+ Couchdb.all
+ ...
+ Document.address = '192.168.2.16'
+ Document.port = '6000'
+ docs = Couchdb.docs_from 'contacts'  
 
+To change it back to default bind address at anytime, simply set the values to nil
+ Couchdb.address = nil
+ Couchdb.port = nil
+ Couchdb.all
+ ...
+ Document.address = nil
+ Document.port = nil
+ docs = Couchdb.docs_from 'contacts'  
 
 
 == Copyright

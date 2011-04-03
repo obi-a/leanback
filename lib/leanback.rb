@@ -9,9 +9,9 @@ module Document
       doc_id = doc[:doc_id]
       data = doc[:data]
       json_data = Yajl::Encoder.encode(data)
-      set_url
+      set_address
       begin
-         response = RestClient.put 'http://' + @url + ':' + @port + '/' + URI.escape(db_name) + '/' + URI.escape(doc_id),json_data, {:content_type => :json, :accept => :json}
+         response = RestClient.put 'http://' + @address + ':' + @port + '/' + URI.escape(db_name) + '/' + URI.escape(doc_id),json_data, {:content_type => :json, :accept => :json}
          hash = Yajl::Parser.parse(response.to_str)
        rescue => e
          hash = Yajl::Parser.parse(e.response.to_s)
@@ -24,9 +24,9 @@ module Document
       doc_id = doc[:doc_id]
       data = doc[:data]
       json_data = Yajl::Encoder.encode(data)
-      set_url
+      set_address
       begin
-        response = RestClient.put 'http://' + @url + ':' + @port + '/' + URI.escape(db_name) + '/' + URI.escape(doc_id), json_data, {:content_type => :json, :accept => :json}
+        response = RestClient.put 'http://' + @address + ':' + @port + '/' + URI.escape(db_name) + '/' + URI.escape(doc_id), json_data, {:content_type => :json, :accept => :json}
          hash = Yajl::Parser.parse(response.to_str)
        rescue => e
          hash = Yajl::Parser.parse(e.response.to_s)
@@ -38,9 +38,9 @@ module Document
    db_name = doc[:database]
    doc_id = doc[:doc_id]
    rev = doc[:rev]
-   set_url
+   set_address
    begin 
-    response = RestClient.delete 'http://' + @url + ':' + @port + '/' + URI.escape(db_name)  + '/' + URI.escape(doc_id) + '?rev=' + rev, {:content_type => :json}
+    response = RestClient.delete 'http://' + @address + ':' + @port + '/' + URI.escape(db_name)  + '/' + URI.escape(doc_id) + '?rev=' + rev, {:content_type => :json}
       hash = Yajl::Parser.parse(response.to_str)
     rescue => e
      hash = Yajl::Parser.parse(e.response.to_s)
@@ -48,11 +48,11 @@ module Document
  end
 
    class << self
-       attr_accessor :url 
+       attr_accessor :address 
        attr_accessor :port 
-     def set_url()
-      if @url == nil && port == nil
-         @url = 'localhost'
+     def set_address
+      if @address == nil && port == nil
+         @address = '127.0.0.1'
          @port = '5984'
       end 
      end
@@ -62,9 +62,9 @@ end
 module Couchdb
   #create a database if one with the same name doesn't already exist
   def self.create(database_name)
-       set_url
+       set_address
        begin
-         response = RestClient.put 'http://' + @url + ':' + @port + '/' + URI.escape(database_name), {:content_type => :json}
+         response = RestClient.put 'http://' + @address + ':' + @port + '/' + URI.escape(database_name), {:content_type => :json}
          hash = Yajl::Parser.parse(response.to_str)
        rescue => e
          hash = Yajl::Parser.parse(e.response.to_s)
@@ -74,9 +74,9 @@ module Couchdb
 
  #delete a database
  def self.delete(database_name)
-      set_url
+      set_address
        begin
-         response = RestClient.delete 'http://' + @url + ':' + @port + '/' + URI.escape(database_name), {:content_type => :json}
+         response = RestClient.delete 'http://' + @address + ':' + @port + '/' + URI.escape(database_name), {:content_type => :json}
          hash = Yajl::Parser.parse(response.to_str)
        rescue => e
          hash = Yajl::Parser.parse(e.response.to_s)
@@ -85,9 +85,9 @@ module Couchdb
 
  #return a list of all databases
  def self.all
-      set_url
+      set_address
        begin
-         response = RestClient.get 'http://' + @url + ':' + @port + '/_all_dbs', {:content_type => :json}
+         response = RestClient.get 'http://' + @address + ':' + @port + '/_all_dbs', {:content_type => :json}
          hash = Yajl::Parser.parse(response.to_str)
        rescue => e
            raise e
@@ -96,9 +96,9 @@ module Couchdb
 
  #return a list of all docs in the database
 def self.docs_from(database_name)
-  set_url
+  set_address
   begin
-         response = RestClient.get 'http://' + @url + ':' + @port + '/' + URI.escape(database_name) + '/_all_docs?include_docs=true', {:content_type => :json}
+         response = RestClient.get 'http://' + @address + ':' + @port + '/' + URI.escape(database_name) + '/_all_docs?include_docs=true', {:content_type => :json}
          hash = Yajl::Parser.parse(response.to_str)
          rows = hash["rows"]
          only_rows = []
@@ -115,11 +115,11 @@ end
 
 
  class << self
-       attr_accessor :url 
+       attr_accessor :address 
        attr_accessor :port 
-     def set_url()
-      if @url == nil && port == nil
-         @url = 'localhost'
+     def set_address()
+      if @address == nil && port == nil
+         @address = '127.0.0.1'
          @port = '5984'
       end 
      end

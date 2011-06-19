@@ -71,6 +71,11 @@ Retrieve all documents in a database
   puts d["phone"]
  end  
 
+Retrieve a document by ID
+ doc = doc = {:database => 'contacts', :doc_id => 'Linda'}
+ Couchdb.find doc
+ #=>
+
 Attempting to create a database that already exists
  Couchdb.create 'contacts'
  # => {"error"=>"file_exists", "reason"=>"The database could not be created, the file already exists."} 

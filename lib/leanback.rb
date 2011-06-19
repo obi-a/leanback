@@ -94,6 +94,21 @@ module Couchdb
        end
  end
 
+##find a document by _id
+def self.find(doc)
+ set_address
+ db_name = doc[:database]
+ doc_id = doc[:doc_id]
+  begin
+   response = RestClient.get 'http://' + @address + ':' + @port + '/' + db_name + '/' + doc_id
+   hash = Yajl::Parser.parse(response.to_str)
+   #puts hash.inspect
+  rescue => e
+   hash = Yajl::Parser.parse(e.response.to_s)
+   #puts hash.inspect
+ end 
+end
+
  #return a list of all docs in the database
 def self.docs_from(database_name)
   set_address

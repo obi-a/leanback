@@ -23,6 +23,13 @@ class TestLeanback < Test::Unit::TestCase
 #	puts hash.inspect
  # end
 
+  should "return a document by ID" do
+        
+        doc = {:database => 'monitors', :doc_id => 'ee6f4f65-2b5b-4452-a9c4-fd9d860ec17d'}
+        hash = Couchdb.find doc
+        puts hash.inspect
+  end
+
   should "return a display a list of all databases" do
       databases = Couchdb.all
         databases.each do |db_name| 

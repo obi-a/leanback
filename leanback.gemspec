@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{leanback}
-  s.version = "0.1.6"
+  s.version = "0.1.7"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Obi Akubue"]
-  s.date = %q{2011-04-03}
+  s.authors = [%q{Obi Akubue}]
+  s.date = %q{2011-06-19}
   s.description = %q{lightweight Ruby interface to CouchDB}
   s.email = %q{obioraakubue@yahoo.com}
   s.extra_rdoc_files = [
@@ -24,14 +24,17 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "Rakefile",
     "VERSION",
+    "leanback-0.1.6.gem",
+    "leanback-0.1.7.gem",
+    "leanback.gemspec",
     "lib/leanback.rb",
     "test/helper.rb",
     "test/test_leanback.rb"
   ]
   s.homepage = %q{http://github.com/obi-a/leanback}
-  s.licenses = ["MIT"]
-  s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.7}
+  s.licenses = [%q{MIT}]
+  s.require_paths = [%q{lib}]
+  s.rubygems_version = %q{1.8.5}
   s.summary = %q{lightweight Ruby interface to CouchDB}
   s.test_files = [
     "test/helper.rb",
@@ -39,7 +42,6 @@ Gem::Specification.new do |s|
   ]
 
   if s.respond_to? :specification_version then
-    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then

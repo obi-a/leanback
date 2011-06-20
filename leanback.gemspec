@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = [%q{Obi Akubue}]
-  s.date = %q{2011-06-19}
+  s.date = %q{2011-06-20}
   s.description = %q{lightweight Ruby interface to CouchDB}
   s.email = %q{obioraakubue@yahoo.com}
   s.extra_rdoc_files = [

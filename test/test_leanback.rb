@@ -9,37 +9,33 @@ class TestLeanback < Test::Unit::TestCase
 
 
   should "create a database if it doesn't already exist" do
-	hash = Couchdb.create 'staff'
-	puts hash.inspect
+       #hash = Couchdb.create 'staff'
+	#puts hash.inspect
   end
 
  should "create a database if it doesn't already exist" do
-	hash = Couchdb.create 'contacts'
-	puts hash.inspect
+	#hash = Couchdb.create 'contacts'
+	#puts hash.inspect
   end
 
-  #should "return error message illegal database name" do
- #	hash = Couchdb.create 'more books'
-#	puts hash.inspect
- # end
 
   should "return a document by ID" do
         
-        doc = {:database => 'monitors', :doc_id => 'ee6f4f65-2b5b-4452-a9c4-fd9d860ec17d'}
-        hash = Couchdb.find doc
-        puts hash.inspect
+        #doc = {:database => 'monitors', :doc_id => 'ee6f4f65-2b5b-4452-a9c4-fd9d860ec17d'}
+        #hash = Couchdb.find doc
+        #puts hash.inspect
   end
 
   should "return a display a list of all databases" do
-      databases = Couchdb.all
-        databases.each do |db_name| 
-           puts db_name
-        end
+      #databases = Couchdb.all
+       # databases.each do |db_name| 
+        #   puts db_name
+       # end
    end
 
    should "delete a database" do 
-       hash = Couchdb.delete 'staff'
-       puts hash.inspect
+       #hash = Couchdb.delete 'staff'
+      # puts hash.inspect
    end
 
   should "create a document" do 
@@ -64,17 +60,17 @@ class TestLeanback < Test::Unit::TestCase
 
    should "display all documents in the database" do 
       docs = Couchdb.docs_from 'monitors'
-       
+       puts 'docs = Couchdb.docs_from monitors'
       docs.each do |d| 
-          puts d["_rev"]
-          puts d["_id"]    
-          puts d["every"]
-          puts d["monitor"]
-          puts d["url"] 
-          puts d["test"]
-          puts d["contact"]
-          puts d["via"]
-          puts d["notify_interval"]
+          puts "_rev: " + d["_rev"]
+          puts "_id: " + d["_id"]    
+          puts "every: " + d["every"]
+          puts "monitor: " + d["monitor"]
+          puts "url: " + d["url"] 
+          puts "test: " + d["test"]
+          puts "contact: " + d["contact"]
+          puts  "via: " + d["via"]
+          puts "notify_interval: " + d["notify_interval"]
        end
    end
 

@@ -116,13 +116,12 @@ def self.docs_from(database_name)
          response = RestClient.get 'http://' + @address + ':' + @port + '/' + URI.escape(database_name) + '/_all_docs?include_docs=true', {:content_type => :json}
          hash = Yajl::Parser.parse(response.to_str)
          rows = hash["rows"]
-         only_rows = []
          count = 0 
          rows.each do |row|
-            only_rows[count] = row["doc"]
-            count = count + 1
+            rows[count] = row["doc"]
+            count += 1
           end
-        return only_rows
+        return rows
   rescue => e
      hash = Yajl::Parser.parse(e.response.to_s)
   end  

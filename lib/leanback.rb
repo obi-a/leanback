@@ -94,8 +94,8 @@ module Couchdb
        end
  end
 
-##find a document by _id
-def self.find(doc)
+##view document 
+def self.view(doc)
  set_address
  db_name = doc[:database]
  doc_id = doc[:doc_id]

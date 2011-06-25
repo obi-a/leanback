@@ -19,10 +19,10 @@ class TestLeanback < Test::Unit::TestCase
   end
 
 
-  should "return a document by ID" do
+  should "view document" do
         
         doc = {:database => 'monitors', :doc_id => 'ee6f4f65-2b5b-4452-a9c4-fd9d860ec17d'}
-        hash = Couchdb.find doc
+        hash = Couchdb.view doc
         puts hash.inspect
   end
 

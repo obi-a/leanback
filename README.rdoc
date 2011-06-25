@@ -55,9 +55,9 @@ Lets edit that document to change the email address, phone number, and add a gen
  Document.edit doc
  # => {"ok"=>true, "id"=>"Linda", "rev"=>"2-e813a0e902e3ac114400ff3959a2adde"}
 
-Retrieve the document by id
+Retrieve/view the document 
  doc = {:database => 'contacts', :doc_id => 'Linda'}
- Couchdb.find doc
+ Couchdb.view doc
   #=> {"_id"=>"Linda", "_rev"=>"2-e813a0e902e3ac114400ff3959a2adde", "firstname"=>"Linda", 
                   "lastname"=>"smith", "email"=>"linda@mail.com", "gender"=>"female", "phone"=>"718-245-5611"} 
 

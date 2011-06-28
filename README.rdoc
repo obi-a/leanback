@@ -77,6 +77,16 @@ Retrieve all documents in a database
   puts d["phone"]
  end  
 
+Query a permanent view
+ view = { :database => "contacts", :design_doc => 'my_views', :view => 'get_female_contacts'}
+ Couchdb.find view 
+ # => [{"_id"=>"Mary", "_rev"=>"5-bfcd67fd17dbb6a875af8f6dc497b15f", "firstname"=>"Mary", "lastname"=>"smith", "phone"=>"212-234-1234", "email"=>"mary@mail.com", "gender"=>"female"}, {"_id"=>"Nancy", "_rev"=>"1-d15a83d2a23b495c19df2595b636ecc8", "firstname"=>"Nancy", "lastname"=>"Lee", "phone"=>"347-808-3734", "email"=>"nancy@mail.com", "gender"=>"female"}]
+
+This is the ruby code equivalent of sending 
+http://127.0.0.1:5984/[database]/_design/[design_doc]/_view/[view_name] 
+For the above example
+http://127.0.0.1:5984/contacts/_design/my_views/_view/get_female_contacts
+
 Attempting to create a database that already exists
  Couchdb.create 'contacts'
  # => {"error"=>"file_exists", "reason"=>"The database could not be created, the file already exists."} 

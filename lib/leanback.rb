@@ -94,7 +94,7 @@ module Couchdb
        end
  end
 
-##view document 
+##view a document 
 def self.view(doc)
  set_address
  db_name = doc[:database]
@@ -105,9 +105,30 @@ def self.view(doc)
    #puts hash.inspect
   rescue => e
    hash = Yajl::Parser.parse(e.response.to_s)
-   #puts hash.inspect
  end 
 end
+
+#query a permanent view
+def self.find(doc)
+ set_address
+ db_name = doc[:database]
+ design_doc_name = doc[:design_doc]
+ view_name = doc[:view]
+   begin
+     response = RestClient.get 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name + '/_view/' + view_name
+     hash = Yajl::Parser.parse(response.to_str)
+     rows = hash["rows"]
+     count = 0
+     rows.each do |row|
+      rows[count] = row["value"]
+      count += 1  
+     end
+     return rows.inspect
+   rescue => e
+    hash = Yajl::Parser.parse(e.response.to_s)
+   end
+end
+
 
  #return a list of all docs in the database
 def self.docs_from(database_name)

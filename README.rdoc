@@ -85,10 +85,11 @@ Retrieve all documents in a database
  {"_id"=>"Nancy", "_rev"=>"1-d15a83d2a23b495c19df2595b636ecc8", "firstname"=>"Nancy", "lastname"=>"Lee", 
                                     "phone"=>"347-808-3734", "email"=>"nancy@mail.com", "gender"=>"female"}]
 
-This is the equivalent of sending 
- http://127.0.0.1:5984/[database]/_design/[design_doc]/_view/[view_name] 
+This is similar to sending a
+ GET http://127.0.0.1:5984/[database]/_design/[design_doc]/_view/[view_name] 
 For the above example
- http://127.0.0.1:5984/contacts/_design/my_views/_view/get_female_contacts
+ GET http://127.0.0.1:5984/contacts/_design/my_views/_view/get_female_contacts
+Leanback parses the native JSON results to return only the data values.
 
 ===Create a design document with permanent views:
 First define the views in a JSON file 

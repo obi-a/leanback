@@ -1,5 +1,6 @@
 require 'rest_client'
 require 'yajl'
+require 'erb'
 
 module Document
   
@@ -102,7 +103,6 @@ def self.view(doc)
   begin
    response = RestClient.get 'http://' + @address + ':' + @port + '/' + db_name + '/' + doc_id
    hash = Yajl::Parser.parse(response.to_str)
-   #puts hash.inspect
   rescue => e
    hash = Yajl::Parser.parse(e.response.to_s)
  end 
@@ -123,12 +123,35 @@ def self.find(doc)
       rows[count] = row["value"]
       count += 1  
      end
-     return rows.inspect
+     return rows
    rescue => e
     hash = Yajl::Parser.parse(e.response.to_s)
    end
 end
 
+#create a design document with views
+def self.create_design(doc)
+ set_address
+ db_name = doc[:database]
+ design_doc_name = doc[:design_doc]
+ json_doc_name = doc[:json_doc]
+
+ begin
+  #bind json doc to string
+  message_template = ERB.new File.new(json_doc_name).read
+  str = message_template.result(binding)
+ rescue => e
+   raise e
+ end
+
+  begin
+   
+   response = RestClient.put 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name, str, {:content_type => :json, :accept => :json}
+    hash = Yajl::Parser.parse(response.to_str)
+  rescue => e
+    hash = Yajl::Parser.parse(e.response.to_s)
+  end
+end
 
  #return a list of all docs in the database
 def self.docs_from(database_name)

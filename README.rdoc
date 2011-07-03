@@ -77,7 +77,7 @@ Retrieve all documents in a database
   puts d["phone"]
  end  
 
-Query a permanent view
+===Query a permanent view
  view = { :database => "contacts", :design_doc => 'my_views', :view => 'get_female_contacts'}
  Couchdb.find view 
  # => [{"_id"=>"Mary", "_rev"=>"5-bfcd67fd17dbb6a875af8f6dc497b15f", "firstname"=>"Mary", "lastname"=>"smith", 
@@ -90,7 +90,33 @@ This is the equivalent of sending
 For the above example
  http://127.0.0.1:5984/contacts/_design/my_views/_view/get_female_contacts
 
+===Create a design document with permanent views:
+First define the views in a JSON file 
+ //my_views.json
+ {
+  "language" : "javascript",
+  "views" :{
+     "get_email" : {
+       "map" : "function(doc){
+          if(doc.lastname && doc.email)
+            emit(doc.id,{Firstname: doc.firstname, Lastname: doc.lastname, Email: doc.email});
+         }"
+     }
+  }
+ }
 
+Now create the design document and add the json file
+ doc = { :database => 'contacts', :design_doc => 'more_views', :json_doc => '/path/to/my_views.json' }
+ hash = Couchdb.create_design doc 
+ # => {"ok"=>true, "id"=>"_design/more_views", "rev"=>"1-d67ae97ff03a98f68ddc300bf9ae5048"}
+
+To query the view
+ view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_email'}
+ Couchdb.find view 
+ # => [{"Firstname"=>"Nancy", "Lastname"=>"Lee", "Email"=>"nancy@mail.com"}, 
+         {"Firstname"=>"john", "Lastname"=>"smith", "Email"=>"john@mail.com"}]
+
+===Error handling
 Attempting to create a database that already exists
  Couchdb.create 'contacts'
  # => {"error"=>"file_exists", "reason"=>"The database could not be created, the file already exists."} 
@@ -99,12 +125,13 @@ Attempting to delete a database that no longer exists
  Couchdb.delete 'more_books'
  # => {"error"=>"not_found", "reason"=>"missing"} 
 
-Most methods return a hash value unless otherwise specified. When a database transaction goes through successfully most methods will return a hash value # => {"ok" => true ...} and when something goes wrong it returns a hash value # => {"error" => ...}
+Most methods return a hash value unless otherwise specified. When a database transaction goes through successfully most methods will return a hash {"ok" => true ...} and when something goes wrong it returns a hash {"error" => ...}
 
 You can always check this value 
  hash = Couchdb.delete 'schools'
  puts hash.inspect
 
+===Bind Address
 Leanback uses the default Couchdb bind address http://127.0.0.1:5984. To use a different bind address;
  Couchdb.address = '192.168.2.16'
  Couchdb.port = '6000'

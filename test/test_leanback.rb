@@ -21,16 +21,22 @@ class TestLeanback < Test::Unit::TestCase
 
   should "view document doc" do
         
-        doc = {:database => 'monitors', :doc_id => 'd5a9e37c-da63-412c-9a00-7e2b5e8b8504'}
+        doc = {:database => 'monitors', :doc_id => '3-d71c8ee21d6753896f2d08f57a985e94'}
         hash = Couchdb.view doc
         #puts hash.inspect
   end
 
   should "Query a permanent view" do
-    view = { :database => "contacts", :design_doc => 'my_views', :view => 'get_female_contacts'}
+    view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_email'}
     puts 'viewing design doc...'
     hash = Couchdb.find view 
     puts hash.inspect
+  end
+
+  should "Create a design doc/permanent view" do
+    doc = { :database => 'contacts', :design_doc => 'more_views', :json_doc => '/home/obi/bin/leanback/test/my_views.json' }
+     hash = Couchdb.create_design doc
+     #puts hash.inspect
   end
 
   should "return a display a list of all databases" do

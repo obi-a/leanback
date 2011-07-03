@@ -55,18 +55,18 @@ Lets edit that document to change the email address, phone number, and add a gen
  Document.edit doc
  # => {"ok"=>true, "id"=>"Linda", "rev"=>"2-e813a0e902e3ac114400ff3959a2adde"}
 
-===Retrieve/view the document 
+Retrieve/view the document 
  doc = {:database => 'contacts', :doc_id => 'Linda'}
  Couchdb.view doc
   #=> {"_id"=>"Linda", "_rev"=>"2-e813a0e902e3ac114400ff3959a2adde", "firstname"=>"Linda", 
                   "lastname"=>"smith", "email"=>"linda@mail.com", "gender"=>"female", "phone"=>"718-245-5611"} 
 
-===Delete the document
+Delete the document
  doc = {:database => 'contacts', :doc_id => 'Linda', :rev => '2-e813a0e902e3ac114400ff3959a2adde'}
  Document.delete doc
  # => {"ok"=>true, "id"=>"Linda", "rev"=>"3-48580d1806983b32cb03f114efb064e3"} 
 
-===Retrieve all documents in a database
+Retrieve all documents in a database
  docs = Couchdb.docs_from 'contacts'  
  docs.each do |d| 
   puts d["_rev"]

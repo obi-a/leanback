@@ -108,7 +108,7 @@ First define the views in a JSON file
 
 Now create the design document and add the json file
  doc = { :database => 'contacts', :design_doc => 'more_views', :json_doc => '/path/to/my_views.json' }
- hash = Couchdb.create_design doc 
+ Couchdb.create_design doc 
  # => {"ok"=>true, "id"=>"_design/more_views", "rev"=>"1-d67ae97ff03a98f68ddc300bf9ae5048"}
 
 To query the view

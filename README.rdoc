@@ -112,7 +112,7 @@ The method
 will query the view we created above, with a
  GET http://127.0.0.1:5984/contacts/_design/email_finder/_view/find_by_email?key="nancy@mail.com"
 This returns all contacts with email = 'nancy@mail.com'.
-Leanback parses the results to return only the data values.
+Leanback parses the native JSON results to return only the data values.
 
 ====Usage
 You also can do 

@@ -71,7 +71,6 @@ module Couchdb
          hash = Yajl::Parser.parse(e.response.to_s)
        end
   end
-  
 
  #delete a database
  def self.delete(database_name)
@@ -109,13 +108,17 @@ def self.view(doc)
 end
 
 #query a permanent view
-def self.find(doc)
+def self.find(doc,key=nil)
  set_address
  db_name = doc[:database]
  design_doc_name = doc[:design_doc]
  view_name = doc[:view]
    begin
+    if key == nil
      response = RestClient.get 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name + '/_view/' + view_name
+    else
+     response = RestClient.get 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name + '/_view/' + view_name + URI.escape('?key="' + key + '"')
+    end
      hash = Yajl::Parser.parse(response.to_str)
      rows = hash["rows"]
      count = 0
@@ -125,7 +128,8 @@ def self.find(doc)
      end
      return rows
    rescue => e
-    hash = Yajl::Parser.parse(e.response.to_s)
+    puts e.inspect
+    #hash = Yajl::Parser.parse(e.response.to_s)
    end
 end
 
@@ -151,6 +155,46 @@ def self.create_design(doc)
   rescue => e
     hash = Yajl::Parser.parse(e.response.to_s)
   end
+end
+
+#add a finder method to the database
+#this creates a find by key method
+def self.add_finder(options)
+ set_address 
+ db_name = options[:database]
+ key = options[:key] 
+ design_doc_name = key + '_finder'
+ 
+ view ='{
+ "language" : "javascript",
+ "views" :{
+    "find_by_'+key+'" : {
+      "map" : "function(doc){
+         if(doc.'+key+')
+           emit(doc.'+key+',doc);
+        }"
+    }
+ }
+}'
+
+ begin  
+  response = RestClient.put 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name, view, {:content_type => :json, :accept => :json}
+ rescue => e
+    hash = Yajl::Parser.parse(e.response.to_s)
+ end
+end
+
+#find by key 
+def self.find_by(options)
+ set_address 
+ db_name = options[:database]
+ index =  options.keys[1].to_s
+ search_term = options.values[1]
+ design_doc_name = index + '_finder'
+ view_name = 'find_by_' + index
+  
+ view = { :database => db_name, :design_doc => design_doc_name, :view => view_name}
+ find view,search_term
 end
 
  #return a list of all docs in the database

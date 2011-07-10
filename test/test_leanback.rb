@@ -19,14 +19,21 @@ class TestLeanback < Test::Unit::TestCase
   end
 
   should "add a finder method to the database" do
-       options = {:database => 'contacts', :key => 'email'}
        hash = Couchdb.add_finder(:database => 'contacts', :key => 'email') 
        #puts hash.inspect
   end
 
  should "find items by key" do
-     hash = Couchdb.find_by( :database => 'contacts', :email => 'nancy@mail.com')  
-     puts hash.inspect
+     docs = Couchdb.find_by( :database => 'contacts', :email => 'nancy@mail.com')  
+     #puts hash.inspect
+     docs.each do |d| 
+ 	puts d["_rev"]
+ 	puts d["_id"]    
+ 	puts d["firstname"]
+ 	puts d["lastname"]
+ 	puts d["email"] 
+ 	puts d["phone"]
+    end
  end
 
   should "view document doc" do

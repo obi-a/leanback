@@ -77,6 +77,54 @@ Retrieve all documents in a database
   puts d["phone"]
  end  
 
+===To Find documents by key
+First add a finder/index to the database
+ Couchdb.add_finder(:database => 'contacts', :key => 'email') 
+ # => {"ok":true,"id":"_design/email_finder","rev":"7-da7f3c0bf183f4a36a82013bd0ea6537"}
+ 
+This will create a design document in the contacts database called _design/email_finder 
+With a view called find_by_email
+ {
+   "_id": "_design/email_finder",
+   "_rev": "7-da7f3c0bf183f4a36a82013bd0ea6537",
+   "language": "javascript",
+   "views": {
+       "find_by_email": {
+           "map": "function(doc){
+              if(doc.email)          
+                  emit(doc.email,doc); 
+                 }"
+       }
+   }
+ }
+
+Now to find documents by key (to find all contacts with email = 'nancy@mail.com')
+ Couchdb.find_by( :database => 'contacts', :email => 'nancy@mail.com')  
+ # => [{"_id"=>"Nancy", "_rev"=>"1-d15a83d2a23b495c19df2595b636ecc8", "firstname"=>"Nancy", "lastname"=>"Lee", "phone"=>"347-808-3734", "email"=>"nancy@mail.com", "gender"=>"female"}]
+
+This will query the view we created above, with a
+ GET http://127.0.0.1:5984/contacts/_design/email_finder/_view/find_by_email?key="nancy@mail.com"
+
+ You also can do 
+  docs = Couchdb.find_by( :database => 'contacts', :email => 'nancy@mail.com')  
+     docs.each do |d| 
+ 	puts d["_rev"]
+ 	puts d["_id"]    
+ 	puts d["firstname"]
+ 	puts d["lastname"]
+ 	puts d["email"] 
+ 	puts d["phone"]
+    end
+
+ # => rev1-d15a83d2a23b495c19df2595b636ecc8
+      Nancy
+      Nancy
+      Lee
+      nancy@mail.com
+      347-808-3734
+
+
+
 ===Query a permanent view
  view = { :database => "contacts", :design_doc => 'my_views', :view => 'get_female_contacts'}
  Couchdb.find view 
@@ -137,20 +185,17 @@ You can always check this value
 Leanback uses the default Couchdb bind address http://127.0.0.1:5984. To use a different bind address;
  Couchdb.address = '192.168.2.16'
  Couchdb.port = '6000'
- Couchdb.all
  ...
  Document.address = '192.168.2.16'
  Document.port = '6000'
- docs = Couchdb.docs_from 'contacts'  
+ 
 
 To change it back to default bind address at anytime, simply set the values to nil
  Couchdb.address = nil
  Couchdb.port = nil
- Couchdb.all
  ...
  Document.address = nil
  Document.port = nil
- docs = Couchdb.docs_from 'contacts'  
 
 
 == Copyright

@@ -128,8 +128,8 @@ def self.find(doc,key=nil)
      end
      return rows
    rescue => e
-    puts e.inspect
-    #hash = Yajl::Parser.parse(e.response.to_s)
+    #puts e.inspect
+    hash = Yajl::Parser.parse(e.response.to_s)
    end
 end
 

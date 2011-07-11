@@ -88,7 +88,7 @@ Now to find documents by email key (example: to find all contacts with email = '
  # => [{"_id"=>"Nancy", "_rev"=>"1-d15a83d2a23b495c19df2595b636ecc8", "firstname"=>"Nancy", "lastname"=>"Lee",
                    "phone"=>"347-808-3734", "email"=>"nancy@mail.com", "gender"=>"female"}]
 
-====How the Find by key works
+====How it works
 The method
  Couchdb.add_finder(:database => 'contacts', :key => 'email') 
 creates a new design document in the contacts database called _design/email_finder with a view called find_by_email

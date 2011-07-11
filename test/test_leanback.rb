@@ -25,15 +25,7 @@ class TestLeanback < Test::Unit::TestCase
 
  should "find items by key" do
      docs = Couchdb.find_by( :database => 'contacts', :email => 'nancy@mail.com')  
-     #puts hash.inspect
-     docs.each do |d| 
- 	puts d["_rev"]
- 	puts d["_id"]    
- 	puts d["firstname"]
- 	puts d["lastname"]
- 	puts d["email"] 
- 	puts d["phone"]
-    end
+     puts docs.inspect
  end
 
   should "view document doc" do

@@ -119,7 +119,7 @@ This returns all contacts with email = 'nancy@mail.com'. Leanback will parse the
 If you ran 
  Couchdb.find_by( :database => 'contacts', :lastname => 'Smith')  
  Couchdb.find_by( :database => 'contacts', :gender => 'female') 
-you will notice the following design_documents/indexes have been added to the database 
+you will notice the following design_documents have been added to the database 
  _design/lastname_finder
  _design/gender_finder
 

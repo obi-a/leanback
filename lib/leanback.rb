@@ -194,7 +194,17 @@ def self.find_by(options)
  view_name = 'find_by_' + index
   
  view = { :database => db_name, :design_doc => design_doc_name, :view => view_name}
- find view,search_term
+ docs = find view,search_term
+
+ #add a finder/index if one doesn't already exist in the database
+ #then find_by_key
+ if(docs.is_a?(Hash))#when finder doesn't exist docs returns {"error"=>"not_found", "reason"=>"missing"} 
+  if (docs.keys[0].to_s == "error") &&  (docs.values[0].to_s == "not_found") && (docs.keys[1].to_s == "reason") 
+      add_finder(:database => db_name, :key => index)
+      docs = find view,search_term
+  end
+ end #end of first if
+ return docs
 end
 
  #return a list of all docs in the database

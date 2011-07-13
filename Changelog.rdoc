@@ -1,0 +1,8 @@
+=Leanback 0.2.2
+July 13, 2011:-
+* No need to call add_finder() method directly anymore. find_by() now adds a finder index to the database if one doesn't already exist.
+Example:
+The method:
+ Couchdb.find_by( :database => 'contacts', :email => 'nancy@mail.com')  
+will add the finder to the database if one doesn't already exist. No need to call  
+ Couchdb.add_finder(:database => 'contacts', :key => 'email')

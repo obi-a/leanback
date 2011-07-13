@@ -24,8 +24,10 @@ class TestLeanback < Test::Unit::TestCase
   end
 
  should "find items by key" do
-     docs = Couchdb.find_by( :database => 'contacts', :email => 'nancy@mail.com')  
-     #puts docs.inspect
+     docs = Couchdb.find_by( :database => 'contacts', :email => 'nancy@mail.com')
+     #docs = Couchdb.find_by( :database => 'contacts', :lastname => 'Smith') 
+     #docs = Couchdb.find_by( :database => 'contacts', :gender => 'female') 
+     puts docs.inspect
  end
 
   should "view document doc" do
@@ -39,7 +41,7 @@ class TestLeanback < Test::Unit::TestCase
     view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_email'}
     puts 'viewing design doc...'
     hash = Couchdb.find view 
-    puts hash.inspect
+    #puts hash.inspect
   end
 
   should "Create a design doc/permanent view" do

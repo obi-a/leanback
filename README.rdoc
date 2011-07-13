@@ -86,11 +86,13 @@ To find documents by email key (example: to find all contacts with email = 'nanc
 
 To find all contacts with lastname = 'Smith'
  Couchdb.find_by( :database => 'contacts', :lastname => 'Smith')  
- # => [{"_id"=>"john", "_rev"=>"5-642689e0a50843d6fa508159a01b4fd4", "firstname"=>"John", "lastname"=>"Smith", "email"=>"john@mail.com", "gender"=>"male"}]
+ # => [{"_id"=>"john", "_rev"=>"5-642689e0a50843d6fa508159a01b4fd4", "firstname"=>"John", "lastname"=>"Smith",
+                   "email"=>"john@mail.com", "gender"=>"male"}]
 
 To find all female contacts 
  Couchdb.find_by( :database => 'contacts', :gender => 'female') 
- # => [{"_id"=>"Nancy", "_rev"=>"1-d15a83d2a23b495c19df2595b636ecc8", "firstname"=>"Nancy", "lastname"=>"Lee", "phone"=>"347-808-3734", "email"=>"nancy@mail.com", "gender"=>"female"}]
+ # => [{"_id"=>"Nancy", "_rev"=>"1-d15a83d2a23b495c19df2595b636ecc8", "firstname"=>"Nancy", "lastname"=>"Lee",
+                  "phone"=>"347-808-3734", "email"=>"nancy@mail.com", "gender"=>"female"}]
 
 
 ====How it works

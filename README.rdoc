@@ -98,10 +98,9 @@ To find all female contacts
 ====How it works
 The method
  Couchdb.find_by(:database => 'contacts', :email => 'nancy@mail.com')  
-will query the 'contacts' database for a design_document called _design/email_finder and a view called find_by_email with key = "nancy@mail.com".
-It sends a  
+will sends a
  GET http://127.0.0.1:5984/contacts/_design/email_finder/_view/find_by_email?key="nancy@mail.com"
-This returns all contacts with email = 'nancy@mail.com'. Leanback will parse the native JSON results to return only the data values. If the design_document and view doesn't exist Leanback will create it in the database. See the source below;
+This returns all contacts with email = 'nancy@mail.com'. Leanback will parse the native JSON results to return only the data values. If the design_document _design/email_finder and view find_by_email doesn't exist Leanback will create it in the database. See the source for the generated design_document;
  {
    "_id": "_design/email_finder",
    "_rev": "7-da7f3c0bf183f4a36a82013bd0ea6537",

@@ -216,6 +216,20 @@ Then it returns the email list
    return docs
 So the first time the get_emails() method is called by the application the view is created an added to the database.
 
+Source for the get_emails view:
+#my_views.json
+ {
+  "language" : "javascript",
+  "views" :{
+    "get_emails" : {
+      "map" : "function(doc){
+         if(doc.firstname && doc.email)
+           emit(doc.id,{Name: doc.firstname, Email: doc.email});
+        }"
+    }
+  }
+ }
+
 ===Error handling
 Attempting to create a database that already exists
  Couchdb.create 'contacts'

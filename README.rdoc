@@ -217,7 +217,7 @@ Then it returns the email list
 So the first time the get_emails() method is called by the application the view is created an added to the database.
 
 Source for the get_emails view:
-#my_views.json
+ #my_views.json
  {
   "language" : "javascript",
   "views" :{

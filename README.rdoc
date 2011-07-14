@@ -208,7 +208,7 @@ sends a request to the design_document (my_views) and view (get_emails). If this
 If the view doesn't exist it returns the following Hash
  {"error"=>"not_found", "reason"=>"missing"} 
 this line below, checks if the view returned an error
- if( docs.is_a?(Hash)) && (docs.keys[0].to_s == "error")
+ if( docs.is_a?(Hash)) && (docs.keys[0] == "error")
 If it returned an error, that means the view doesn't exist, so it creates the view and sends a request for the view again. See below:
    doc = { :database => 'contacts', :design_doc => 'my_views', :json_doc => '/path/to/my_views.json' }
    Couchdb.create_design doc

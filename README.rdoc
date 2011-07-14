@@ -215,7 +215,7 @@ If it returned an error, that means the view doesn't exist, so it creates the vi
    docs = Couchdb.find(:database => "contacts", :design_doc => 'my_views', :view => 'get_emails')
 Then it returns the email list
    return docs
-So the first time the get_emails() method is called by the application the view is created an added to the database.
+So the first time the get_emails() method is called by the application the view is created and added to the database.
 
 Source for the get_emails view:
  #my_views.json

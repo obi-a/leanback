@@ -182,7 +182,8 @@ To query the view
          {"Firstname"=>"john", "Lastname"=>"smith", "Email"=>"john@mail.com"}]
 
 
-===Create View on the fly if it doesn't already exist
+===Create View on the fly if it doesn't already exist 
+(this will be deprecated in v0.2.3 when better error handling is added.Leanback will be raising Runtime errors instead of checking a hash for errors )
 Let's say we want to query a view and create it on the fly if it doesn't already exist, and still return the values. In this example we will query the get_emails view (which returns emails of all contacts), if this view doesn't already exist it will be added to the database.
 
  def get_emails
@@ -233,6 +234,7 @@ Source for the get_emails view:
 
 
 ===Error handling
+(this will be deprecated in v0.2.3 when better error handling is added.Leanback will be raising Runtime errors instead of checking a hash for errors )
 Attempting to create a database that already exists
  Couchdb.create 'contacts'
  # => {"error"=>"file_exists", "reason"=>"The database could not be created, the file already exists."} 

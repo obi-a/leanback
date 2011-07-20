@@ -18,8 +18,8 @@ class TestLeanback < Test::Unit::TestCase
         hash = Couchdb.create 'contacts'
         #puts hash.inspect
        rescue => e
-          #puts e.inspect
-         # puts e.error
+          #puts "Error message: " + e.to_s
+          #puts "Error value: " + e.error
        end 
   end
 
@@ -28,8 +28,8 @@ class TestLeanback < Test::Unit::TestCase
        hash = Couchdb.delete 'buildings'
        #puts hash.inspect
       rescue CouchdbException => e
-       #puts e.inspect
-       #puts e.error
+       #puts "Error message: " + e.to_s
+       #puts "Error value: " + e.error
       end
    end
 
@@ -63,14 +63,14 @@ class TestLeanback < Test::Unit::TestCase
   end
 
   should "Query a permanent view that doesn't exist and handle exception" do
-    view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_user_email'}
     begin
      #puts 'viewing design doc...'
+     view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_user_email'}
      hash = Couchdb.find view 
      #puts hash.inspect
     rescue CouchdbException => e
-        #puts e.to_s
-        #puts e.error
+      puts "Error message: " + e.to_s
+      puts "Error value: " + e.error
     end  
   end
 
@@ -96,7 +96,7 @@ class TestLeanback < Test::Unit::TestCase
   should "return a display a list of all databases" do
       databases = Couchdb.all
        databases.each do |db_name| 
-           puts db_name
+          # puts db_name
         end
    end
 
@@ -135,8 +135,8 @@ class TestLeanback < Test::Unit::TestCase
          hash = Document.delete doc
          #puts hash.inspect
       rescue CouchdbException => e   
-         puts e.to_s
-         puts e.error
+         #puts e.to_s
+         #puts e.error
       end
    end
 
@@ -167,10 +167,24 @@ class TestLeanback < Test::Unit::TestCase
        end
    end
 
+   should "create view on the fly if it doesn't already exist" do
+     begin  
+      docs = Couchdb.find(:database => "contacts", :design_doc => 'x_my_views', :view => 'get_emails') 
+     rescue CouchdbException => e
+       #puts e.to_s
+       doc = { :database => 'contacts', :design_doc => 'x_my_views', :json_doc => '/home/obi/bin/my_views.json' }
+       #doc = { :database => 'contacts', :design_doc => 'my_views', :json_doc => '/path/to/my_views.json' }
+       Couchdb.create_design doc
+       docs = Couchdb.find(:database => "contacts", :design_doc => 'my_views', :view => 'get_emails')      
+     end
+        #puts docs.inspect
+   end
+
+
   should " switch to default bind address" do
      Couchdb.address = nil
      Couchdb.port = nil
-     Couchdb.all
+     #Couchdb.all
   end
   
 end

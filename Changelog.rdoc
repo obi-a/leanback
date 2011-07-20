@@ -1,3 +1,18 @@
+=Leanback 0.2.3
+July 19, 2011:-
+* Added better error handling all database operations now raise a CouchdbException when something goes wrong. It's now easy to track exceptions.
+   begin 	
+   Couchdb.create 'contacts'
+  rescue => e
+   puts "Error message: " + e.to_s
+   puts "Error value: " + e.error
+  end 
+
+ # => Error message: CouchDB: Error - file_exists. Reason - The database could not be created, the file already exists.
+      Error value: file_exists
+
+See README for details
+
 =Leanback 0.2.2
 July 13, 2011:-
 * No need to call add_finder() method directly anymore. find_by() now adds a finder index to the database if one doesn't already exist.

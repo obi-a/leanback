@@ -187,16 +187,15 @@ To query the view
 Let's say we want to query a view and create it on the fly if it doesn't already exist, and still return the values. In this example we will query the get_emails view (which returns emails of all contacts), if this view doesn't already exist it will be added to the database.
 
  def get_emails
-  docs = Couchdb.find(:database => "contacts", :design_doc => 'my_views', :view => 'get_emails') 
-  if( docs.is_a?(Hash)) && (docs.keys[0] == "error")
-    doc = { :database => 'contacts', :design_doc => 'my_views', :json_doc => '/path/to/my_views.json' }
-    Couchdb.create_design doc
-    docs = Couchdb.find(:database => "contacts", :design_doc => 'my_views', :view => 'get_emails')    
-  end
- 
+  begin  
+      docs = Couchdb.find(:database => "contacts", :design_doc => 'x_my_views', :view => 'get_emails') 
+     rescue CouchdbException => e
+       doc = { :database => 'contacts', :design_doc => 'my_views', :json_doc => '/path/to/my_views.json' }
+       Couchdb.create_design doc
+       docs = Couchdb.find(:database => "contacts", :design_doc => 'my_views', :view => 'get_emails')      
+     end
   return docs
  end
-
 
  email_list = get_emails()
  puts email_list.inspect
@@ -206,17 +205,18 @@ In get_emails(),
  docs = Couchdb.find(:database => "contacts", :design_doc => 'my_views', :view => 'get_emails') 
 sends a request to the design_document (my_views) and view (get_emails). If this view is found in the database, it returns an Array with the name and email of all contacts:
   [{"Name"=>"Nancy", "Email"=>"nancy@mail.com"}, {"Name"=>"John", "Email"=>"john@mail.com"}]
-If the view doesn't exist it returns the following Hash
- {"error"=>"not_found", "reason"=>"missing"} 
-this line below, checks if the view returned an error
- if( docs.is_a?(Hash)) && (docs.keys[0] == "error")
-If it returned an error, that means the view doesn't exist, so it creates the view and sends a request for the view again. See below:
+if the view doesn't exist it raises a CouchdbException. We catch this exception 
+  rescue CouchdbException => e
+and then it creates design_doc and view 
+  doc = { :database => 'contacts', :design_doc => 'my_views', :json_doc => '/path/to/my_views.json' }
+  Couchdb.create_design doc
+next it sends a request for the view again. 
    doc = { :database => 'contacts', :design_doc => 'my_views', :json_doc => '/path/to/my_views.json' }
    Couchdb.create_design doc
    docs = Couchdb.find(:database => "contacts", :design_doc => 'my_views', :view => 'get_emails')
 Then it returns the email list
    return docs
-So the first time the get_emails() method is called by the application the view is created and added to the database.
+So the first time the get_emails() method is called by an application the view is created on the fly and added to the database.
 
 Source for the get_emails view:
  #my_views.json
@@ -234,21 +234,55 @@ Source for the get_emails view:
 
 
 ===Error handling
-(this will be deprecated in v0.2.3 when better error handling is added.Leanback will be raising Runtime errors instead of checking a hash for errors )
 Attempting to create a database that already exists
- Couchdb.create 'contacts'
- # => {"error"=>"file_exists", "reason"=>"The database could not be created, the file already exists."} 
+  begin 	
+   Couchdb.create 'contacts'
+  rescue => e
+   puts "Error message: " + e.to_s
+   puts "Error value: " + e.error
+  end 
 
-Attempting to delete a database that no longer exists
- Couchdb.delete 'more_books'
- # => {"error"=>"not_found", "reason"=>"missing"} 
+ # => Error message: CouchDB: Error - file_exists. Reason - The database could not be created, the file already exists.
+      Error value: file_exists
 
-Most methods return a hash value unless otherwise specified. When a database transaction goes through successfully most methods will return a hash {"ok" => true,} and when something goes wrong it returns a hash {"error" => " ",...}
 
-You can always check this value 
- hash = Couchdb.delete 'schools'
- puts hash.inspect
+Attempting to delete a database that doesn't exist
+  begin
+    Couchdb.delete 'buildings'
+  rescue CouchdbException => e
+   puts "Error message: " + e.to_s
+   puts "Error value: " + e.error
+  end
 
+ # => Error message: CouchDB: Error - not_found. Reason - missing
+      Error value: not_found
+
+Attempting to query a permanent view that doesn't exist
+  begin
+   view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_user_email'}
+   Couchdb.find view 
+  rescue CouchdbException => e
+   puts "Error message: " + e.to_s
+   puts "Error value: " + e.error
+  end 
+
+ # => Error message: CouchDB: Error - not_found. Reason - missing_named_view
+      Error value: not_found
+
+When something goes wrong with a call to the database, Leanback will raise a CouchdbException. You can always check the information passed by the Exception. See example below:
+  begin
+   view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_user_email'}
+   Couchdb.find view 
+  rescue CouchdbException => e
+    if e.error == "not_found"
+       doc = { :database => 'contacts', :design_doc => 'more_views', :json_doc => '/path/to/user_email.json' }
+       Couchdb.create_design doc
+       docs = Couchdb.find(:database => "contacts", :design_doc => 'more_views', :view => 'get_user_email')      
+    end
+  end 
+
+In the code above the rescue block will create and request the permanent view if it's not found by the initial request outside the block. e.error is the value of the error returned by CouchDB.
+  
 
 ===Bind Address
 Leanback uses the default Couchdb bind address http://127.0.0.1:5984. To use a different bind address;

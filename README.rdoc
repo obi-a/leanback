@@ -183,17 +183,16 @@ To query the view
 
 
 ===Create View on the fly if it doesn't already exist 
-(this will be deprecated in v0.2.3 when better error handling is added.Leanback will be raising Runtime errors instead of checking a hash for errors )
 Let's say we want to query a view and create it on the fly if it doesn't already exist, and still return the values. In this example we will query the get_emails view (which returns emails of all contacts), if this view doesn't already exist it will be added to the database.
 
  def get_emails
   begin  
-      docs = Couchdb.find(:database => "contacts", :design_doc => 'x_my_views', :view => 'get_emails') 
-     rescue CouchdbException => e
-       doc = { :database => 'contacts', :design_doc => 'my_views', :json_doc => '/path/to/my_views.json' }
-       Couchdb.create_design doc
-       docs = Couchdb.find(:database => "contacts", :design_doc => 'my_views', :view => 'get_emails')      
-     end
+   docs = Couchdb.find(:database => "contacts", :design_doc => 'x_my_views', :view => 'get_emails') 
+  rescue CouchdbException => e
+    doc = { :database => 'contacts', :design_doc => 'my_views', :json_doc => '/path/to/my_views.json' }
+    Couchdb.create_design doc
+    docs = Couchdb.find(:database => "contacts", :design_doc => 'my_views', :view => 'get_emails')      
+  end
   return docs
  end
 
@@ -248,7 +247,7 @@ Attempting to create a database that already exists
 
 Attempting to delete a database that doesn't exist
   begin
-    Couchdb.delete 'buildings'
+   Couchdb.delete 'buildings'
   rescue CouchdbException => e
    puts "Error message: " + e.to_s
    puts "Error value: " + e.error
@@ -275,9 +274,9 @@ When something goes wrong with a call to the database, Leanback will raise a Cou
    Couchdb.find view 
   rescue CouchdbException => e
     if e.error == "not_found"
-       doc = { :database => 'contacts', :design_doc => 'more_views', :json_doc => '/path/to/user_email.json' }
-       Couchdb.create_design doc
-       docs = Couchdb.find(:database => "contacts", :design_doc => 'more_views', :view => 'get_user_email')      
+     doc = { :database => 'contacts', :design_doc => 'more_views', :json_doc => '/path/to/user_email.json' }
+     Couchdb.create_design doc
+     docs = Couchdb.find(:database => "contacts", :design_doc => 'more_views', :view => 'get_user_email')      
     end
   end 
 

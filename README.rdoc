@@ -206,12 +206,10 @@ sends a request to the design_document (my_views) and view (get_emails). If this
   [{"Name"=>"Nancy", "Email"=>"nancy@mail.com"}, {"Name"=>"John", "Email"=>"john@mail.com"}]
 if the view doesn't exist it raises a CouchdbException. It catches this exception 
   rescue CouchdbException => e
-and then it creates design_doc and view 
+and then it creates the design_document (my_views) and view (get_emails), since they don't already exist
   doc = { :database => 'contacts', :design_doc => 'my_views', :json_doc => '/path/to/my_views.json' }
   Couchdb.create_design doc
 next it sends a request for the view again. 
-   doc = { :database => 'contacts', :design_doc => 'my_views', :json_doc => '/path/to/my_views.json' }
-   Couchdb.create_design doc
    docs = Couchdb.find(:database => "contacts", :design_doc => 'my_views', :view => 'get_emails')
 Then it returns the email list
    return docs

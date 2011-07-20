@@ -209,18 +209,16 @@ def self.find_by(options)
  search_term = options.values[1]
  design_doc_name = index + '_finder'
  view_name = 'find_by_' + index
-  
- view = { :database => db_name, :design_doc => design_doc_name, :view => view_name}
- docs = find view,search_term
-
- #add a finder/index if one doesn't already exist in the database
- #then find_by_key
- if(docs.is_a?(Hash))#when finder doesn't exist docs returns {"error"=>"not_found", "reason"=>"missing"} 
-  if (docs.keys[0].to_s == "error") &&  (docs.values[0].to_s == "not_found") && (docs.keys[1].to_s == "reason") 
-      add_finder(:database => db_name, :key => index)
-      docs = find view,search_term
-  end
- end #end of first if
+ 
+ begin 
+  view = { :database => db_name, :design_doc => design_doc_name, :view => view_name}
+  docs = find view,search_term
+ rescue CouchdbException => e
+    #add a finder/index if one doesn't already exist in the database
+    #then find_by_key
+    add_finder(:database => db_name, :key => index)
+    docs = find view,search_term
+ end
  return docs
 end
 

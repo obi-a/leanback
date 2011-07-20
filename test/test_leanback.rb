@@ -44,9 +44,9 @@ class TestLeanback < Test::Unit::TestCase
   end
 
  should "find items by key" do
-     docs = Couchdb.find_by( :database => 'contacts', :email => 'nancy@mail.com')
-     #docs = Couchdb.find_by( :database => 'contacts', :lastname => 'Smith') 
-     #docs = Couchdb.find_by( :database => 'contacts', :gender => 'female') 
+     #docs = Couchdb.find_by( :database => 'contacts', :email => 'nancy@mail.com')
+     docs = Couchdb.find_by( :database => 'contacts', :lastname => 'smith') 
+     #docs = Couchdb.find_by( :database => 'contacts', :country => 'female') 
      #puts docs.inspect
  end
 
@@ -69,8 +69,8 @@ class TestLeanback < Test::Unit::TestCase
      hash = Couchdb.find view 
      #puts hash.inspect
     rescue CouchdbException => e
-      puts "Error message: " + e.to_s
-      puts "Error value: " + e.error
+     # puts "Error message: " + e.to_s
+     # puts "Error value: " + e.error
     end  
   end
 
@@ -152,9 +152,9 @@ class TestLeanback < Test::Unit::TestCase
 
 
    should "display all documents in the database" do 
-      docs = Couchdb.docs_from 'monitors'
-       #puts 'docs = Couchdb.docs_from monitors'
-      docs.each do |d| 
+      #docs = Couchdb.docs_from 'monitors'
+      #puts 'docs = Couchdb.docs_from monitors'
+      #docs.each do |d| 
          # puts "_rev: " + d["_rev"]
           #puts "_id: " + d["_id"]    
           #puts "every: " + d["every"]
@@ -164,21 +164,9 @@ class TestLeanback < Test::Unit::TestCase
           #puts "contact: " + d["contact"]
           #puts  "via: " + d["via"]
           #puts "notify_interval: " + d["notify_interval"]
-       end
+       #end
    end
 
-   should "create view on the fly if it doesn't already exist" do
-     begin  
-      docs = Couchdb.find(:database => "contacts", :design_doc => 'x_my_views', :view => 'get_emails') 
-     rescue CouchdbException => e
-       #puts e.to_s
-       doc = { :database => 'contacts', :design_doc => 'x_my_views', :json_doc => '/home/obi/bin/my_views.json' }
-       #doc = { :database => 'contacts', :design_doc => 'my_views', :json_doc => '/path/to/my_views.json' }
-       Couchdb.create_design doc
-       docs = Couchdb.find(:database => "contacts", :design_doc => 'my_views', :view => 'get_emails')      
-     end
-        #puts docs.inspect
-   end
 
 
   should " switch to default bind address" do

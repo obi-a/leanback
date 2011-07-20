@@ -183,11 +183,11 @@ To query the view
 
 
 ===Create View on the fly if it doesn't already exist 
-Let's say we want to query a view and create it on the fly if it doesn't already exist, and still return the values. In this example we will query the get_emails view (which returns emails of all contacts), if this view doesn't already exist it will be added to the database.
+Let's say we want to query a view and create it on the fly if it doesn't already exist, and still return the values. In this example we will query a view called get_emails view (which returns emails of all contacts), if this view doesn't already exist it will be added to the database.
 
  def get_emails
   begin  
-   docs = Couchdb.find(:database => "contacts", :design_doc => 'x_my_views', :view => 'get_emails') 
+   docs = Couchdb.find(:database => "contacts", :design_doc => 'my_views', :view => 'get_emails') 
   rescue CouchdbException => e
     doc = { :database => 'contacts', :design_doc => 'my_views', :json_doc => '/path/to/my_views.json' }
     Couchdb.create_design doc
@@ -204,7 +204,7 @@ In get_emails(),
  docs = Couchdb.find(:database => "contacts", :design_doc => 'my_views', :view => 'get_emails') 
 sends a request to the design_document (my_views) and view (get_emails). If this view is found in the database, it returns an Array with the name and email of all contacts:
   [{"Name"=>"Nancy", "Email"=>"nancy@mail.com"}, {"Name"=>"John", "Email"=>"john@mail.com"}]
-if the view doesn't exist it raises a CouchdbException. We catch this exception 
+if the view doesn't exist it raises a CouchdbException. It catches this exception 
   rescue CouchdbException => e
 and then it creates design_doc and view 
   doc = { :database => 'contacts', :design_doc => 'my_views', :json_doc => '/path/to/my_views.json' }
@@ -215,7 +215,7 @@ next it sends a request for the view again.
    docs = Couchdb.find(:database => "contacts", :design_doc => 'my_views', :view => 'get_emails')
 Then it returns the email list
    return docs
-So the first time the get_emails() method is called by an application the view is created on the fly and added to the database.
+So the first time the get_emails() method is called, the view will be created on the fly and added to the database.
 
 Source for the get_emails view:
  #my_views.json
@@ -233,10 +233,12 @@ Source for the get_emails view:
 
 
 ===Error handling
+Every database operation raises a CouchdbException when things go wrong.
+
 Attempting to create a database that already exists
   begin 	
    Couchdb.create 'contacts'
-  rescue => e
+  rescue CouchdbException => e
    puts "Error message: " + e.to_s
    puts "Error value: " + e.error
   end 
@@ -268,7 +270,7 @@ Attempting to query a permanent view that doesn't exist
  # => Error message: CouchDB: Error - not_found. Reason - missing_named_view
       Error value: not_found
 
-When something goes wrong with a call to the database, Leanback will raise a CouchdbException. You can always check the information passed by the Exception. See example below:
+You can always check the information passed to the Exception. See example below:
   begin
    view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_user_email'}
    Couchdb.find view 
@@ -280,7 +282,7 @@ When something goes wrong with a call to the database, Leanback will raise a Cou
     end
   end 
 
-In the code above the rescue block will create and request the permanent view if it's not found by the initial request outside the block. e.error is the value of the error returned by CouchDB.
+In the code above, the rescue block will create and request the permanent view if it's not found by the initial request outside the block. e.error is the value of the error returned by CouchDB.
   
 
 ===Bind Address

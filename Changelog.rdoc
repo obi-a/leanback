@@ -1,3 +1,7 @@
+=Leanback 0.2.4
+July 20, 2011:-
+* find_by(database,key) has a bug in version 0.2.3, please use version 0.2.4 instead
+
 =Leanback 0.2.3
 July 19, 2011:-
 * Added better error handling all database operations now raise a CouchdbException when something goes wrong. It's now easy to track exceptions.

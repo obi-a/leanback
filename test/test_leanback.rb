@@ -13,47 +13,90 @@ class TestLeanback < Test::Unit::TestCase
 	#puts hash.inspect
   end
 
- should "create a database if it doesn't already exist" do
-	hash = Couchdb.create 'contacts'
-	#puts hash.inspect
+ should "create a database if it doesn't already exist, and handle exception if it exists" do
+       begin 	
+        hash = Couchdb.create 'contacts'
+        #puts hash.inspect
+       rescue => e
+          #puts e.inspect
+         # puts e.error
+       end 
   end
 
-  should "add a finder method to the database" do
+  should "delete a database that doesn't exist and handle the exception" do 
+      begin
+       hash = Couchdb.delete 'buildings'
+       #puts hash.inspect
+      rescue CouchdbException => e
+       #puts e.inspect
+       #puts e.error
+      end
+   end
+
+  should "add a finder method to the database or handle exception if a finder already exists" do
+      begin
        hash = Couchdb.add_finder(:database => 'contacts', :key => 'email') 
        #puts hash.inspect
+       rescue CouchdbException => e
+        #puts e.to_s
+        #puts e.error
+      end
   end
 
  should "find items by key" do
      docs = Couchdb.find_by( :database => 'contacts', :email => 'nancy@mail.com')
      #docs = Couchdb.find_by( :database => 'contacts', :lastname => 'Smith') 
      #docs = Couchdb.find_by( :database => 'contacts', :gender => 'female') 
-     puts docs.inspect
+     #puts docs.inspect
  end
 
-  should "view document doc" do
-        
+  should "view document doc or handle exception" do
+     
         doc = {:database => 'monitors', :doc_id => '3-d71c8ee21d6753896f2d08f57a985e94'}
+       begin 
         hash = Couchdb.view doc
         #puts hash.inspect
+       rescue CouchdbException => e
+        #puts e.inspect
+        #puts e.error
+       end
   end
+
+  should "Query a permanent view that doesn't exist and handle exception" do
+    view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_user_email'}
+    begin
+     #puts 'viewing design doc...'
+     hash = Couchdb.find view 
+     #puts hash.inspect
+    rescue CouchdbException => e
+        #puts e.to_s
+        #puts e.error
+    end  
+  end
+
 
   should "Query a permanent view" do
     view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_email'}
-    puts 'viewing design doc...'
+    #puts 'viewing design doc...'
     hash = Couchdb.find view 
     #puts hash.inspect
   end
 
-  should "Create a design doc/permanent view" do
+  should "Create a design doc/permanent view or handle exception" do
     doc = { :database => 'contacts', :design_doc => 'more_views', :json_doc => '/home/obi/bin/leanback/test/my_views.json' }
+    begin 
      hash = Couchdb.create_design doc
      #puts hash.inspect
+     rescue CouchdbException => e
+        #puts e.to_s
+        #puts e.error
+    end  
   end
 
   should "return a display a list of all databases" do
       databases = Couchdb.all
        databases.each do |db_name| 
-           #puts db_name
+           puts db_name
         end
    end
 
@@ -62,29 +105,55 @@ class TestLeanback < Test::Unit::TestCase
        #puts hash.inspect
    end
 
-  should "create a document" do 
+  should "create a document and handle exception if one occurs" do 
+       begin
         data = {:firstname => 'Nancy', :lastname =>'Lee', :phone => '347-808-3734',:email =>'nancy@mail.com',:gender => 'female'}
          doc = {:database => 'contacts', :doc_id => 'Nancy', :data => data}
          hash = Document.create doc
          #puts hash.inspect    
+       rescue CouchdbException => e
+        #puts e.to_s
+        #puts e.error
+      end  
   end
 
- should "edit a document" do 
+ should "edit a document - handle exceptions" do 
+        begin
          data = {:firstname => 'john', :lastname =>'smith', :email => 'john@mail.com',:gender=>'male', :_rev=>'2-e813a0e902e3ac114400ff3959a2adde'}
          doc = {:database => 'contacts', :doc_id => 'john', :data => data}
          hash = Document.edit doc
-         #puts hash.inspect    
+         #puts hash.inspect 
+        rescue CouchdbException => e   
+          #puts e.to_s
+          #puts e.error
+        end
   end
 
-   should "delete a document" do 
+   should "delete a document - handle exceptions" do 
+       begin
          doc = {:database => 'contacts', :doc_id => 'john', :rev => '3-be02e80490f8e9e610d9a9e33d752316'}
          hash = Document.delete doc
          #puts hash.inspect
+      rescue CouchdbException => e   
+         puts e.to_s
+         puts e.error
+      end
    end
+
+   should "display all documents in the database that doesn't exist and handle exception" do 
+    begin
+      docs = Couchdb.docs_from 'buildings'
+    rescue CouchdbException => e
+        #puts e.to_s
+        #puts e.error
+    end  
+   end
+  
+
 
    should "display all documents in the database" do 
       docs = Couchdb.docs_from 'monitors'
-       puts 'docs = Couchdb.docs_from monitors'
+       #puts 'docs = Couchdb.docs_from monitors'
       docs.each do |d| 
          # puts "_rev: " + d["_rev"]
           #puts "_id: " + d["_id"]    

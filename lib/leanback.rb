@@ -2,6 +2,14 @@ require 'rest_client'
 require 'yajl'
 require 'erb'
 
+class CouchdbException < RuntimeError
+   attr :error
+   def initialize(error)
+    @error = error.values[0]
+  end
+end
+
+
 module Document
   
   #create a document 
@@ -16,6 +24,7 @@ module Document
          hash = Yajl::Parser.parse(response.to_str)
        rescue => e
          hash = Yajl::Parser.parse(e.response.to_s)
+         raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
        end
   end
 
@@ -31,6 +40,7 @@ module Document
          hash = Yajl::Parser.parse(response.to_str)
        rescue => e
          hash = Yajl::Parser.parse(e.response.to_s)
+         raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
       end
   end
 
@@ -45,6 +55,7 @@ module Document
       hash = Yajl::Parser.parse(response.to_str)
     rescue => e
      hash = Yajl::Parser.parse(e.response.to_s)
+     raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
     end
  end
 
@@ -69,6 +80,7 @@ module Couchdb
          hash = Yajl::Parser.parse(response.to_str)
        rescue => e
          hash = Yajl::Parser.parse(e.response.to_s)
+         raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
        end
   end
 
@@ -80,6 +92,7 @@ module Couchdb
          hash = Yajl::Parser.parse(response.to_str)
        rescue => e
          hash = Yajl::Parser.parse(e.response.to_s)
+         raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
        end 
  end
 
@@ -104,6 +117,7 @@ def self.view(doc)
    hash = Yajl::Parser.parse(response.to_str)
   rescue => e
    hash = Yajl::Parser.parse(e.response.to_s)
+   raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
  end 
 end
 
@@ -130,6 +144,7 @@ def self.find(doc,key=nil)
    rescue => e
     #puts e.inspect
     hash = Yajl::Parser.parse(e.response.to_s)
+    raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
    end
 end
 
@@ -154,6 +169,7 @@ def self.create_design(doc)
     hash = Yajl::Parser.parse(response.to_str)
   rescue => e
     hash = Yajl::Parser.parse(e.response.to_s)
+    raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
   end
 end
 
@@ -181,6 +197,7 @@ def self.add_finder(options)
   response = RestClient.put 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name, view, {:content_type => :json, :accept => :json}
  rescue => e
     hash = Yajl::Parser.parse(e.response.to_s)
+    raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
  end
 end
 
@@ -222,6 +239,7 @@ def self.docs_from(database_name)
         return rows
   rescue => e
      hash = Yajl::Parser.parse(e.response.to_s)
+     raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
   end  
 end
 

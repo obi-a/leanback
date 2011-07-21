@@ -183,7 +183,7 @@ To query the view
 
 
 ===Create View on the fly if it doesn't already exist 
-Let's say we want to query a view and create it on the fly if it doesn't already exist, and still return the values. In this example we will query a view called get_emails view (which returns emails of all contacts), if this view doesn't already exist it will be added to the database.
+Best practice would be to create all your static views when you create the database, but if you want to query a view and create it on the fly if it doesn't already exist, and still return the values. In this example we will query a view called get_emails view (which returns emails of all contacts), if this view doesn't already exist it will be added to the database.
 
  def get_emails
   begin  
@@ -236,6 +236,7 @@ Every database operation raises a CouchdbException when things go wrong.
 Attempting to create a database that already exists
   begin 	
    Couchdb.create 'contacts'
+   #create static views
   rescue CouchdbException => e
    puts "Error message: " + e.to_s
    puts "Error value: " + e.error

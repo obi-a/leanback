@@ -155,6 +155,20 @@ For the above example
  GET http://127.0.0.1:5984/contacts/_design/my_views/_view/get_female_contacts
 Leanback parses the native JSON results to return only the data values.
 
+===Query View by a key 
+ view = { :database => "contacts", :design_doc => 'the_view', :view => 'age'}
+ age = "36"
+ Couchdb.find(view,key = age)
+
+ # => [{"_id"=>"Nancy", "_rev"=>"2-4404d0a5a1a3dff103fd46faf1e46c30", "firstname"=>"Nancy", "lastname"=>"Lee", "phone"=>"347-808-3734", "email"=>"nancy@mail.com", "gender"=>"female", "age"=>"36"}]
+
+This is similar to sending a
+ GET http://127.0.0.1:5984/[database]/_design/[design_doc]/_view/[view_name]?key="searchterm"
+For the above example
+ GET http://127.0.0.1:5984/contacts/_design/the_view/_view/age?key="36"
+Leanback parses the native JSON results to return only the data values.
+ 
+
 ===Create a design document with permanent views:
 First define the views in a JSON file 
  //my_views.json

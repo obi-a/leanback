@@ -155,7 +155,7 @@ For the above example
  GET http://127.0.0.1:5984/contacts/_design/my_views/_view/get_female_contacts
 Leanback parses the native JSON results to return only the data values.
 
-===Query View by a key 
+===Query a view by key 
  view = { :database => "contacts", :design_doc => 'the_view', :view => 'age'}
  age = "36"
  Couchdb.find(view,key = age)

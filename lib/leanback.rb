@@ -44,6 +44,18 @@ module Document
       end
   end
 
+ #update a doc
+ def self.update (doc)
+      db_name = doc[:database]
+      doc_id = doc[:doc_id]
+      data = doc[:data]
+      doc = {:database => db_name, :doc_id => doc_id}
+      options = Couchdb.view doc 
+      options = options.merge(data)
+      doc = {:database => db_name, :doc_id => doc_id, :data => options}
+      edit doc
+ end
+
  #delete a doc
  def self.delete(doc)
    db_name = doc[:database]

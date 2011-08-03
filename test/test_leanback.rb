@@ -117,6 +117,13 @@ class TestLeanback < Test::Unit::TestCase
       end  
   end
 
+ should  "update the document" do
+   #data = {"age" => "42", "lastname" => "arnold", "phone" => "202-456-1234", "hobbies" => "football,running, video gamess" }
+   data = {"age" => "13" }
+   doc = { :database => 'contacts', :doc_id => 'john', :data => data}   
+   Document.update doc 
+ end
+
  should "edit a document - handle exceptions" do 
         begin
          data = {:firstname => 'john', :lastname =>'smith', :email => 'john@mail.com',:gender=>'male', :_rev=>'2-e813a0e902e3ac114400ff3959a2adde'}

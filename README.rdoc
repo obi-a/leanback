@@ -34,7 +34,7 @@ Return a list of all Databases
  Couchdb.all
 
  # => ["maps", "inventory", "monitors", "contacts", "books"]
-
+===Create Document
 Create a new document
  data = {:firstname => 'Linda', 
          :lastname =>'smith', 
@@ -47,7 +47,39 @@ Create a new document
  # => {"ok"=>true, "id"=>"Linda", "rev"=>"1-6f16274513f51e922ff1f745452a92b6"} 
 This will create a new document in the 'contacts' database, with document id 'Linda'.
 
-Lets edit that document to change the email address, phone number, and add a gender
+===Update Document
+Let's update that document to change the email address
+ data = {"email" => "linda@mail.com" }
+ doc = { :database => 'contacts', :doc_id => 'Linda', :data => data}   
+ Document.update doc 
+
+Let's add gender and age 
+ data = {"age" => "32","gender" => "female" }
+ doc = { :database => 'contacts', :doc_id => 'Linda', :data => data}   
+ Document.update doc 
+
+
+To change phone# and add a fax number
+ data = {"phone" => "718-234-2904","fax" => "646-309-4049" }
+ doc = { :database => 'contacts', :doc_id => 'Linda', :data => data}   
+ Document.update doc
+ 
+Let's add twitter account, facebook account and website url
+  data = {"twitter" => "http://twitter.com/#!/linda",
+            "faceboook" => "http://facebook.com/linda",
+               "website" => "http://linda-blogs.com" }
+   doc = { :database => 'contacts', :doc_id => 'Linda', :data => data}   
+   Document.update doc 
+
+Retrieve/view the document 
+ doc = {:database => 'contacts', :doc_id => 'Linda'}
+ Couchdb.view doc
+
+ #=> {"_id"=>"Linda", "_rev"=>"5-f99fd63f2c784b5e2f7b7d92b2df9a1e", "firstname"=>"Linda", "lastname"=>"smith", "phone"=>"718-234-2904", "email"=>"linda@mail.com", "age"=>"32", "gender"=>"female", "fax"=>"646-309-4049", "twitter"=>"http://twitter.com/#!/linda", "faceboook"=>"http://facebook.com/linda", "website"=>"http://linda-blogs.com"}
+
+===Edit Document
+
+To edit that document to change the email address, phone number, and add a gender
  data = {:firstname => 'Linda', 
          :lastname =>'smith', 
          :email => 'linda@mail.com',
@@ -60,20 +92,21 @@ Lets edit that document to change the email address, phone number, and add a gen
 
  # => {"ok"=>true, "id"=>"Linda", "rev"=>"2-e813a0e902e3ac114400ff3959a2adde"}
 
-Retrieve/view the document 
+
+===Retrieve/view the document 
  doc = {:database => 'contacts', :doc_id => 'Linda'}
  Couchdb.view doc
 
   #=> {"_id"=>"Linda", "_rev"=>"2-e813a0e902e3ac114400ff3959a2adde", "firstname"=>"Linda", 
                   "lastname"=>"smith", "email"=>"linda@mail.com", "gender"=>"female", "phone"=>"718-245-5611"} 
 
-Delete the document
+===Delete the document
  doc = {:database => 'contacts', :doc_id => 'Linda', :rev => '2-e813a0e902e3ac114400ff3959a2adde'}
  Document.delete doc
 
  # => {"ok"=>true, "id"=>"Linda", "rev"=>"3-48580d1806983b32cb03f114efb064e3"} 
 
-Retrieve all documents in a database
+===Retrieve all documents in a database
  docs = Couchdb.docs_from 'contacts'  
  docs.each do |d| 
   puts d["_rev"]

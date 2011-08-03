@@ -64,7 +64,10 @@ To change phone# and add a fax number
  Document.update doc
  
 Let's add twitter account, facebook account and website url
-  data = {"twitter" => "http://twitter.com/#!/linda", "faceboook" => "http://facebook.com/linda", "website" => "http://linda-blogs.com" }
+  data = {"twitter" => "http://twitter.com/#!/linda", 
+           "faceboook" => "http://facebook.com/linda", 
+           "website" => "http://linda-blogs.com" }
+
    doc = { :database => 'contacts', :doc_id => 'Linda', :data => data}   
    Document.update doc 
 

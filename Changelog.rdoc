@@ -1,6 +1,14 @@
+=Leanback 0.2.6
+August 3, 2011:-
+* Added ability to delete documents without having to retrieve the _rev revision number
+Example:
+ doc = {:database => 'contacts', :doc_id => 'James'}
+ Document.delete doc
+The above will delete the document with id 'james'. See README for details. 
+
 =Leanback 0.2.5
 August 2, 2011:-
-* Added dynamic updates for documents. This makes it easy to update documents without deleting old fields or having to track the _rev value. 
+* Added dynamic updates for documents. This makes it easy to update documents without deleting old fields or having to track the _rev number. 
 To update a document now:
  data = {"age" => "53" }
    doc = { :database => 'contacts', :doc_id => 'john', :data => data}   

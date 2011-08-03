@@ -80,7 +80,7 @@ Retrieve/view the document
       "fax"=>"646-309-4049", "twitter"=>"http://twitter.com/#!/linda", 
              "faceboook"=>"http://facebook.com/linda", "website"=>"http://linda-blogs.com"}
 
-To edit a document replacing it with a new document
+To edit the document and replace it with a new one
  data = {:firstname => 'Linda', 
          :lastname =>'smith', 
          :email => 'linda@mail.com',

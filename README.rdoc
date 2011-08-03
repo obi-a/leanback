@@ -80,25 +80,25 @@ Retrieve/view the document
       "fax"=>"646-309-4049", "twitter"=>"http://twitter.com/#!/linda", 
              "faceboook"=>"http://facebook.com/linda", "website"=>"http://linda-blogs.com"}
 
-To edit that document to change the email address, phone number, and add a gender
+To edit a document replacing it with a new document
  data = {:firstname => 'Linda', 
          :lastname =>'smith', 
          :email => 'linda@mail.com',
          :gender=>'female',
          :phone =>'718-245-5611',
-         :_rev=>'1-6f16274513f51e922ff1f745452a92b6'}
+         :_rev=>'5-f99fd63f2c784b5e2f7b7d92b2df9a1e'}
 
  doc = {:database => 'contacts', :doc_id => 'Linda', :data => data}
  Document.edit doc
 
- # => {"ok"=>true, "id"=>"Linda", "rev"=>"2-e813a0e902e3ac114400ff3959a2adde"}
-
+ # => {"ok"=>true, "id"=>"Linda", "rev"=>"6-211ebb68bdd4ba8799387214b4a3b445"}
+This replaces the existing document with a new one, the _rev property must be included in the data.
 
 Retrieve/view the document 
  doc = {:database => 'contacts', :doc_id => 'Linda'}
  Couchdb.view doc
 
-  #=> {"_id"=>"Linda", "_rev"=>"2-e813a0e902e3ac114400ff3959a2adde", "firstname"=>"Linda", 
+  #=> {"_id"=>"Linda", "_rev"=>"6-211ebb68bdd4ba8799387214b4a3b445", "firstname"=>"Linda", 
                   "lastname"=>"smith", "email"=>"linda@mail.com", "gender"=>"female", "phone"=>"718-245-5611"} 
 
 Delete the document

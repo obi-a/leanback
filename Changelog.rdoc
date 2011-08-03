@@ -23,11 +23,11 @@ July 20, 2011:-
 July 19, 2011:-
 * Added better error handling all database operations now raise a CouchdbException when something goes wrong. It's now easy to track exceptions.
 
-   begin 	
-   Couchdb.create 'contacts'
+  begin 	
+  Couchdb.create 'contacts'
   rescue => e
-   puts "Error message: " + e.to_s
-   puts "Error value: " + e.error
+  puts "Error message: " + e.to_s
+  puts "Error value: " + e.error
   end 
  # => Error message: CouchDB: Error - file_exists. Reason - The database could not be created, the file already exists.
       Error value: file_exists

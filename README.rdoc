@@ -92,7 +92,7 @@ To edit the document and replace it with a new one
  Document.edit doc
 
  # => {"ok"=>true, "id"=>"Linda", "rev"=>"6-211ebb68bdd4ba8799387214b4a3b445"}
-This replaces the existing document with a new one, the _rev property must be included in the data.
+This replaces the existing document with a new one, the _rev number of the document must be included in the data.
 
 Retrieve/view the document 
  doc = {:database => 'contacts', :doc_id => 'Linda'}

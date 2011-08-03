@@ -56,8 +56,19 @@ module Document
       edit doc
  end
 
- #delete a doc
- def self.delete(doc)
+#delete document
+ def self.delete(doc)  
+   db_name = doc[:database]
+   doc_id = doc[:doc_id]
+   doc = {:database => db_name, :doc_id => doc_id}
+   hash = Couchdb.view doc
+   doc = {:database => db_name, :doc_id => doc_id, :rev => hash["_rev"]}
+   delete_rev doc
+ end
+
+
+ #delete a doc by rev#
+ def self.delete_rev(doc)
    db_name = doc[:database]
    doc_id = doc[:doc_id]
    rev = doc[:rev]

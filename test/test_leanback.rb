@@ -119,7 +119,7 @@ class TestLeanback < Test::Unit::TestCase
 
  should  "update the document" do
    #data = {"age" => "42", "lastname" => "arnold", "phone" => "202-456-1234", "hobbies" => "football,running, video gamess" }
-   data = {"age" => "13" }
+   data = {"age" => "54" }
    doc = { :database => 'contacts', :doc_id => 'john', :data => data}   
    Document.update doc 
  end
@@ -136,10 +136,30 @@ class TestLeanback < Test::Unit::TestCase
         end
   end
 
-   should "delete a document - handle exceptions" do 
-       begin
-         doc = {:database => 'contacts', :doc_id => 'john', :rev => '3-be02e80490f8e9e610d9a9e33d752316'}
+   should "create and delete a document -- any handle exceptions" do
+     begin
+
+         data = {:firstname => 'James', 
+        	 :lastname =>'Nova', 
+       		 :phone => '212-234-1234',
+        	 :email =>'james@mail.com'}
+
+         doc = {:database => 'contacts', :doc_id => 'james', :data => data}
+         Document.create doc
+
+         doc = {:database => 'contacts', :doc_id => 'James'}
          hash = Document.delete doc
+         puts hash.inspect
+      rescue CouchdbException => e   
+         #puts e.to_s
+         #puts e.error
+      end
+   end
+
+   should "delete a document with revision number - any handle exceptions" do 
+       begin
+         doc = {:database => 'contacts', :doc_id => 'james', :rev => '4-4e70528f7400e2e43d6543aec4d8aa2b'}
+         hash = Document.delete_rev doc
          #puts hash.inspect
       rescue CouchdbException => e   
          #puts e.to_s

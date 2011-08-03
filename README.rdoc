@@ -22,14 +22,17 @@ Require the leanback Gem
  
 Create a CouchDB database
  Couchdb.create 'contacts'
+
  # => {"ok"=>true}
 
 Delete a database
  Couchdb.delete 'contacts'
+
  # => {"ok"=>true} 
 
 Return a list of all Databases
  Couchdb.all
+
  # => ["maps", "inventory", "monitors", "contacts", "books"]
 
 Create a new document
@@ -40,6 +43,7 @@ Create a new document
 
  doc = {:database => 'contacts', :doc_id => 'Linda', :data => data}
  Document.create doc
+
  # => {"ok"=>true, "id"=>"Linda", "rev"=>"1-6f16274513f51e922ff1f745452a92b6"} 
 This will create a new document in the 'contacts' database, with document id 'Linda'.
 
@@ -53,17 +57,20 @@ Lets edit that document to change the email address, phone number, and add a gen
 
  doc = {:database => 'contacts', :doc_id => 'Linda', :data => data}
  Document.edit doc
+
  # => {"ok"=>true, "id"=>"Linda", "rev"=>"2-e813a0e902e3ac114400ff3959a2adde"}
 
 Retrieve/view the document 
  doc = {:database => 'contacts', :doc_id => 'Linda'}
  Couchdb.view doc
+
   #=> {"_id"=>"Linda", "_rev"=>"2-e813a0e902e3ac114400ff3959a2adde", "firstname"=>"Linda", 
                   "lastname"=>"smith", "email"=>"linda@mail.com", "gender"=>"female", "phone"=>"718-245-5611"} 
 
 Delete the document
  doc = {:database => 'contacts', :doc_id => 'Linda', :rev => '2-e813a0e902e3ac114400ff3959a2adde'}
  Document.delete doc
+
  # => {"ok"=>true, "id"=>"Linda", "rev"=>"3-48580d1806983b32cb03f114efb064e3"} 
 
 Retrieve all documents in a database
@@ -81,16 +88,19 @@ Retrieve all documents in a database
 ===To Find documents by key
 To find documents by email key (example: to find all contacts with email = 'nancy@mail.com')
  Couchdb.find_by( :database => 'contacts', :email => 'nancy@mail.com')  
+
  # => [{"_id"=>"Nancy", "_rev"=>"1-d15a83d2a23b495c19df2595b636ecc8", "firstname"=>"Nancy", "lastname"=>"Lee",
                    "phone"=>"347-808-3734", "email"=>"nancy@mail.com", "gender"=>"female"}]
 
 To find all contacts with lastname = 'Smith'
  Couchdb.find_by( :database => 'contacts', :lastname => 'Smith')  
+
  # => [{"_id"=>"john", "_rev"=>"5-642689e0a50843d6fa508159a01b4fd4", "firstname"=>"John", "lastname"=>"Smith",
                    "email"=>"john@mail.com", "gender"=>"male"}]
 
 To find all female contacts 
  Couchdb.find_by( :database => 'contacts', :gender => 'female') 
+
  # => [{"_id"=>"Nancy", "_rev"=>"1-d15a83d2a23b495c19df2595b636ecc8", "firstname"=>"Nancy", "lastname"=>"Lee",
                   "phone"=>"347-808-3734", "email"=>"nancy@mail.com", "gender"=>"female"}]
 
@@ -144,6 +154,7 @@ You can do
 ===Query a permanent view
  view = { :database => "contacts", :design_doc => 'my_views', :view => 'get_female_contacts'}
  Couchdb.find view 
+
  # => [{"_id"=>"Mary", "_rev"=>"5-bfcd67fd17dbb6a875af8f6dc497b15f", "firstname"=>"Mary", "lastname"=>"smith", 
                                          "phone"=>"212-234-1234", "email"=>"mary@mail.com", "gender"=>"female"}, 
  {"_id"=>"Nancy", "_rev"=>"1-d15a83d2a23b495c19df2595b636ecc8", "firstname"=>"Nancy", "lastname"=>"Lee", 
@@ -154,6 +165,21 @@ This is similar to sending a
 For the above example
  GET http://127.0.0.1:5984/contacts/_design/my_views/_view/get_female_contacts
 Leanback parses the native JSON results to return only the data values.
+
+===Query a view by key 
+ view = { :database => "contacts", :design_doc => 'the_view', :view => 'age'}
+ age = "36"
+ Couchdb.find(view,key = age)
+
+ # => [{"_id"=>"Nancy", "_rev"=>"2-4404d0a5a1a3dff103fd46faf1e46c30", "firstname"=>"Nancy", "lastname"=>"Lee", 
+                 "phone"=>"347-808-3734", "email"=>"nancy@mail.com", "gender"=>"female", "age"=>"36"}]
+
+This is similar to sending a
+ GET http://127.0.0.1:5984/[database]/_design/[design_doc]/_view/[view_name]?key="searchterm"
+For the above example
+ GET http://127.0.0.1:5984/contacts/_design/the_view/_view/age?key="36"
+Leanback parses the native JSON results to return only the data values.
+ 
 
 ===Create a design document with permanent views:
 First define the views in a JSON file 
@@ -173,17 +199,19 @@ First define the views in a JSON file
 Now create the design document and add the json file
  doc = { :database => 'contacts', :design_doc => 'more_views', :json_doc => '/path/to/my_views.json' }
  Couchdb.create_design doc 
+
  # => {"ok"=>true, "id"=>"_design/more_views", "rev"=>"1-d67ae97ff03a98f68ddc300bf9ae5048"}
 
 To query the view
  view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_email'}
  Couchdb.find view 
+
  # => [{"Firstname"=>"Nancy", "Lastname"=>"Lee", "Email"=>"nancy@mail.com"}, 
          {"Firstname"=>"john", "Lastname"=>"smith", "Email"=>"john@mail.com"}]
 
 
 ===Create View on the fly if it doesn't already exist 
-Let's say we want to query a view and create it on the fly if it doesn't already exist, and still return the values. In this example we will query a view called get_emails view (which returns emails of all contacts), if this view doesn't already exist it will be added to the database.
+Let's say we want to query a view, and create it on the fly if it doesn't already exist, and still return the values. In this example we will query a view called get_emails view (which returns emails of all contacts), if this view doesn't already exist it will be added to the database.
 
  def get_emails
   begin  
@@ -198,6 +226,7 @@ Let's say we want to query a view and create it on the fly if it doesn't already
 
  email_list = get_emails()
  puts email_list.inspect
+
  # => [{"Name"=>"Nancy", "Email"=>"nancy@mail.com"}, {"Name"=>"John", "Email"=>"john@mail.com"}]
 
 In get_emails(), 
@@ -236,6 +265,7 @@ Every database operation raises a CouchdbException when things go wrong.
 Attempting to create a database that already exists
   begin 	
    Couchdb.create 'contacts'
+   #create static views
   rescue CouchdbException => e
    puts "Error message: " + e.to_s
    puts "Error value: " + e.error
@@ -304,4 +334,5 @@ To change it back to default bind address at anytime, simply set the values to n
 
 Copyright (c) 2011 Obi Akubue. See LICENSE.txt for
 further details.
+
 

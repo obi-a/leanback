@@ -7,7 +7,6 @@ To update a document now:
    Document.update doc 
 This will update the document and change the John's age to 53. See README for details
 
-
 =Leanback 0.2.4
 July 20, 2011:-
 * find_by(database,key) has a bug in version 0.2.3, please use version 0.2.4 instead

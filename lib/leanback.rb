@@ -196,6 +196,32 @@ def self.create_design(doc)
   end
 end
 
+#Query view, create view on fly if it dosen't already exist
+def self.find_on_fly(doc, key = nil)  
+   db_name = doc[:database]
+   design_doc = doc[:design_doc]
+   view = doc[:view]
+   json_doc = doc[:json_doc]
+ 
+   begin 
+      if( key == nil)
+       docs = find(:database => db_name, :design_doc => design_doc, :view => view) 
+      else
+       docs = find({:database => db_name, :design_doc => design_doc, :view => view},key) 
+      end
+     rescue CouchdbException => e
+        document = { :database => db_name, :design_doc => design_doc, :json_doc => json_doc}
+        create_design document  
+        if( key == nil)
+          docs = find(:database => db_name, :design_doc => design_doc, :view => view) 
+        else
+          docs = find({:database => db_name, :design_doc => design_doc, :view => view},key) 
+        end
+      end
+    return docs
+ end
+
+
 #add a finder method to the database
 #this creates a find by key method
 def self.add_finder(options)

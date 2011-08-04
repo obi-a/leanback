@@ -82,6 +82,28 @@ class TestLeanback < Test::Unit::TestCase
     #puts hash.inspect
   end
 
+
+  should "Query a permanent view and create the view on the fly, if it doesn't already exist" do
+    view = {:database => 'contacts',
+         :design_doc => 'my_views',
+          :view => 'get_emails',
+           :json_doc => '/home/obi/bin/my_views.json'}
+
+     hash = Couchdb.find_on_fly(view)
+     #puts hash.inspect
+  end
+
+  should "Query a permanent view by key and create the view on the fly, if it doesn't already exist" do
+    view = { :database => 'contacts', 
+           :design_doc => 'the_view', 
+            :view => 'age',
+             :json_doc => '/home/obi/bin/view_age.json'}
+
+    age = '36'
+    hash = Couchdb.find_on_fly(view,key = age)
+    puts hash.inspect  
+  end
+
   should "Create a design doc/permanent view or handle exception" do
     doc = { :database => 'contacts', :design_doc => 'more_views', :json_doc => '/home/obi/bin/leanback/test/my_views.json' }
     begin 
@@ -119,7 +141,7 @@ class TestLeanback < Test::Unit::TestCase
 
  should  "update the document" do
    #data = {"age" => "42", "lastname" => "arnold", "phone" => "202-456-1234", "hobbies" => "football,running, video gamess" }
-   data = {"age" => "54" }
+   data = {:age => "41", :lastname => "Stevens" }
    doc = { :database => 'contacts', :doc_id => 'john', :data => data}   
    Document.update doc 
  end
@@ -145,11 +167,11 @@ class TestLeanback < Test::Unit::TestCase
         	 :email =>'james@mail.com'}
 
          doc = {:database => 'contacts', :doc_id => 'james', :data => data}
-         Document.create doc
+         #Document.create doc
 
          doc = {:database => 'contacts', :doc_id => 'James'}
          hash = Document.delete doc
-         puts hash.inspect
+         #puts hash.inspect
       rescue CouchdbException => e   
          #puts e.to_s
          #puts e.error

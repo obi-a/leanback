@@ -250,39 +250,34 @@ To query the view
          {"Firstname"=>"john", "Lastname"=>"smith", "Email"=>"john@mail.com"}]
 
 
-===Create View on the fly if it doesn't already exist 
+===Query a View and Create it on the fly if it doesn't already exist 
 Let's say we want to query a view, and create it on the fly if it doesn't already exist, and still return the values. In this example we will query a view called get_emails view (which returns emails of all contacts), if this view doesn't already exist it will be added to the database.
 
+ 
  def get_emails
-  begin  
-   docs = Couchdb.find(:database => "contacts", :design_doc => 'my_views', :view => 'get_emails') 
-  rescue CouchdbException => e
-    doc = { :database => 'contacts', :design_doc => 'my_views', :json_doc => '/path/to/my_views.json' }
-    Couchdb.create_design doc
-    docs = Couchdb.find(:database => "contacts", :design_doc => 'my_views', :view => 'get_emails')      
-  end
-  return docs
- end
+    view = {:database => 'contacts',
+         :design_doc => 'my_views',
+          :view => 'get_emails',
+           :json_doc => '/path/to/my_views.json'}
 
- email_list = get_emails()
- puts email_list.inspect
+    Couchdb.find_on_fly(view)
+  end
+
+  email_list = get_emails()
+  puts email_list.inspect 
 
  # => [{"Name"=>"Nancy", "Email"=>"nancy@mail.com"}, {"Name"=>"John", "Email"=>"john@mail.com"}]
 
 In get_emails(), 
- docs = Couchdb.find(:database => "contacts", :design_doc => 'my_views', :view => 'get_emails') 
+ Couchdb.find_on_fly(view)
 sends a request to the design_document (my_views) and view (get_emails). If this view is found in the database, it returns an Array with the name and email of all contacts:
   [{"Name"=>"Nancy", "Email"=>"nancy@mail.com"}, {"Name"=>"John", "Email"=>"john@mail.com"}]
-if the view doesn't exist it raises a CouchdbException. It catches this exception 
-  rescue CouchdbException => e
-and then it creates the design_document (my_views) and view (get_emails), since they don't already exist
-  doc = { :database => 'contacts', :design_doc => 'my_views', :json_doc => '/path/to/my_views.json' }
-  Couchdb.create_design doc
-next it sends a request for the view again. 
-   docs = Couchdb.find(:database => "contacts", :design_doc => 'my_views', :view => 'get_emails')
-Then it returns the email list
-   return docs
-So the first time the get_emails() method is called, the view will be created on the fly and added to the database.
+it creates the design_document and view if doesn't already exist using the json document
+   :json_doc => '/path/to/my_views.json' 
+  
+next it sends a request for the view again and then it returns the email list.
+
+So the first time the get_emails() method is called, the view will be created on the fly and added to the database. Other calls to get_email will return the values since the view has been created.
 
 Source for the get_emails view:
  #my_views.json
@@ -298,6 +293,36 @@ Source for the get_emails view:
   }
  }
 
+You can also query a permanent view a key and create it on the fly, if it doesn't already exist.
+Let's say we want to view all contacts with age = "36", and we already defined a view in a json file (view_age.json).
+  view = { :database => 'contacts', 
+           :design_doc => 'the_view', 
+            :view => 'age',
+             :json_doc => '/path/to/view_age.json'}
+
+  age = '36'
+  Couchdb.find_on_fly(view,key = age)
+
+ #=> [{"_id"=>"Nancy", "_rev"=>"2-4404d0a5a1a3dff103fd46faf1e46c30", "firstname"=>"Nancy", "lastname"=>"Lee", "phone"=>"347-808-3734", "email"=>"nancy@mail.com", "gender"=>"female", "age"=>"36"}]
+
+ The above example will query the design_document (the_view) and view (age) in the database (contacts), using the key (age). If the view doesn't exist it will be created from the json document (view.age.json).
+
+This is similar to sending a
+ GET http://127.0.0.1:5984/contacts/_design/the_view/_view/age?key="36"
+
+The view is generated from the source code:
+ #view_age.json
+ {
+  "language" : "javascript",
+  "views" :{
+    "age" : {
+      "map" : "function(doc){
+         if(doc.age)
+           emit(doc.age,doc);
+        }"
+     }
+  }
+ }
 
 ===Error handling
 Every database operation raises a CouchdbException when things go wrong.

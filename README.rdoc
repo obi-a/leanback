@@ -48,25 +48,25 @@ Create a new document
 This will create a new document in the 'contacts' database, with document id 'Linda'.
 
 Let's update that document to change the email address
- data = {"email" => "linda@mail.com" }
+ data = {:email => "linda@mail.com" }
  doc = { :database => 'contacts', :doc_id => 'Linda', :data => data}   
  Document.update doc 
 
 Let's add gender and age 
- data = {"age" => "32","gender" => "female" }
+ data = {:age => "32", :gender => "female" }
  doc = { :database => 'contacts', :doc_id => 'Linda', :data => data}   
  Document.update doc 
 
 
 To change phone# and add a fax number
- data = {"phone" => "718-234-2904","fax" => "646-309-4049" }
+ data = {:phone => "718-234-2904",:fax => "646-309-4049" }
  doc = { :database => 'contacts', :doc_id => 'Linda', :data => data}   
  Document.update doc
  
 Let's add twitter account, facebook account and website url
-  data = {"twitter" => "http://twitter.com/#!/linda", 
-           "faceboook" => "http://facebook.com/linda", 
-           "website" => "http://linda-blogs.com" }
+  data = { :twitter => "http://twitter.com/#!/linda", 
+            :faceboook => "http://facebook.com/linda", 
+             :website => "http://linda-blogs.com" }
 
    doc = { :database => 'contacts', :doc_id => 'Linda', :data => data}   
    Document.update doc 

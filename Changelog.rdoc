@@ -4,7 +4,7 @@ August 3, 2011:-
 Example:
  doc = {:database => 'contacts', :doc_id => 'James'}
  Document.delete doc
-The above will delete the document with id 'james'. See README for details. 
+The above will delete the document with id 'James'. See README for details. 
 
 =Leanback 0.2.5
 August 2, 2011:-

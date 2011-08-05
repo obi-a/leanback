@@ -364,21 +364,8 @@ Attempting to query a permanent view that doesn't exist
  # => Error message: CouchDB: Error - not_found. Reason - missing_named_view
       Error value: not_found
 
-You can always check the information passed to the Exception. See example below:
-  begin
-   view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_user_email'}
-   Couchdb.find view 
-  rescue CouchdbException => e
-    if e.error == "not_found"
-     doc = { :database => 'contacts', :design_doc => 'more_views', :json_doc => '/path/to/user_email.json' }
-     Couchdb.create_design doc
-     docs = Couchdb.find(:database => "contacts", :design_doc => 'more_views', :view => 'get_user_email')      
-    end
-  end 
-
-In the code above, the rescue block will create and request the permanent view if it's not found by the initial request outside the block. e.error is the value of the error returned by CouchDB.
+You can always check the information passed to the Exception. 
   
-
 ===Bind Address
 Leanback uses the default Couchdb bind address http://127.0.0.1:5984. To use a different bind address;
  Couchdb.address = '192.168.2.16'

@@ -1,3 +1,16 @@
+=Leanback 0.2.7
+August 4, 2011:-
+*Added ability to Query a permanent view and create it on the fly from a json file, if it doesn't already exist.
+Example:
+     view = {:database => 'contacts',
+         :design_doc => 'my_views',
+          :view => 'get_emails',
+           :json_doc => '/path/to/my_views.json'}
+
+     Couchdb.find_on_fly(view)
+The above will query the view and add it to the database if it doesn't already exist and still return the values. 
+See README for details
+
 =Leanback 0.2.6
 August 3, 2011:-
 * Added ability to delete documents without having to retrieve the _rev revision number

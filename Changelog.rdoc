@@ -1,6 +1,6 @@
 =Leanback 0.2.7
 August 4, 2011:-
-* Added ability to Query a permanent view and create it on the fly from a json file, if it doesn't already exist.
+* Added ability to Query a permanent view and create it on the fly from a json file, if it doesn't already exist and then return the values
 Example:
      view = {:database => 'contacts',
          :design_doc => 'my_views',

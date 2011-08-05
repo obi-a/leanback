@@ -272,12 +272,12 @@ In get_emails(),
  Couchdb.find_on_fly(view)
 sends a request to the design_document (my_views) and view (get_emails). If this view is found in the database, it returns an Array with the name and email of all contacts:
   [{"Name"=>"Nancy", "Email"=>"nancy@mail.com"}, {"Name"=>"John", "Email"=>"john@mail.com"}]
-it creates the design_document and view if doesn't already exist using the json document
+if the design document and view doesn't already exist, it creates it and adds it to the database using the json document
    :json_doc => '/path/to/my_views.json' 
   
 next it sends a request for the view again and then it returns the email list.
 
-So the first time the get_emails() method is called, the view will be created on the fly and added to the database. Other calls to get_email will return the values since the view has been created.
+So the first time the get_emails() method is called, the view will be created on the fly and added to the database. Future calls to get_email would simply return the values from the view.
 
 Source for the get_emails view:
  #my_views.json
@@ -293,8 +293,8 @@ Source for the get_emails view:
   }
  }
 
-You can also query a permanent view a key and create it on the fly, if it doesn't already exist.
-Let's say we want to view all contacts with age = "36", and we already defined a view in a json file (view_age.json).
+You can also query a permanent view with a key and create it on the fly, if it doesn't already exist.
+Let's say we want to view all contacts with age = "36", and we already defined the view in a json file (view_age.json).
   view = { :database => 'contacts', 
            :design_doc => 'the_view', 
             :view => 'age',
@@ -305,7 +305,7 @@ Let's say we want to view all contacts with age = "36", and we already defined a
 
  #=> [{"_id"=>"Nancy", "_rev"=>"2-4404d0a5a1a3dff103fd46faf1e46c30", "firstname"=>"Nancy", "lastname"=>"Lee", "phone"=>"347-808-3734", "email"=>"nancy@mail.com", "gender"=>"female", "age"=>"36"}]
 
- The above example will query the design_document (the_view) and view (age) in the database (contacts), using the key (age). If the view doesn't exist it will be created from the json document (view.age.json).
+ The above example will query the design_document (the_view) and view (age) in the database (contacts), using the key (age). If the view doesn't exist it will be created from the json document (view.age.json). And then return the values from the view.
 
 This is similar to sending a
  GET http://127.0.0.1:5984/contacts/_design/the_view/_view/age?key="36"

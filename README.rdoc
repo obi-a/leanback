@@ -306,7 +306,7 @@ Let's say we want to view all contacts with age = "36", and we already defined t
  #=> [{"_id"=>"Nancy", "_rev"=>"2-4404d0a5a1a3dff103fd46faf1e46c30", "firstname"=>"Nancy", "lastname"=>"Lee", 
                   "phone"=>"347-808-3734", "email"=>"nancy@mail.com", "gender"=>"female", "age"=>"36"}]
 
- The above example will query the design_document (the_view) and view (age) in the database (contacts), using the key (age). If the view doesn't exist it will be created from the json document (view.age.json). And then return the values from the view.
+The above example will query the design_document (the_view) and view (age) in the database (contacts), using the key (age). If the view doesn't exist it will be created from the json document (view.age.json). And then return the values from the view.
 
 This is similar to sending a
  GET http://127.0.0.1:5984/contacts/_design/the_view/_view/age?key="36"

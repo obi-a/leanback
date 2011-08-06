@@ -214,6 +214,8 @@ Leanback parses the native JSON results to return only the data values.
  # => [{"_id"=>"Nancy", "_rev"=>"2-4404d0a5a1a3dff103fd46faf1e46c30", "firstname"=>"Nancy", "lastname"=>"Lee", 
                  "phone"=>"347-808-3734", "email"=>"nancy@mail.com", "gender"=>"female", "age"=>"36"}]
 
+The above example will return all contacts with age = 36.
+
 This is similar to sending a
  GET http://127.0.0.1:5984/[database]/_design/[design_doc]/_view/[view_name]?key="searchterm"
 For the above example

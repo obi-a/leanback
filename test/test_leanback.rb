@@ -9,37 +9,46 @@ class TestLeanback < Test::Unit::TestCase
 
 
   should "create a database if it doesn't already exist" do
-       hash = Couchdb.create 'staff'
-	#puts hash.inspect
+      hash = Couchdb.create 'staff'
+      assert_equal '{"ok"=>true}', hash.to_s
+      response = RestClient.get 'http://127.0.0.1:5984/_all_dbs', {:content_type => :json}
+      assert_equal true,response.include?("staff")
   end
 
  should "create a database if it doesn't already exist, and handle exception if it exists" do
        begin 	
         hash = Couchdb.create 'contacts'
-        #puts hash.inspect
+        assert_equal '{"ok"=>true}', hash.to_s
        rescue => e
-          #puts "Error message: " + e.to_s
-          #puts "Error value: " + e.error
+          assert_equal "CouchDB: Error - file_exists. Reason - The database could not be created, the file already exists.", e.to_s
+          assert_equal "file_exists", e.error
        end 
   end
 
-  should "delete a database that doesn't exist and handle the exception" do 
+  should "try to delete a database that doesn't exist and handle the exception" do 
       begin
        hash = Couchdb.delete 'buildings'
        #puts hash.inspect
       rescue CouchdbException => e
-       #puts "Error message: " + e.to_s
-       #puts "Error value: " + e.error
+       assert_equal "CouchDB: Error - not_found. Reason - missing", e.to_s
+       assert_equal "not_found", e.error
       end
    end
 
   should "add a finder method to the database or handle exception if a finder already exists" do
       begin
        hash = Couchdb.add_finder(:database => 'contacts', :key => 'email') 
-       #puts hash.inspect
+        assert_equal true,hash.include?("_design/email_finder")
+        assert_equal true,hash.include?("true")
+        assert_equal true,hash.include?("rev")
+        
+        doc = {:database => 'contacts', :doc_id => '_design/email_finder'}
+        hash = Couchdb.view doc
+        assert_equal '_design/email_finder', hash["_id"] 
+
        rescue CouchdbException => e
-        #puts e.to_s
-        #puts e.error
+        assert_equal "CouchDB: Error - conflict. Reason - Document update conflict.", e.to_s
+        assert_equal "conflict", e.error
       end
   end
 
@@ -47,39 +56,39 @@ class TestLeanback < Test::Unit::TestCase
      #docs = Couchdb.find_by( :database => 'contacts', :email => 'nancy@mail.com')
      docs = Couchdb.find_by( :database => 'contacts', :lastname => 'smith') 
      #docs = Couchdb.find_by( :database => 'contacts', :country => 'female') 
-     #puts docs.inspect
+     
+     d = docs[0]
+     assert_equal "smith", d["lastname"] 
  end
 
   should "view document doc or handle exception" do
      
-        doc = {:database => 'monitors', :doc_id => '3-d71c8ee21d6753896f2d08f57a985e94'}
+        doc = {:database => 'monitors', :doc_id => 'john'}
        begin 
         hash = Couchdb.view doc
-        #puts hash.inspect
+        assert_equal 'john', hash["_id"] 
        rescue CouchdbException => e
-        #puts e.inspect
-        #puts e.error
+        assert_equal "CouchDB: Error - not_found. Reason - missing", e.to_s
+        assert_equal "not_found", e.error
        end
   end
 
   should "Query a permanent view that doesn't exist and handle exception" do
     begin
-     #puts 'viewing design doc...'
      view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_user_email'}
      hash = Couchdb.find view 
-     #puts hash.inspect
     rescue CouchdbException => e
-     # puts "Error message: " + e.to_s
-     # puts "Error value: " + e.error
+      assert_equal "CouchDB: Error - not_found. Reason - missing_named_view", e.to_s
+      assert_equal "not_found", e.error
     end  
   end
 
 
   should "Query a permanent view" do
     view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_email'}
-    #puts 'viewing design doc...'
-    hash = Couchdb.find view 
-    #puts hash.inspect
+    docs = Couchdb.find view 
+    assert_equal true,docs[0].include?("Email")
+    assert_equal true,docs[0].include?("Lastname")
   end
 
 
@@ -88,9 +97,14 @@ class TestLeanback < Test::Unit::TestCase
          :design_doc => 'my_views',
           :view => 'get_emails',
            :json_doc => '/home/obi/bin/my_views.json'}
-
-     hash = Couchdb.find_on_fly(view)
-     #puts hash.inspect
+     
+     docs = Couchdb.find_on_fly(view)
+     assert_equal true,docs[0].include?("Email")
+     assert_equal true,docs[0].include?("Name")
+     #verify that the view was created
+     doc = {:database => 'contacts', :doc_id => '_design/my_views'}
+     hash = Couchdb.view doc
+     assert_equal '_design/my_views', hash["_id"]
   end
 
   should "Query a permanent view by key and create the view on the fly, if it doesn't already exist" do
@@ -100,31 +114,42 @@ class TestLeanback < Test::Unit::TestCase
              :json_doc => '/home/obi/bin/view_age.json'}
 
     age = '36'
-    hash = Couchdb.find_on_fly(view,key = age)
-    puts hash.inspect  
+    docs = Couchdb.find_on_fly(view,key = age)
+    assert_equal true,docs[0].include?("age")
+    d = docs[0]
+    assert_equal '36', d["age"]
+    #verify that the view was created
+    doc = {:database => 'contacts', :doc_id => '_design/the_view'}
+    hash = Couchdb.view doc
+    assert_equal '_design/the_view', hash["_id"]
   end
 
   should "Create a design doc/permanent view or handle exception" do
     doc = { :database => 'contacts', :design_doc => 'more_views', :json_doc => '/home/obi/bin/leanback/test/my_views.json' }
     begin 
      hash = Couchdb.create_design doc
-     #puts hash.inspect
-     rescue CouchdbException => e
-        #puts e.to_s
-        #puts e.error
+     assert_equal '_design/more_views', hash["id"] 
+     assert_equal true, hash["ok"] 
+     
+     doc = {:database => 'contacts', :doc_id => '_design/more_views'}
+     hash = Couchdb.view doc
+     assert_equal '_design/more_views', hash["_id"] 
+    rescue CouchdbException => e
+     assert_equal "CouchDB: Error - conflict. Reason - Document update conflict.", e.to_s
+     assert_equal "conflict", e.error
     end  
   end
 
   should "return a display a list of all databases" do
       databases = Couchdb.all
-       databases.each do |db_name| 
-          # puts db_name
-        end
+      assert_equal true,databases.include?("contacts")
    end
 
    should "delete a database" do 
        hash = Couchdb.delete 'staff'
-       #puts hash.inspect
+       assert_equal true, hash["ok"] 
+       response = RestClient.get 'http://127.0.0.1:5984/_all_dbs', {:content_type => :json}
+       assert_equal false,response.include?("staff")
    end
 
   should "create a document and handle exception if one occurs" do 
@@ -132,10 +157,10 @@ class TestLeanback < Test::Unit::TestCase
         data = {:firstname => 'Nancy', :lastname =>'Lee', :phone => '347-808-3734',:email =>'nancy@mail.com',:gender => 'female'}
          doc = {:database => 'contacts', :doc_id => 'Nancy', :data => data}
          hash = Document.create doc
-         #puts hash.inspect    
+         puts hash.inspect    
        rescue CouchdbException => e
-        #puts e.to_s
-        #puts e.error
+        assert_equal "CouchDB: Error - conflict. Reason - Document update conflict.", e.to_s
+        assert_equal "conflict", e.error
       end  
   end
 
@@ -145,6 +170,9 @@ class TestLeanback < Test::Unit::TestCase
    doc = { :database => 'contacts', :doc_id => 'john', :data => data}   
    Document.update doc 
  end
+
+#TODO delete sample data after tests. 
+#TODO remove exception handling from the tests
 
  should "edit a document - handle exceptions" do 
         begin

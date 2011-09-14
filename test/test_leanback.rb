@@ -36,7 +36,6 @@ class TestLeanback < Test::Unit::TestCase
    end
 
   should "add a finder method to the database or handle exception if a finder already exists" do
-      begin
        hash = Couchdb.add_finder(:database => 'contacts', :key => 'email') 
         assert_equal true,hash.include?("_design/email_finder")
         assert_equal true,hash.include?("true")
@@ -45,11 +44,6 @@ class TestLeanback < Test::Unit::TestCase
         doc = {:database => 'contacts', :doc_id => '_design/email_finder'}
         hash = Couchdb.view doc
         assert_equal '_design/email_finder', hash["_id"] 
-
-       rescue CouchdbException => e
-        assert_equal "CouchDB: Error - conflict. Reason - Document update conflict.", e.to_s
-        assert_equal "conflict", e.error
-      end
   end
 
  should "find items by key" do
@@ -61,22 +55,27 @@ class TestLeanback < Test::Unit::TestCase
      assert_equal "smith", d["lastname"] 
  end
 
-  should "view document doc or handle exception" do
+  should "create and view document doc" do
+
+        data = {:firstname => 'John', 
+        	 :lastname =>'smith', 
+       		 :phone => '202-234-1234',
+        	 :email =>'james@mail.com',
+                  :age =>'34',
+                  :gender =>'male'}
+
+         doc = {:database => 'contacts', :doc_id => 'john', :data => data}
+         Document.create doc
      
-        doc = {:database => 'monitors', :doc_id => 'john'}
-       begin 
+        doc = {:database => 'contacts', :doc_id => 'john'}
         hash = Couchdb.view doc
         assert_equal 'john', hash["_id"] 
-       rescue CouchdbException => e
-        assert_equal "CouchDB: Error - not_found. Reason - missing", e.to_s
-        assert_equal "not_found", e.error
-       end
   end
 
   should "Query a permanent view that doesn't exist and handle exception" do
     begin
      view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_user_email'}
-     hash = Couchdb.find view 
+     Couchdb.find view 
     rescue CouchdbException => e
       assert_equal "CouchDB: Error - not_found. Reason - missing_named_view", e.to_s
       assert_equal "not_found", e.error
@@ -126,7 +125,6 @@ class TestLeanback < Test::Unit::TestCase
 
   should "Create a design doc/permanent view or handle exception" do
     doc = { :database => 'contacts', :design_doc => 'more_views', :json_doc => '/home/obi/bin/leanback/test/my_views.json' }
-    begin 
      hash = Couchdb.create_design doc
      assert_equal '_design/more_views', hash["id"] 
      assert_equal true, hash["ok"] 
@@ -134,10 +132,6 @@ class TestLeanback < Test::Unit::TestCase
      doc = {:database => 'contacts', :doc_id => '_design/more_views'}
      hash = Couchdb.view doc
      assert_equal '_design/more_views', hash["_id"] 
-    rescue CouchdbException => e
-     assert_equal "CouchDB: Error - conflict. Reason - Document update conflict.", e.to_s
-     assert_equal "conflict", e.error
-    end  
   end
 
   should "return a display a list of all databases" do
@@ -153,57 +147,78 @@ class TestLeanback < Test::Unit::TestCase
    end
 
   should "create a document and handle exception if one occurs" do 
-       begin
         data = {:firstname => 'Nancy', :lastname =>'Lee', :phone => '347-808-3734',:email =>'nancy@mail.com',:gender => 'female'}
          doc = {:database => 'contacts', :doc_id => 'Nancy', :data => data}
-         hash = Document.create doc
-         puts hash.inspect    
-       rescue CouchdbException => e
-        assert_equal "CouchDB: Error - conflict. Reason - Document update conflict.", e.to_s
-        assert_equal "conflict", e.error
-      end  
+         hash = Document.create doc 
+         assert_equal 'Nancy', hash["id"] 
+         assert_equal true, hash["ok"]  
+
+         doc = {:database => 'contacts', :doc_id => 'Nancy'}
+         hash = Couchdb.view doc
+         assert_equal 'Nancy', hash["_id"]
+         assert_equal 'Nancy', hash["firstname"]
+         assert_equal 'Lee', hash["lastname"]
+         assert_equal '347-808-3734', hash["phone"]
   end
 
  should  "update the document" do
    #data = {"age" => "42", "lastname" => "arnold", "phone" => "202-456-1234", "hobbies" => "football,running, video gamess" }
    data = {:age => "41", :lastname => "Stevens" }
    doc = { :database => 'contacts', :doc_id => 'john', :data => data}   
-   Document.update doc 
+   hash = Document.update doc 
+   assert_equal 'john', hash["id"] 
+   assert_equal true, hash["ok"]  
+   
+   doc = {:database => 'contacts', :doc_id => 'john'}
+   hash = Couchdb.view doc
+   assert_equal 'john', hash["_id"]
+   assert_equal '41', hash["age"]
+   assert_equal 'Stevens', hash["lastname"]
+   Document.delete :database => 'contacts', :doc_id => 'john'
  end
 
-#TODO delete sample data after tests. 
-#TODO remove exception handling from the tests
+ should "delete sample documents - ready for next test run" do
+      Document.delete :database => 'contacts', :doc_id => 'Nancy'
+      Document.delete :database => 'contacts', :doc_id => '_design/more_views'
+      Document.delete :database => 'contacts', :doc_id => '_design/the_view'
+      Document.delete :database => 'contacts', :doc_id => '_design/my_views'
+      Document.delete :database => 'contacts', :doc_id => '_design/email_finder'
+ end
 
  should "edit a document - handle exceptions" do 
         begin
+         #see delete without _rev above
          data = {:firstname => 'john', :lastname =>'smith', :email => 'john@mail.com',:gender=>'male', :_rev=>'2-e813a0e902e3ac114400ff3959a2adde'}
          doc = {:database => 'contacts', :doc_id => 'john', :data => data}
          hash = Document.edit doc
          #puts hash.inspect 
         rescue CouchdbException => e   
-          #puts e.to_s
-          #puts e.error
+          assert_equal "CouchDB: Error - conflict. Reason - Document update conflict.", e.to_s
+          assert_equal "conflict", e.error
         end
   end
 
-   should "create and delete a document -- any handle exceptions" do
-     begin
-
-         data = {:firstname => 'James', 
+   should "create and delete a document" do
+         data = {:firstname => 'Sun', 
         	 :lastname =>'Nova', 
        		 :phone => '212-234-1234',
         	 :email =>'james@mail.com'}
 
-         doc = {:database => 'contacts', :doc_id => 'james', :data => data}
-         #Document.create doc
+         doc = {:database => 'contacts', :doc_id => 'Sun', :data => data}
+         Document.create doc
 
-         doc = {:database => 'contacts', :doc_id => 'James'}
+         doc = {:database => 'contacts', :doc_id => 'Sun'}
          hash = Document.delete doc
-         #puts hash.inspect
-      rescue CouchdbException => e   
-         #puts e.to_s
-         #puts e.error
-      end
+
+        assert_equal 'Sun', hash["id"] 
+        assert_equal true, hash["ok"]  
+       begin
+        doc = {:database => 'contacts', :doc_id => 'Sun'}
+        Couchdb.view doc
+       rescue CouchdbException => e
+        assert_equal "CouchDB: Error - not_found. Reason - deleted", e.to_s
+        assert_equal "not_found", e.error
+       end
    end
 
    should "delete a document with revision number - any handle exceptions" do 
@@ -212,17 +227,17 @@ class TestLeanback < Test::Unit::TestCase
          hash = Document.delete_rev doc
          #puts hash.inspect
       rescue CouchdbException => e   
-         #puts e.to_s
-         #puts e.error
+        assert_equal "CouchDB: Error - conflict. Reason - Document update conflict.", e.to_s
+        assert_equal "conflict", e.error
       end
    end
 
-   should "display all documents in the database that doesn't exist and handle exception" do 
+   should "attempt to display all documents in the database that doesn't exist and handle exception" do 
     begin
       docs = Couchdb.docs_from 'buildings'
     rescue CouchdbException => e
-        #puts e.to_s
-        #puts e.error
+        assert_equal "CouchDB: Error - not_found. Reason - no_db_file", e.to_s
+        assert_equal "not_found", e.error
     end  
    end
   

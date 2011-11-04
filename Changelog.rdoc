@@ -1,3 +1,7 @@
+November 3, 2011:-
+* Changed all the syntax for working with documents (creating, editing, updating and deleting documents now use a new syntax) See README for the change. Document::Module has been removed, it's methods are now part of Couchdb::Module. 
+    
+
 =Leanback 0.2.7
 August 4, 2011:-
 * Added ability to Query a permanent view and create it on the fly from a json file, if it doesn't already exist and then return the values

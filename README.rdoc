@@ -42,7 +42,7 @@ Create a new document
          :email =>'john@mail.com'}
 
  doc = {:database => 'contacts', :doc_id => 'Linda', :data => data}
- Document.create doc
+ Couchdb.create_doc doc
 
  # => {"ok"=>true, "id"=>"Linda", "rev"=>"1-6f16274513f51e922ff1f745452a92b6"} 
 This will create a new document in the 'contacts' database, with document id 'Linda'.
@@ -50,18 +50,18 @@ This will create a new document in the 'contacts' database, with document id 'Li
 Let's update that document to change the email address
  data = {:email => "linda@mail.com" }
  doc = { :database => 'contacts', :doc_id => 'Linda', :data => data}   
- Document.update doc 
+ Couchdb.update_doc doc 
 
 Let's add gender and age 
  data = {:age => "32", :gender => "female" }
  doc = { :database => 'contacts', :doc_id => 'Linda', :data => data}   
- Document.update doc 
+ Couchdb.update_doc doc 
 
 
 To change phone# and add a fax number
  data = {:phone => "718-234-2904",:fax => "646-309-4049" }
  doc = { :database => 'contacts', :doc_id => 'Linda', :data => data}   
- Document.update doc
+ Couchdb.update_doc doc
  
 Let's add twitter account, facebook account and website url
   data = { :twitter => "http://twitter.com/#!/linda", 
@@ -69,7 +69,7 @@ Let's add twitter account, facebook account and website url
              :website => "http://linda-blogs.com" }
 
    doc = { :database => 'contacts', :doc_id => 'Linda', :data => data}   
-   Document.update doc 
+   Couchdb.update_doc doc 
 
 Retrieve/view the document 
  doc = {:database => 'contacts', :doc_id => 'Linda'}
@@ -89,7 +89,7 @@ To edit the document and replace it with a new one
          :_rev=>'5-f99fd63f2c784b5e2f7b7d92b2df9a1e'}
 
  doc = {:database => 'contacts', :doc_id => 'Linda', :data => data}
- Document.edit doc
+ Couchdb.edit_doc doc
 
  # => {"ok"=>true, "id"=>"Linda", "rev"=>"6-211ebb68bdd4ba8799387214b4a3b445"}
 This replaces the existing document with a new one, the _rev number of the document must be included in the data.
@@ -103,13 +103,13 @@ Retrieve/view the document
 
 Delete the document
   doc = {:database => 'contacts', :doc_id => 'Linda'}
-  Document.delete doc
+  Couchdb.delete_doc doc
   
  #=> {"ok"=>true, "id"=>"Linda", "rev"=>"7-a2cfbbb607a668c26256bc19ff270ecf"}
 
 Delete the document using it's revision number (_rev):
  doc = {:database => 'contacts', :doc_id => 'Linda', :rev => '2-e813a0e902e3ac114400ff3959a2adde'}
- Document.delete_rev doc
+ Couchdb.delete_rev doc
 
  #=> {"ok"=>true, "id"=>"Linda", "rev"=>"3-48580d1806983b32cb03f114efb064e3"} 
 
@@ -372,18 +372,10 @@ You can always check the information passed to the Exception.
 Leanback uses the default Couchdb bind address http://127.0.0.1:5984. To use a different bind address;
  Couchdb.address = '192.168.2.16'
  Couchdb.port = '6000'
- ...
- Document.address = '192.168.2.16'
- Document.port = '6000'
  
-
 To change it back to default bind address at anytime, simply set the values to nil
  Couchdb.address = nil
  Couchdb.port = nil
- ...
- Document.address = nil
- Document.port = nil
-
 
 == Copyright
 

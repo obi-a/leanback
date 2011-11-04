@@ -13,7 +13,7 @@ end
 module Document
   
   #create a document 
-  def self.create( doc)  
+  def self.create_doc( doc)  
       db_name =  doc[:database]
       doc_id = doc[:doc_id]
       data = doc[:data]
@@ -29,7 +29,7 @@ module Document
   end
 
   #edit a document
-  def self.edit(doc)
+  def self.edit_doc(doc)
       db_name = doc[:database]
       doc_id = doc[:doc_id]
       data = doc[:data]
@@ -45,7 +45,7 @@ module Document
   end
 
  #update a doc
- def self.update (doc)
+ def self.update_doc(doc)
       db_name = doc[:database]
       doc_id = doc[:doc_id]
       data = doc[:data]
@@ -53,11 +53,11 @@ module Document
       options = Couchdb.view doc 
       options = options.merge(data)
       doc = {:database => db_name, :doc_id => doc_id, :data => options}
-      edit doc
+      edit_doc doc
  end
 
 #delete document
- def self.delete(doc)  
+ def self.delete_doc(doc)  
    db_name = doc[:database]
    doc_id = doc[:doc_id]
    doc = {:database => db_name, :doc_id => doc_id}

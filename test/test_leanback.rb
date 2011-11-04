@@ -65,7 +65,7 @@ class TestLeanback < Test::Unit::TestCase
                   :gender =>'male'}
 
          doc = {:database => 'contacts', :doc_id => 'john', :data => data}
-         Document.create doc
+         Document.create_doc doc
      
         doc = {:database => 'contacts', :doc_id => 'john'}
         hash = Couchdb.view doc
@@ -149,7 +149,7 @@ class TestLeanback < Test::Unit::TestCase
   should "create a document and handle exception if one occurs" do 
         data = {:firstname => 'Nancy', :lastname =>'Lee', :phone => '347-808-3734',:email =>'nancy@mail.com',:gender => 'female'}
          doc = {:database => 'contacts', :doc_id => 'Nancy', :data => data}
-         hash = Document.create doc 
+         hash = Document.create_doc doc 
          assert_equal 'Nancy', hash["id"] 
          assert_equal true, hash["ok"]  
 
@@ -165,7 +165,7 @@ class TestLeanback < Test::Unit::TestCase
    #data = {"age" => "42", "lastname" => "arnold", "phone" => "202-456-1234", "hobbies" => "football,running, video gamess" }
    data = {:age => "41", :lastname => "Stevens" }
    doc = { :database => 'contacts', :doc_id => 'john', :data => data}   
-   hash = Document.update doc 
+   hash = Document.update_doc doc 
    assert_equal 'john', hash["id"] 
    assert_equal true, hash["ok"]  
    
@@ -174,15 +174,15 @@ class TestLeanback < Test::Unit::TestCase
    assert_equal 'john', hash["_id"]
    assert_equal '41', hash["age"]
    assert_equal 'Stevens', hash["lastname"]
-   Document.delete :database => 'contacts', :doc_id => 'john'
+   Document.delete_doc :database => 'contacts', :doc_id => 'john'
  end
 
  should "delete sample documents - ready for next test run" do
-      Document.delete :database => 'contacts', :doc_id => 'Nancy'
-      Document.delete :database => 'contacts', :doc_id => '_design/more_views'
-      Document.delete :database => 'contacts', :doc_id => '_design/the_view'
-      Document.delete :database => 'contacts', :doc_id => '_design/my_views'
-      Document.delete :database => 'contacts', :doc_id => '_design/email_finder'
+      Document.delete_doc :database => 'contacts', :doc_id => 'Nancy'
+      Document.delete_doc :database => 'contacts', :doc_id => '_design/more_views'
+      Document.delete_doc :database => 'contacts', :doc_id => '_design/the_view'
+      Document.delete_doc :database => 'contacts', :doc_id => '_design/my_views'
+      Document.delete_doc :database => 'contacts', :doc_id => '_design/email_finder'
  end
 
  should "edit a document - handle exceptions" do 
@@ -190,7 +190,7 @@ class TestLeanback < Test::Unit::TestCase
          #see delete without _rev above
          data = {:firstname => 'john', :lastname =>'smith', :email => 'john@mail.com',:gender=>'male', :_rev=>'2-e813a0e902e3ac114400ff3959a2adde'}
          doc = {:database => 'contacts', :doc_id => 'john', :data => data}
-         hash = Document.edit doc
+         hash = Document.edit_doc doc
          #puts hash.inspect 
         rescue CouchdbException => e   
           assert_equal "CouchDB: Error - conflict. Reason - Document update conflict.", e.to_s
@@ -205,10 +205,10 @@ class TestLeanback < Test::Unit::TestCase
         	 :email =>'james@mail.com'}
 
          doc = {:database => 'contacts', :doc_id => 'Sun', :data => data}
-         Document.create doc
+         Document.create_doc doc
 
          doc = {:database => 'contacts', :doc_id => 'Sun'}
-         hash = Document.delete doc
+         hash = Document.delete_doc doc
 
         assert_equal 'Sun', hash["id"] 
         assert_equal true, hash["ok"]  

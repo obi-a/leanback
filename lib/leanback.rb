@@ -9,12 +9,6 @@ class CouchdbException < RuntimeError
   end
 end
 
-
-module Document
-  
-  
-end
-
 module Couchdb
 
 #create a document 

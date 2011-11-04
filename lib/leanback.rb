@@ -12,7 +12,12 @@ end
 
 module Document
   
-  #create a document 
+  
+end
+
+module Couchdb
+
+#create a document 
   def self.create_doc( doc)  
       db_name =  doc[:database]
       doc_id = doc[:doc_id]
@@ -92,9 +97,7 @@ module Document
       end 
      end
   end
-end
 
-module Couchdb
   #create a database if one with the same name doesn't already exist
   def self.create(database_name)
        set_address

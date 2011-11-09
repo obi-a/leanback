@@ -11,6 +11,49 @@ end
 
 module Couchdb
 
+#couchdb configuration api
+def self.set_config(data) 
+  section = data[:section]
+  key = data[:key] 
+  value = data[:value]
+  json_data = Yajl::Encoder.encode(value)
+  set_address
+  begin
+   response = RestClient.put 'http://' + @address + ':' + @port + '/_config/' + URI.escape(section) + '/' + URI.escape(key),json_data, {:content_type => :json, :accept => :json}
+   hash = Yajl::Parser.parse(response.to_str)
+  rescue => e
+   hash = Yajl::Parser.parse(e.response.to_s)
+   raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
+ end
+end
+
+def self.delete_config(data) 
+  section = data[:section]
+  key = data[:key] 
+  set_address
+  begin
+   response = RestClient.delete 'http://' + @address + ':' + @port + '/_config/' + URI.escape(section) + '/' + URI.escape(key), {:content_type => :json}
+   hash = Yajl::Parser.parse(response.to_str)
+  rescue => e
+   hash = Yajl::Parser.parse(e.response.to_s)
+   raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
+ end
+end
+
+
+def self.get_config(data) 
+  section = data[:section]
+  key = data[:key] 
+  set_address
+  begin
+   response = RestClient.get 'http://' + @address + ':' + @port + '/_config/' + URI.escape(section) + '/' + URI.escape(key), {:content_type => :json}
+   hash = Yajl::Parser.parse(response.to_str)
+  rescue => e
+   hash = Yajl::Parser.parse(e.response.to_s)
+   raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
+ end
+end
+
 #create a document 
   def self.create_doc( doc)  
       db_name =  doc[:database]

@@ -259,7 +259,45 @@ class TestLeanback < Test::Unit::TestCase
        #end
    end
 
+#TODO: add better tests with validations for couchDB configuration methods later
 
+  should "change the timeout key to 78787 " do
+     data = {:section => "couch_httpd_auth",
+              :key => "timeout",
+                :value => "78787"}
+    Couchdb.set_config data
+ end
+ 
+should "return the configuration values" do
+  data = {:section => "httpd",
+              :key => "port"}
+  puts "port = " + Couchdb.get_config(data)
+
+  data = {:section => "couch_httpd_auth",
+              :key => "timeout"}
+  puts "timeout = " + Couchdb.get_config(data)
+ end
+
+should "set sample key values to couchDB configuration" do
+     data = {:section => "sample_config_section",
+              :key => "sample_key",
+                :value => "sample_value"}
+     Couchdb.set_config data
+ end
+
+should "delete couchDB sample configuration" do
+     data = {:section => "sample_config_section",
+              :key => "sample_key"}
+     hash = Couchdb.delete_config data
+     puts hash.inspect
+ end
+
+should "add an admin user" do
+    # data = {:section => "admins",
+     #         :key => "obi",
+      #          :value => "trusted"}
+   # Couchdb.set_config data
+end
 
   should " switch to default bind address" do
      Couchdb.address = nil

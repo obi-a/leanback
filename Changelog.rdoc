@@ -1,3 +1,7 @@
+November 9,2011:-
+* Added support for couchDB configuration API. It's now possible to change/modify/delete any couchDB configuration settings with Leanback. README will soon be updated with details.
+  
+
 November 3, 2011:-
 * Changed all the syntax for working with documents (creating, editing, updating and deleting documents now use a new syntax) See README for the change. Document::Module has been removed, it's methods are now part of Couchdb::Module. 
     

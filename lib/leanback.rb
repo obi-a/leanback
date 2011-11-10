@@ -11,8 +11,21 @@ end
 
 module Couchdb
 
+#login to couchdb
+def self.login(username, password)
+  set_address
+  data = 'name=' + username + '&password=' + password
+  begin
+   response = RestClient.post 'http://' + @address + ':' + @port + '/_session/', data, {:content_type => 'application/x-www-form-urlencoded'}
+   response.cookies
+  rescue => e
+   hash = Yajl::Parser.parse(e.response.to_s)
+   raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
+ end
+end
+
 #couchdb configuration api
-def self.set_config(data) 
+def self.set_config(data,auth_session = nil) 
   section = data[:section]
   key = data[:key] 
   value = data[:value]
@@ -27,7 +40,7 @@ def self.set_config(data)
  end
 end
 
-def self.delete_config(data) 
+def self.delete_config(data,auth_session = nil) 
   section = data[:section]
   key = data[:key] 
   set_address
@@ -41,7 +54,7 @@ def self.delete_config(data)
 end
 
 
-def self.get_config(data) 
+def self.get_config(data,auth_session = nil) 
   section = data[:section]
   key = data[:key] 
   set_address
@@ -55,7 +68,7 @@ def self.get_config(data)
 end
 
 #create a document 
-  def self.create_doc( doc)  
+  def self.create_doc( doc,auth_session = nil)  
       db_name =  doc[:database]
       doc_id = doc[:doc_id]
       data = doc[:data]
@@ -71,7 +84,7 @@ end
   end
 
   #edit a document
-  def self.edit_doc(doc)
+  def self.edit_doc(doc,auth_session = nil)
       db_name = doc[:database]
       doc_id = doc[:doc_id]
       data = doc[:data]
@@ -87,7 +100,7 @@ end
   end
 
  #update a doc
- def self.update_doc(doc)
+ def self.update_doc(doc,auth_session = nil)
       db_name = doc[:database]
       doc_id = doc[:doc_id]
       data = doc[:data]
@@ -99,18 +112,18 @@ end
  end
 
 #delete document
- def self.delete_doc(doc)  
+ def self.delete_doc(doc,auth_session = nil)  
    db_name = doc[:database]
    doc_id = doc[:doc_id]
    doc = {:database => db_name, :doc_id => doc_id}
    hash = Couchdb.view doc
    doc = {:database => db_name, :doc_id => doc_id, :rev => hash["_rev"]}
-   delete_rev doc
+   delete_rev(doc,auth_session)
  end
 
 
  #delete a doc by rev#
- def self.delete_rev(doc)
+ def self.delete_rev(doc,auth_session = nil)
    db_name = doc[:database]
    doc_id = doc[:doc_id]
    rev = doc[:rev]
@@ -124,19 +137,9 @@ end
     end
  end
 
-   class << self
-       attr_accessor :address 
-       attr_accessor :port 
-     def set_address
-      if @address == nil && port == nil
-         @address = '127.0.0.1'
-         @port = '5984'
-      end 
-     end
-  end
 
   #create a database if one with the same name doesn't already exist
-  def self.create(database_name)
+  def self.create(database_name,auth_session = nil)
        set_address
        begin
          response = RestClient.put 'http://' + @address + ':' + @port + '/' + URI.escape(database_name), {:content_type => :json}
@@ -148,7 +151,7 @@ end
   end
 
  #delete a database
- def self.delete(database_name)
+ def self.delete(database_name,auth_session = nil)
       set_address
        begin
          response = RestClient.delete 'http://' + @address + ':' + @port + '/' + URI.escape(database_name), {:content_type => :json}
@@ -160,7 +163,7 @@ end
  end
 
  #return a list of all databases
- def self.all
+ def self.all(auth_session = nil)
       set_address
        begin
          response = RestClient.get 'http://' + @address + ':' + @port + '/_all_dbs', {:content_type => :json}
@@ -171,7 +174,7 @@ end
  end
 
 ##view a document 
-def self.view(doc)
+def self.view(doc,auth_session = nil)
  set_address
  db_name = doc[:database]
  doc_id = doc[:doc_id]
@@ -185,7 +188,7 @@ def self.view(doc)
 end
 
 #query a permanent view
-def self.find(doc,key=nil)
+def self.find(doc,key=nil,auth_session = nil)
  set_address
  db_name = doc[:database]
  design_doc_name = doc[:design_doc]
@@ -212,7 +215,7 @@ def self.find(doc,key=nil)
 end
 
 #create a design document with views
-def self.create_design(doc)
+def self.create_design(doc,auth_session = nil)
  set_address
  db_name = doc[:database]
  design_doc_name = doc[:design_doc]
@@ -237,7 +240,7 @@ def self.create_design(doc)
 end
 
 #Query view, create view on fly if it dosen't already exist
-def self.find_on_fly(doc, key = nil)  
+def self.find_on_fly(doc, key = nil,auth_session = nil)  
    db_name = doc[:database]
    design_doc = doc[:design_doc]
    view = doc[:view]
@@ -245,17 +248,17 @@ def self.find_on_fly(doc, key = nil)
  
    begin 
       if( key == nil)
-       docs = find(:database => db_name, :design_doc => design_doc, :view => view) 
+       docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session = nil) 
       else
-       docs = find({:database => db_name, :design_doc => design_doc, :view => view},key) 
+       docs = find({:database => db_name, :design_doc => design_doc, :view => view},key,auth_session = nil) 
       end
      rescue CouchdbException => e
         document = { :database => db_name, :design_doc => design_doc, :json_doc => json_doc}
-        create_design document  
+        create_design document,auth_session = nil 
         if( key == nil)
-          docs = find(:database => db_name, :design_doc => design_doc, :view => view) 
+          docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session = nil) 
         else
-          docs = find({:database => db_name, :design_doc => design_doc, :view => view},key) 
+          docs = find({:database => db_name, :design_doc => design_doc, :view => view},key,auth_session = nil) 
         end
       end
     return docs
@@ -264,7 +267,7 @@ def self.find_on_fly(doc, key = nil)
 
 #add a finder method to the database
 #this creates a find by key method
-def self.add_finder(options)
+def self.add_finder(options,auth_session = nil)
  set_address 
  db_name = options[:database]
  key = options[:key] 
@@ -291,7 +294,7 @@ def self.add_finder(options)
 end
 
 #find by key 
-def self.find_by(options)
+def self.find_by(options,auth_session = nil)
  set_address 
  db_name = options[:database]
  index =  options.keys[1].to_s
@@ -301,18 +304,18 @@ def self.find_by(options)
  
  begin 
   view = { :database => db_name, :design_doc => design_doc_name, :view => view_name}
-  docs = find view,search_term
+  docs = find view,search_term,auth_session
  rescue CouchdbException => e
     #add a finder/index if one doesn't already exist in the database
     #then find_by_key
-    add_finder(:database => db_name, :key => index)
-    docs = find view,search_term
+    add_finder({:database => db_name, :key => index},auth_session = nil)
+    docs = find view,search_term,auth_session
  end
  return docs
 end
 
  #return a list of all docs in the database
-def self.docs_from(database_name)
+def self.docs_from(database_name,auth_session = nil)
   set_address
   begin
          response = RestClient.get 'http://' + @address + ':' + @port + '/' + URI.escape(database_name) + '/_all_docs?include_docs=true', {:content_type => :json}

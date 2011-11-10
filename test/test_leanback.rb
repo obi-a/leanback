@@ -294,9 +294,15 @@ should "delete couchDB sample configuration" do
 
 should "add an admin user" do
     # data = {:section => "admins",
-     #         :key => "obi",
-      #          :value => "trusted"}
-   # Couchdb.set_config data
+    #          :key => "obi",
+    #            :value => "trusted"}
+    #Couchdb.set_config data
+end
+
+should "login a user" do
+   #hash = Couchdb.login(username = 'obi',password ='trusted') 
+   #puts hash.inspect
+   #sleep
 end
 
   should " switch to default bind address" do

@@ -2,6 +2,7 @@ GEM
   remote: http://rubygems.org/
   remote: http://gemcutter.org/
   specs:
+    diff-lcs (1.1.2)
     git (1.2.5)
     jeweler (1.5.2)
       bundler (~> 1.0.0)
@@ -12,6 +13,14 @@ GEM
     rcov (0.9.9)
     rest-client (1.6.1)
       mime-types (>= 1.16)
+    rspec (2.6.0)
+      rspec-core (~> 2.6.0)
+      rspec-expectations (~> 2.6.0)
+      rspec-mocks (~> 2.6.0)
+    rspec-core (2.6.4)
+    rspec-expectations (2.6.0)
+      diff-lcs (~> 1.1.2)
+    rspec-mocks (2.6.0)
     shoulda (2.11.3)
     yajl-ruby (0.8.2)
 
@@ -23,5 +32,6 @@ DEPENDENCIES
   jeweler (~> 1.5.2)
   rcov
   rest-client
+  rspec
   shoulda
   yajl-ruby

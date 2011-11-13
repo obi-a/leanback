@@ -142,7 +142,7 @@ end
   def self.create(database_name,auth_session = "")
        set_address
        begin
-         response = RestClient.put 'http://' + @address + ':' + @port + '/' + URI.escape(database_name), {:cookies => {"AuthSession" => auth_session}}
+         response = RestClient.put 'http://' + @address + ':' + @port + '/' + URI.escape(database_name), {:content_type => :json},{:cookies => {"AuthSession" => auth_session}}
          hash = Yajl::Parser.parse(response.to_str)
        rescue => e
          hash = Yajl::Parser.parse(e.response.to_s)
@@ -188,7 +188,7 @@ def self.view(doc,auth_session = "")
 end
 
 #query a permanent view
-def self.find(doc,key=nil,auth_session = "")
+def self.find(doc,auth_session = "",key=nil)
  set_address
  db_name = doc[:database]
  design_doc_name = doc[:design_doc]
@@ -240,7 +240,7 @@ def self.create_design(doc,auth_session = "")
 end
 
 #Query view, create view on fly if it dosen't already exist
-def self.find_on_fly(doc, key = nil,auth_session = "")  
+def self.find_on_fly(doc,auth_session = "",key = nil)  
    db_name = doc[:database]
    design_doc = doc[:design_doc]
    view = doc[:view]
@@ -250,7 +250,7 @@ def self.find_on_fly(doc, key = nil,auth_session = "")
       if( key == nil)
        docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session) 
       else
-       docs = find({:database => db_name, :design_doc => design_doc, :view => view},key,auth_session) 
+       docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session,key) 
       end
      rescue CouchdbException => e
         document = { :database => db_name, :design_doc => design_doc, :json_doc => json_doc}
@@ -258,7 +258,7 @@ def self.find_on_fly(doc, key = nil,auth_session = "")
         if( key == nil)
           docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session) 
         else
-          docs = find({:database => db_name, :design_doc => design_doc, :view => view},key,auth_session) 
+          docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session,key) 
         end
       end
     return docs
@@ -304,12 +304,12 @@ def self.find_by(options,auth_session = "")
  
  begin 
   view = { :database => db_name, :design_doc => design_doc_name, :view => view_name}
-  docs = find view,search_term,auth_session
+  docs = find view,auth_session,search_term
  rescue CouchdbException => e
     #add a finder/index if one doesn't already exist in the database
     #then find_by_key
     add_finder({:database => db_name, :key => index},auth_session)
-    docs = find view,search_term,auth_session
+    docs = find view,auth_session,search_term
  end
  return docs
 end

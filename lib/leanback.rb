@@ -25,14 +25,14 @@ def self.login(username, password)
 end
 
 #couchdb configuration api
-def self.set_config(data,auth_session = nil) 
+def self.set_config(data,auth_session = "") 
   section = data[:section]
   key = data[:key] 
   value = data[:value]
   json_data = Yajl::Encoder.encode(value)
   set_address
   begin
-   response = RestClient.put 'http://' + @address + ':' + @port + '/_config/' + URI.escape(section) + '/' + URI.escape(key),json_data, {:content_type => :json, :accept => :json}
+   response = RestClient.put 'http://' + @address + ':' + @port + '/_config/' + URI.escape(section) + '/' + URI.escape(key),json_data, {:cookies => {"AuthSession" => auth_session}}
    hash = Yajl::Parser.parse(response.to_str)
   rescue => e
    hash = Yajl::Parser.parse(e.response.to_s)
@@ -40,12 +40,12 @@ def self.set_config(data,auth_session = nil)
  end
 end
 
-def self.delete_config(data,auth_session = nil) 
+def self.delete_config(data,auth_session = "") 
   section = data[:section]
   key = data[:key] 
   set_address
   begin
-   response = RestClient.delete 'http://' + @address + ':' + @port + '/_config/' + URI.escape(section) + '/' + URI.escape(key), {:content_type => :json}
+   response = RestClient.delete 'http://' + @address + ':' + @port + '/_config/' + URI.escape(section) + '/' + URI.escape(key), {:cookies => {"AuthSession" => auth_session}}
    hash = Yajl::Parser.parse(response.to_str)
   rescue => e
    hash = Yajl::Parser.parse(e.response.to_s)
@@ -54,12 +54,12 @@ def self.delete_config(data,auth_session = nil)
 end
 
 
-def self.get_config(data,auth_session = nil) 
+def self.get_config(data,auth_session = "") 
   section = data[:section]
   key = data[:key] 
   set_address
   begin
-   response = RestClient.get 'http://' + @address + ':' + @port + '/_config/' + URI.escape(section) + '/' + URI.escape(key), {:content_type => :json}
+   response = RestClient.get 'http://' + @address + ':' + @port + '/_config/' + URI.escape(section) + '/' + URI.escape(key), {:cookies => {"AuthSession" => auth_session}}
    hash = Yajl::Parser.parse(response.to_str)
   rescue => e
    hash = Yajl::Parser.parse(e.response.to_s)
@@ -68,14 +68,14 @@ def self.get_config(data,auth_session = nil)
 end
 
 #create a document 
-  def self.create_doc( doc,auth_session = nil)  
+  def self.create_doc( doc,auth_session = "")  
       db_name =  doc[:database]
       doc_id = doc[:doc_id]
       data = doc[:data]
       json_data = Yajl::Encoder.encode(data)
       set_address
       begin
-         response = RestClient.put 'http://' + @address + ':' + @port + '/' + URI.escape(db_name) + '/' + URI.escape(doc_id),json_data, {:content_type => :json, :accept => :json}
+         response = RestClient.put 'http://' + @address + ':' + @port + '/' + URI.escape(db_name) + '/' + URI.escape(doc_id),json_data, {:cookies => {"AuthSession" => auth_session}}
          hash = Yajl::Parser.parse(response.to_str)
        rescue => e
          hash = Yajl::Parser.parse(e.response.to_s)
@@ -84,14 +84,14 @@ end
   end
 
   #edit a document
-  def self.edit_doc(doc,auth_session = nil)
+  def self.edit_doc(doc,auth_session = "")
       db_name = doc[:database]
       doc_id = doc[:doc_id]
       data = doc[:data]
       json_data = Yajl::Encoder.encode(data)
       set_address
       begin
-        response = RestClient.put 'http://' + @address + ':' + @port + '/' + URI.escape(db_name) + '/' + URI.escape(doc_id), json_data, {:content_type => :json, :accept => :json}
+        response = RestClient.put 'http://' + @address + ':' + @port + '/' + URI.escape(db_name) + '/' + URI.escape(doc_id), json_data, {:cookies => {"AuthSession" => auth_session}}
          hash = Yajl::Parser.parse(response.to_str)
        rescue => e
          hash = Yajl::Parser.parse(e.response.to_s)
@@ -100,36 +100,36 @@ end
   end
 
  #update a doc
- def self.update_doc(doc,auth_session = nil)
+ def self.update_doc(doc,auth_session = "")
       db_name = doc[:database]
       doc_id = doc[:doc_id]
       data = doc[:data]
       doc = {:database => db_name, :doc_id => doc_id}
-      options = Couchdb.view doc 
+      options = Couchdb.view doc,auth_session 
       options = options.merge(data)
       doc = {:database => db_name, :doc_id => doc_id, :data => options}
-      edit_doc doc
+      edit_doc doc,auth_session
  end
 
 #delete document
- def self.delete_doc(doc,auth_session = nil)  
+ def self.delete_doc(doc,auth_session = "")  
    db_name = doc[:database]
    doc_id = doc[:doc_id]
    doc = {:database => db_name, :doc_id => doc_id}
-   hash = Couchdb.view doc
+   hash = Couchdb.view doc,auth_session
    doc = {:database => db_name, :doc_id => doc_id, :rev => hash["_rev"]}
    delete_rev(doc,auth_session)
  end
 
 
  #delete a doc by rev#
- def self.delete_rev(doc,auth_session = nil)
+ def self.delete_rev(doc,auth_session = "")
    db_name = doc[:database]
    doc_id = doc[:doc_id]
    rev = doc[:rev]
    set_address
    begin 
-    response = RestClient.delete 'http://' + @address + ':' + @port + '/' + URI.escape(db_name)  + '/' + URI.escape(doc_id) + '?rev=' + rev, {:content_type => :json}
+    response = RestClient.delete 'http://' + @address + ':' + @port + '/' + URI.escape(db_name)  + '/' + URI.escape(doc_id) + '?rev=' + rev, {:cookies => {"AuthSession" => auth_session}}
       hash = Yajl::Parser.parse(response.to_str)
     rescue => e
      hash = Yajl::Parser.parse(e.response.to_s)
@@ -139,10 +139,10 @@ end
 
 
   #create a database if one with the same name doesn't already exist
-  def self.create(database_name,auth_session = nil)
+  def self.create(database_name,auth_session = "")
        set_address
        begin
-         response = RestClient.put 'http://' + @address + ':' + @port + '/' + URI.escape(database_name), {:content_type => :json}
+         response = RestClient.put 'http://' + @address + ':' + @port + '/' + URI.escape(database_name), {:cookies => {"AuthSession" => auth_session}}
          hash = Yajl::Parser.parse(response.to_str)
        rescue => e
          hash = Yajl::Parser.parse(e.response.to_s)
@@ -151,10 +151,10 @@ end
   end
 
  #delete a database
- def self.delete(database_name,auth_session = nil)
+ def self.delete(database_name,auth_session = "")
       set_address
        begin
-         response = RestClient.delete 'http://' + @address + ':' + @port + '/' + URI.escape(database_name), {:content_type => :json}
+         response = RestClient.delete 'http://' + @address + ':' + @port + '/' + URI.escape(database_name), {:cookies => {"AuthSession" => auth_session}}
          hash = Yajl::Parser.parse(response.to_str)
        rescue => e
          hash = Yajl::Parser.parse(e.response.to_s)
@@ -163,10 +163,10 @@ end
  end
 
  #return a list of all databases
- def self.all(auth_session = nil)
+ def self.all(auth_session = "")
       set_address
        begin
-         response = RestClient.get 'http://' + @address + ':' + @port + '/_all_dbs', {:content_type => :json}
+         response = RestClient.get 'http://' + @address + ':' + @port + '/_all_dbs', {:cookies => {"AuthSession" => auth_session}}
          hash = Yajl::Parser.parse(response.to_str)
        rescue => e
            raise e
@@ -174,12 +174,12 @@ end
  end
 
 ##view a document 
-def self.view(doc,auth_session = nil)
+def self.view(doc,auth_session = "")
  set_address
  db_name = doc[:database]
  doc_id = doc[:doc_id]
   begin
-   response = RestClient.get 'http://' + @address + ':' + @port + '/' + db_name + '/' + doc_id
+   response = RestClient.get 'http://' + @address + ':' + @port + '/' + db_name + '/' + doc_id,{:cookies => {"AuthSession" => auth_session}}
    hash = Yajl::Parser.parse(response.to_str)
   rescue => e
    hash = Yajl::Parser.parse(e.response.to_s)
@@ -188,16 +188,16 @@ def self.view(doc,auth_session = nil)
 end
 
 #query a permanent view
-def self.find(doc,key=nil,auth_session = nil)
+def self.find(doc,key=nil,auth_session = "")
  set_address
  db_name = doc[:database]
  design_doc_name = doc[:design_doc]
  view_name = doc[:view]
    begin
     if key == nil
-     response = RestClient.get 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name + '/_view/' + view_name
+     response = RestClient.get 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name + '/_view/' + view_name,{:cookies => {"AuthSession" => auth_session}}
     else
-     response = RestClient.get 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name + '/_view/' + view_name + URI.escape('?key="' + key + '"')
+     response = RestClient.get 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name + '/_view/' + view_name + URI.escape('?key="' + key + '"'),{:cookies => {"AuthSession" => auth_session}}
     end
      hash = Yajl::Parser.parse(response.to_str)
      rows = hash["rows"]
@@ -215,7 +215,7 @@ def self.find(doc,key=nil,auth_session = nil)
 end
 
 #create a design document with views
-def self.create_design(doc,auth_session = nil)
+def self.create_design(doc,auth_session = "")
  set_address
  db_name = doc[:database]
  design_doc_name = doc[:design_doc]
@@ -231,7 +231,7 @@ def self.create_design(doc,auth_session = nil)
 
   begin
    
-   response = RestClient.put 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name, str, {:content_type => :json, :accept => :json}
+   response = RestClient.put 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name, str, {:cookies => {"AuthSession" => auth_session}}
     hash = Yajl::Parser.parse(response.to_str)
   rescue => e
     hash = Yajl::Parser.parse(e.response.to_s)
@@ -240,7 +240,7 @@ def self.create_design(doc,auth_session = nil)
 end
 
 #Query view, create view on fly if it dosen't already exist
-def self.find_on_fly(doc, key = nil,auth_session = nil)  
+def self.find_on_fly(doc, key = nil,auth_session = "")  
    db_name = doc[:database]
    design_doc = doc[:design_doc]
    view = doc[:view]
@@ -248,17 +248,17 @@ def self.find_on_fly(doc, key = nil,auth_session = nil)
  
    begin 
       if( key == nil)
-       docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session = nil) 
+       docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session) 
       else
-       docs = find({:database => db_name, :design_doc => design_doc, :view => view},key,auth_session = nil) 
+       docs = find({:database => db_name, :design_doc => design_doc, :view => view},key,auth_session) 
       end
      rescue CouchdbException => e
         document = { :database => db_name, :design_doc => design_doc, :json_doc => json_doc}
-        create_design document,auth_session = nil 
+        create_design document,auth_session
         if( key == nil)
-          docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session = nil) 
+          docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session) 
         else
-          docs = find({:database => db_name, :design_doc => design_doc, :view => view},key,auth_session = nil) 
+          docs = find({:database => db_name, :design_doc => design_doc, :view => view},key,auth_session) 
         end
       end
     return docs
@@ -267,7 +267,7 @@ def self.find_on_fly(doc, key = nil,auth_session = nil)
 
 #add a finder method to the database
 #this creates a find by key method
-def self.add_finder(options,auth_session = nil)
+def self.add_finder(options,auth_session = "")
  set_address 
  db_name = options[:database]
  key = options[:key] 
@@ -286,7 +286,7 @@ def self.add_finder(options,auth_session = nil)
 }'
 
  begin  
-  response = RestClient.put 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name, view, {:content_type => :json, :accept => :json}
+  response = RestClient.put 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name, view, {:cookies => {"AuthSession" => auth_session}}
  rescue => e
     hash = Yajl::Parser.parse(e.response.to_s)
     raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
@@ -294,7 +294,7 @@ def self.add_finder(options,auth_session = nil)
 end
 
 #find by key 
-def self.find_by(options,auth_session = nil)
+def self.find_by(options,auth_session = "")
  set_address 
  db_name = options[:database]
  index =  options.keys[1].to_s
@@ -308,17 +308,17 @@ def self.find_by(options,auth_session = nil)
  rescue CouchdbException => e
     #add a finder/index if one doesn't already exist in the database
     #then find_by_key
-    add_finder({:database => db_name, :key => index},auth_session = nil)
+    add_finder({:database => db_name, :key => index},auth_session)
     docs = find view,search_term,auth_session
  end
  return docs
 end
 
  #return a list of all docs in the database
-def self.docs_from(database_name,auth_session = nil)
+def self.docs_from(database_name,auth_session = "")
   set_address
   begin
-         response = RestClient.get 'http://' + @address + ':' + @port + '/' + URI.escape(database_name) + '/_all_docs?include_docs=true', {:content_type => :json}
+         response = RestClient.get 'http://' + @address + ':' + @port + '/' + URI.escape(database_name) + '/_all_docs?include_docs=true',{:cookies => {"AuthSession" => auth_session}}
          hash = Yajl::Parser.parse(response.to_str)
          rows = hash["rows"]
          count = 0 

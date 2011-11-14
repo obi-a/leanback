@@ -2,8 +2,8 @@ path = File.expand_path(File.dirname(__FILE__))
 
 require path + "/helper.rb"
 
-auth_session = "b2JpOjRFQkVGNTVBOvyrfMupYQCL0CwIC146XoJAO5Jo"
-
+auth_session = "b2JpOjRFQzE5QThGOl1vWmoCx68CKvF2eJKrZnkCFv1c"
+ 
 
 data = {:section => "admins",
              :key => "obi",
@@ -11,13 +11,25 @@ data = {:section => "admins",
     #Couchdb.set_config data
 
 #hash = Couchdb.login(username = 'obi',password ='trusted') 
-#puts hash.inspect
-
+#auth_session =  hash["AuthSession"]
+#puts auth_session
+#hash = Couchdb.create('staff',auth_session)
 
 #hash = Couchdb.add_finder({:database => 'contacts', :key => 'firstname'}, auth_session)
 
  #puts hash.inspect 
         
+
+data = { :admins => {"names" => ["nancy"], "roles" => ["admin"]},
+                   :readers => {"names" => ["nancy"],"roles"  => ["admin"]}
+                  }
+
+ #hash = Couchdb.set_security("corn",data,auth_session)
+ #puts hash.inspect
+
+ #hash = Couchdb.get_security("corn",auth_session)
+ #puts hash.inspect
+
  doc = { :database => 'contacts', :design_doc => 'more_views', :json_doc => '/home/obi/bin/leanback/test/my_views.json' }
  #hash = Couchdb.create_design doc, auth_session      
  #puts hash.inspect

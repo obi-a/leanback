@@ -11,6 +11,30 @@ end
 
 module Couchdb
 
+#add security object
+def self.set_security(db_name, data,auth_session="")
+  security_data = Yajl::Encoder.encode(data)
+  set_address
+  begin
+  response = RestClient.put 'http://' + @address + ':' + @port + '/' + URI.escape(db_name) + '/_security/',security_data, {:cookies => {"AuthSession" => auth_session}}
+  hash = Yajl::Parser.parse(response.to_str)
+  rescue => e
+   hash = Yajl::Parser.parse(e.response.to_s)
+   raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
+  end 
+end
+#get security object
+def self.get_security(db_name, auth_session="")
+ set_address
+ begin
+  response = RestClient.get 'http://' + @address + ':' + @port + '/' + URI.escape(db_name) + '/_security/', {:cookies => {"AuthSession" => auth_session}}
+  hash = Yajl::Parser.parse(response.to_str)
+  rescue => e
+  hash = Yajl::Parser.parse(e.response.to_s)
+  raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
+ end 
+end
+
 #login to couchdb
 def self.login(username, password)
   set_address

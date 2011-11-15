@@ -1,8 +1,8 @@
 require 'spec_base.rb'
 
-#hash = Couchdb.login(username = 'obi',password ='trusted') 
-#@@auth_session =  hash["AuthSession"]
-@@auth_session = "b2JpOjRFQkY1QzI3Ojhjz6Yqz9mac6cZj4Ar406YRafm"
+hash = Couchdb.login(username = 'obi',password ='trusted') 
+@@auth_session =  hash["AuthSession"]
+
 
 describe "CouchDB " do
 

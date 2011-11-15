@@ -11,6 +11,37 @@ end
 
 module Couchdb
 
+#add a new user 
+def self.add_user(user, auth_session="")
+  o =  [('a'..'z'),('A'..'Z')].map{|i| i.to_a}.flatten;  
+  salt  =  (0..50).map{ o[rand(o.length)]  }.join; 
+  new_user = {:username => user[:username], :password => user[:password], :roles => user[:roles], :salt => salt}
+  create_user(new_user,auth_session)
+end
+
+#create a new user 
+def self.create_user(user,auth_session= "")
+  password_sha = Digest::SHA1.hexdigest(user[:password] + user[:salt])              
+  
+  user_hash = { :type => "user",
+                   :name => user[:username],
+                   :password_sha => password_sha,
+                   :salt => user[:salt],
+                   :roles => user[:roles]
+                  }
+   
+   str = Yajl::Encoder.encode(user_hash)
+   set_address
+   begin
+    response = RestClient.put 'http://' + @address + ':' + @port + '/_users/org.couchdb.user:' + URI.escape(user[:username]), str,{:cookies => {"AuthSession" => auth_session}}
+    hash = Yajl::Parser.parse(response.to_str)
+  rescue => e
+    hash = Yajl::Parser.parse(e.response.to_s)
+    raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
+  end 
+
+end
+
 #add security object
 def self.set_security(db_name, data,auth_session="")
   security_data = Yajl::Encoder.encode(data)
@@ -34,6 +65,7 @@ def self.get_security(db_name, auth_session="")
   raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
  end 
 end
+
 
 #login to couchdb
 def self.login(username, password)

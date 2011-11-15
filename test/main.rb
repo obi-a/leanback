@@ -18,17 +18,45 @@ data = {:section => "admins",
 #hash = Couchdb.add_finder({:database => 'contacts', :key => 'firstname'}, auth_session)
 
  #puts hash.inspect 
-        
 
+#user = { :username => "Will.i.am", :password => "trusted", :roles => []}
+#hash = Couchdb.add_user(user)
+#puts hash.inspect
+
+#user = { :username => "kris", :password => "trusted", :roles => ["drunk"]}
+#hash = Couchdb.add_user(user,auth_session)
+#puts hash.inspect
+
+hash = Couchdb.login(username = 'kris',password ='trusted') 
+auth_session =  hash["AuthSession"]
+puts "session = " + auth_session
+
+#user = {:username => "jayz", :password => "trusted", :roles => ["student"], :salt => "whatevathesaltis",:email => 'uzi@aol.com'}
+
+#hash = Couchdb.create_user(user)
+#admins can add user roles
+#hash = Couchdb.create_user(user, auth_session)
+
+#puts hash.inspect
+ 
+#o =  [('a'..'z'),('A'..'Z')].map{|i| i.to_a}.flatten;  
+#salt  =  (0..50).map{ o[rand(o.length)]  }.join;       
+
+#puts salt
 data = { :admins => {"names" => ["nancy"], "roles" => ["admin"]},
                    :readers => {"names" => ["nancy"],"roles"  => ["admin"]}
                   }
+#data = { :admins => {"names" => [], "roles" => []},
+#                   :readers => {"names" => [],"roles"  => []}
+#                  }
 
  #hash = Couchdb.set_security("corn",data,auth_session)
  #puts hash.inspect
 
  #hash = Couchdb.get_security("corn",auth_session)
  #puts hash.inspect
+
+
 
  doc = { :database => 'contacts', :design_doc => 'more_views', :json_doc => '/home/obi/bin/leanback/test/my_views.json' }
  #hash = Couchdb.create_design doc, auth_session      

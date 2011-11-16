@@ -169,42 +169,33 @@ end
 
 #TODO: add better tests with validations for couchDB configuration methods later
 
-it "should change the timeout key to 78787 " do
-     data = {:section => "couch_httpd_auth",
-              :key => "timeout",
-                :value => "78787"}
-    Couchdb.set_config data,@@auth_session
- end
- 
-it "should return the configuration values" do
-  data = {:section => "httpd",
-              :key => "port"}
-  puts "port = " + Couchdb.get_config(data,@@auth_session)
-
-  data = {:section => "couch_httpd_auth",
-              :key => "timeout"}
-  puts "timeout = " + Couchdb.get_config(data,@@auth_session)
- end
-
-it "should set sample key values to couchDB configuration" do
+it "should set a config section, retrieve it and delete it" do
      data = {:section => "sample_config_section",
               :key => "sample_key",
                 :value => "sample_value"}
-     Couchdb.set_config data,@@auth_session
- end
+    Couchdb.set_config data,@@auth_session
 
-it "should delete couchDB sample configuration" do
-     data = {:section => "sample_config_section",
+    data = {:section => "sample_config_section",
               :key => "sample_key"}
-     hash = Couchdb.delete_config data,@@auth_session
-     puts hash.inspect
+
+     Couchdb.get_config(data,@@auth_session).should == "sample_value"
+
+     Couchdb.delete_config(data,@@auth_session).should == "sample_value"
+
+     lambda {Couchdb.get_config(data,@@auth_session)}.should raise_error(CouchdbException,"CouchDB: Error - not_found. Reason - unknown_config_value")   
  end
 
-it "should add an admin user" do
-    # data = {:section => "admins",
-    #          :key => "obi",
-    #            :value => "trusted"}
-    #Couchdb.set_config data
+it "should create an admin user and delete the admin user" do
+     data = {:section => "admins",
+              :key => "sample_admin",
+                :value => "trusted"}
+    Couchdb.set_config data,@@auth_session
+
+    data = {:section => "admins",
+              :key => "sample_admin"}
+
+    Couchdb.delete_config(data,@@auth_session)
+    lambda {Couchdb.get_config(data,@@auth_session)}.should raise_error(CouchdbException,"CouchDB: Error - not_found. Reason - unknown_config_value") 
 end
 
 it "should login a user" do

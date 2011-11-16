@@ -1,13 +1,11 @@
 require 'spec_base.rb'
-
+#a day in the life of a CouchDB admin user
 hash = Couchdb.login(username = 'obi',password ='trusted') 
 @@auth_session =  hash["AuthSession"]
 
 
 describe "CouchDB " do
 
-
-  
 it "should create and delete a database" do
   hash = Couchdb.create('staff',@@auth_session)
   hash.to_s.should == '{"ok"=>true}'
@@ -167,7 +165,7 @@ it "should delete a document after creating it" do
     end
 end
 
-#TODO: add better tests with validations for couchDB configuration methods later
+#database: administration tasks
 
 it "should set a config section, retrieve it and delete it" do
      data = {:section => "sample_config_section",
@@ -220,6 +218,26 @@ it "should set security object on a database, retrieve it and reset it back to o
     hash = Couchdb.get_security("contacts",@@auth_session)
     hash["admins"].should == {"names"=>[], "roles"=>[]}
     hash["readers"].should == {"names"=>[], "roles"=>[]}
+end
+
+it "create a new non-admin user, login user, retrieve user and delete the user" do
+ user = { :username => "sample_user", :password => "trusted", :roles => []}
+ hash = Couchdb.add_user(user)
+ hash["ok"].should == true
+ hash["id"].should == 'org.couchdb.user:sample_user'
+ 
+ hash = Couchdb.login(username = 'sample_user',password ='trusted') 
+ hash.has_key?("AuthSession").should == true
+
+ doc = {:database => '_users', :doc_id => 'org.couchdb.user:sample_user'}
+ hash = Couchdb.view doc,@@auth_session
+ hash["_id"].should == 'org.couchdb.user:sample_user'  
+
+ hash = Couchdb.delete_doc doc,@@auth_session
+ hash["id"].should == 'org.couchdb.user:sample_user'
+ hash["ok"].should == true
+
+ lambda {Couchdb.view(doc,@@auth_session)}.should raise_error(CouchdbException,"CouchDB: Error - not_found. Reason - deleted")  
 end
 
 it "should login a user" do

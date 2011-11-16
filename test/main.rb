@@ -10,8 +10,8 @@ data = {:section => "admins",
                 :value => "trusted"}
     #Couchdb.set_config data
 
-#hash = Couchdb.login(username = 'obi',password ='trusted') 
-#auth_session =  hash["AuthSession"]
+hash = Couchdb.login(username = 'obi',password ='trusted') 
+auth_session =  hash["AuthSession"]
 #puts auth_session
 #hash = Couchdb.create('staff',auth_session)
 
@@ -27,9 +27,9 @@ data = {:section => "admins",
 #hash = Couchdb.add_user(user,auth_session)
 #puts hash.inspect
 
-hash = Couchdb.login(username = 'kris',password ='trusted') 
-auth_session =  hash["AuthSession"]
-puts "session = " + auth_session
+#hash = Couchdb.login(username = 'kris',password ='trusted') 
+#auth_session =  hash["AuthSession"]
+#puts "session = " + auth_session
 
 #user = {:username => "jayz", :password => "trusted", :roles => ["student"], :salt => "whatevathesaltis",:email => 'uzi@aol.com'}
 
@@ -88,8 +88,8 @@ view = { :database => 'contacts',
    #puts hash.inspect
 
 
- #docs = Couchdb.find_by({:database => 'contacts', :lastname => 'winner'}, auth_session) 
- #puts "docs = " + docs.inspect
+ docs = Couchdb.find_by({:database => 'contacts', :lastname => 'Hanna'}, auth_session) 
+ puts "docs = " + docs.inspect
 
  #docs = Couchdb.docs_from 'contacts', auth_session
  #puts "docs = " + docs.inspect

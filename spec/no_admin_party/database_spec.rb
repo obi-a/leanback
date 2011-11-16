@@ -198,6 +198,30 @@ it "should create an admin user and delete the admin user" do
     lambda {Couchdb.get_config(data,@@auth_session)}.should raise_error(CouchdbException,"CouchDB: Error - not_found. Reason - unknown_config_value") 
 end
 
+it "should set security object on a database, retrieve it and reset it back to original" do
+    data = { :admins => {"names" => ["obi"], "roles" => ["admin"]},
+                   :readers => {"names" => ["obi"],"roles"  => ["admin"]}
+                  }
+
+    hash = Couchdb.set_security("contacts",data,@@auth_session)
+    hash["ok"].should == true
+    
+    hash = Couchdb.get_security("contacts",@@auth_session)
+    hash["admins"].should == {"names"=>["obi"], "roles"=>["admin"]}
+    hash["readers"].should == {"names"=>["obi"], "roles"=>["admin"]}
+ 
+    data = { :admins => {"names" => [], "roles" => []},
+                :readers => {"names" => [],"roles"  => []}
+                  }
+
+    hash = Couchdb.set_security("contacts",data,@@auth_session)
+    hash["ok"].should == true
+
+    hash = Couchdb.get_security("contacts",@@auth_session)
+    hash["admins"].should == {"names"=>[], "roles"=>[]}
+    hash["readers"].should == {"names"=>[], "roles"=>[]}
+end
+
 it "should login a user" do
    #hash = Couchdb.login(username = 'obi',password ='trusted') 
    #puts hash.inspect

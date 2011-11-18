@@ -32,12 +32,21 @@ describe "non admin user" do
  lambda {Couchdb.view(doc,@@auth_session)}.should raise_error(CouchdbException,"CouchDB: Error - not_found. Reason - deleted")  
 end
 
-it"should create a design doc" do
+it"should query a view" do
  doc = { :database => 'contacts', :design_doc => 'more_views', :json_doc => '/home/obi/bin/leanback/test/my_views.json' }
    hash = Couchdb.create_design doc,@@admin_auth_session
+
+   doc = {:database => 'contacts', :doc_id => '_design/more_views'}
+   hash = Couchdb.view doc,@@auth_session
+   hash["_id"].should == '_design/more_views'
    
-   view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_user_email'}
-   Couchdb.find view,@@auth_session 
+   view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_email'}
+   hash = Couchdb.find view,@@auth_session 
+
+   hash[0].has_key?("Firstname").should == true
+   hash[0].has_key?("Lastname").should == true
+   hash[0].has_key?("Email").should == true
+   Couchdb.delete_doc({:database => 'contacts', :doc_id => '_design/more_views'},@@admin_auth_session) 
 end
 
 end

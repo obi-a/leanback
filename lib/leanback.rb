@@ -393,9 +393,12 @@ end
  class << self
        attr_accessor :address 
        attr_accessor :port 
+
      def set_address()
-      if @address == nil && port == nil
+      if @address == nil 
          @address = '127.0.0.1'
+      end
+      if @port == nil
          @port = '5984'
       end 
      end

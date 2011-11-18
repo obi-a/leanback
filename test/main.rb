@@ -12,8 +12,21 @@ data = {:section => "admins",
 
 hash = Couchdb.login(username = 'obi',password ='trusted') 
 auth_session =  hash["AuthSession"]
+
+
+
+
+
+data = {:section => "httpd",
+              :key => "port",
+                :value => "6980" }
+#Couchdb.set_config(data,auth_session) 
+
+#Couchdb.port = "6980"
+  
+
 #puts auth_session
-#hash = Couchdb.create('staff',auth_session)
+# Couchdb.create('staff',auth_session)
 
 #hash = Couchdb.add_finder({:database => 'contacts', :key => 'firstname'}, auth_session)
 
@@ -88,8 +101,8 @@ view = { :database => 'contacts',
    #puts hash.inspect
 
 
- docs = Couchdb.find_by({:database => 'contacts', :lastname => 'Hanna'}, auth_session) 
- puts "docs = " + docs.inspect
+ #docs = Couchdb.find_by({:database => 'contacts', :lastname => 'Hanna'}, auth_session) 
+ #puts "docs = " + docs.inspect
 
  #docs = Couchdb.docs_from 'contacts', auth_session
  #puts "docs = " + docs.inspect

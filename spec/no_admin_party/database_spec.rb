@@ -1,7 +1,15 @@
 require 'spec_base.rb'
+
 #a day in the life of a CouchDB admin user
 hash = Couchdb.login(username = 'obi',password ='trusted') 
 @@auth_session =  hash["AuthSession"]
+
+data = {:section => "httpd",
+              :key => "port",
+                :value => "6980" }
+Couchdb.set_config(data,@@auth_session) 
+
+Couchdb.port = "6980"
 
 
 describe "CouchDB " do
@@ -94,11 +102,17 @@ it "should query a permanent view by key and create the view on the fly, if it d
     Couchdb.delete_doc({:database => 'contacts', :doc_id => '_design/the_view'},@@auth_session)
 end
 
-it "should create a design doc/permanent view" do
+it "should create a design doc/permanent view and query it" do
    doc = { :database => 'contacts', :design_doc => 'more_views', :json_doc => '/home/obi/bin/leanback/test/my_views.json' }
    hash = Couchdb.create_design doc,@@auth_session
    hash["id"].should == '_design/more_views'
    hash["ok"].should == true
+
+   view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_email'}
+   hash = Couchdb.find view,@@auth_session 
+   hash[0].has_key?("Firstname").should == true
+   hash[0].has_key?("Lastname").should == true
+   hash[0].has_key?("Email").should == true
 
   doc = {:database => 'contacts', :doc_id => '_design/more_views'}
   hash = Couchdb.view doc,@@auth_session
@@ -240,18 +254,15 @@ it "create a new non-admin user, login user, retrieve user and delete the user" 
  lambda {Couchdb.view(doc,@@auth_session)}.should raise_error(CouchdbException,"CouchDB: Error - not_found. Reason - deleted")  
 end
 
-it "should login a user" do
-   #hash = Couchdb.login(username = 'obi',password ='trusted') 
-   #puts hash.inspect
-   #sleep
-end
 
 it "should switch to default bind address" do
-     #Couchdb.address = nil
-     #Couchdb.port = nil
-     #Couchdb.all
-  end
-
-
+     data = {:section => "httpd",
+              :key => "port",
+                :value => "5984" }
+     Couchdb.set_config(data,@@auth_session) 
+    Couchdb.address = nil
+    Couchdb.port = nil
+    Couchdb.all @@auth_session
+end
 
 end

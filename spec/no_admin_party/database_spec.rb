@@ -260,9 +260,9 @@ it "should switch to default bind address" do
               :key => "port",
                 :value => "5984" }
      Couchdb.set_config(data,@@auth_session) 
-    Couchdb.address = nil
-    Couchdb.port = nil
-    Couchdb.all @@auth_session
+    #Couchdb.address = nil
+    #Couchdb.port = nil
+    #Couchdb.all @@auth_session
 end
 
 end

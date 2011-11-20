@@ -1,3 +1,7 @@
+=Leanback 0.3.0
+Nvember 20,2011
+* Added CouchDB Security features: working with admin and non-admin users, authentication, adding security objects to databases. See documentation for details.
+
 November 9,2011:-
 * Added support for couchDB configuration API. It's now possible to change/modify/delete any couchDB configuration settings with Leanback. README will soon be updated with details.
   

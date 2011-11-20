@@ -17,7 +17,7 @@ This project is still under development. Not complete by any means. I made this 
 
    + [Installation](http://www.whisperservers.com/leanback/leanback/installation/) 
  
-   + [Basic Couchdb Operations](http://www.whisperservers.com/leanback/basic-couchdb-operations/)
+   + [Basic CouchDB Operations](http://www.whisperservers.com/leanback/basic-couchdb-operations/)
 
    + Working with [CouchDB Views](http://www.whisperservers.com/leanback/design-documents-and-permanent-views/)
 

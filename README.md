@@ -1,21 +1,21 @@
-= Leanback
+###Leanback
 
 Simple Ruby Interface to CouchDB. 
 
---This project is still under development. Not complete by any means. I made this Gem to use in my projects. I will expose more CouchDB features soon.
+This project is still under development. Not complete by any means. I made this Gem to use in my projects. I will expose more CouchDB features soon.
 
-==Goals
+##Goals
 * To create a simple Ruby Interface to CouchDB
 * Expose the features of CouchDB to the Ruby Lang., 
 * Use a minimalist Ruby DSL to access CouchDB
 * provide a very easy way to persist and retrieve data
 
-==Install
+##Install
 
  gem install leanback
 
 
-==Usage
+##Usage
 
 
 * [Leanback](http://www.whisperservers.com/leanback/leanback/)
@@ -28,10 +28,10 @@ Simple Ruby Interface to CouchDB.
 
    + [Error Handling](http://www.whisperservers.com/ragios/ragios-saint-ruby/status-reports/)
 
-==License
+##License
 MIT License.
 
-==Copyright
+##Copyright
 
 Copyright (c) 2011 Obi Akubue. 
 

@@ -10,11 +10,6 @@ This project is still under development. Not complete by any means. I made this 
 * Use a minimalist Ruby DSL to access CouchDB
 * provide a very easy way to persist and retrieve data
 
-##Install
-
- gem install leanback
-
-
 ##Usage
 
 

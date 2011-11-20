@@ -11,7 +11,53 @@ data = {:section => "admins",
     #Couchdb.set_config data
 
 hash = Couchdb.login(username = 'obi',password ='trusted') 
+#puts hash.inspect
+
 auth_session =  hash["AuthSession"]
+
+#data = {:section => "httpd",
+#              :key => "port"}
+
+data = {:section => "couchdb",
+              :key => "database_dir"}
+
+#hash = Couchdb.get_config(data,auth_session)
+#puts hash.inspect
+
+data = { :admins => {"names" => ["david"], "roles" => ["admin"]},
+                   :readers => {"names" => ["david"],"roles"  => ["admin"]}
+                  }
+
+    #hash = Couchdb.set_security("contacts",data,auth_session)
+      hash = Couchdb.get_security("contacts",auth_session)
+    puts hash.inspect
+
+ data = {:section => "admins",
+              :key => "sample_admin",
+                :value => "trusted"}
+    #Couchdb.set_config data,auth_session
+
+    data = {:section => "admins",
+              :key => "sample_admin"}
+
+    #hash = Couchdb.delete_config(data,auth_session)
+    #puts "EKE" + hash.inspect
+
+#hash = Couchdb.create 'contactsabc',auth_session
+#hash = Couchdb.all,auth_session
+#puts hash.inspect
+
+data = {:firstname => 'Linda', 
+        :lastname =>'smith', 
+        :phone => '212-234-1234',
+        :email =>'john@mail.com'}
+ 
+doc = {:database => 'contactsabc', :doc_id => 'Linda', :data => data}
+#hash = Couchdb.create_doc doc,auth_session
+#puts hash.inspect
+
+#hash = Couchdb.find_by( {:database => 'contactss', :email => 'john@mail.com'},auth_session)  
+#puts hash.inspect
 
 
 

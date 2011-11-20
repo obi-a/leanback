@@ -24,7 +24,9 @@ This project is still under development. Not complete by any means. I made this 
    + [Error Handling](http://www.whisperservers.com/ragios/ragios-saint-ruby/status-reports/)
    
    + [CouchDB Configuration](http://www.whisperservers.com/leanback/couchdb-configuration/) 
+   
    + [CouchDB Security](http://www.whisperservers.com/leanback/couchdb-security/) 
+   
    + [CouchDB Bind_Address & Port](http://www.whisperservers.com/leanback/setting-the-bind_address-port/) 
 
 ##License

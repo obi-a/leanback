@@ -25,7 +25,7 @@ This project is still under development. Not complete by any means. I made this 
    
    + [CouchDB Configuration](http://www.whisperservers.com/leanback/couchdb-configuration/) 
    + [CouchDB Security](http://www.whisperservers.com/leanback/couchdb-security/) 
-   + Setting [Bind_Address and Port](http://www.whisperservers.com/leanback/setting-the-bind_address-port/) 
+   + [CouchDB Bind_Address & Port](http://www.whisperservers.com/leanback/setting-the-bind_address-port/) 
 
 ##License
 MIT License.

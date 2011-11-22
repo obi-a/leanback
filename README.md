@@ -21,7 +21,7 @@ This project is still under development. Not complete by any means. I made this 
 
    + Working with [CouchDB Views](http://www.whisperservers.com/leanback/design-documents-and-permanent-views/)
 
-   + [Error Handling](http://www.whisperservers.com/ragios/ragios-saint-ruby/status-reports/)
+   + [Error Handling](http://www.whisperservers.com/leanback/error-handling/)
    
    + [CouchDB Configuration](http://www.whisperservers.com/leanback/couchdb-configuration/) 
    

@@ -15,6 +15,15 @@ hash = Couchdb.login(username = 'obi',password ='trusted')
 
 auth_session =  hash["AuthSession"]
 
+new_password = 'ninja'
+puts new_password
+puts Couchdb.change_password(username = 'kent', new_password, auth_session)
+
+hash = Couchdb.login(username ,new_password) 
+user_auth_session =  hash["AuthSession"]
+
+puts user_auth_session
+
 #data = {:section => "httpd",
 #              :key => "port"}
 
@@ -29,8 +38,8 @@ data = { :admins => {"names" => ["david"], "roles" => ["admin"]},
                   }
 
     #hash = Couchdb.set_security("contacts",data,auth_session)
-      hash = Couchdb.get_security("contacts",auth_session)
-    puts hash.inspect
+#      hash = Couchdb.get_security("contacts",auth_session)
+ #   puts hash.inspect
 
  data = {:section => "admins",
               :key => "sample_admin",

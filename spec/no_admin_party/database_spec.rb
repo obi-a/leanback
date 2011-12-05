@@ -255,6 +255,23 @@ it "create a new non-admin user, login user, retrieve user and delete the user" 
 end
 
 
+it "should non-admin user password, verify new password" do
+ user = { :username => "another_sample_user", :password => "trusted", :roles => []}
+ hash = Couchdb.add_user(user)
+ hash["ok"].should == true
+ hash["id"].should == 'org.couchdb.user:another_sample_user'
+
+ Couchdb.change_password(username = 'another_sample_user', new_password = "brown", @@auth_session)
+ hash = Couchdb.login(username = 'another_sample_user',password ='brown') 
+ hash.has_key?("AuthSession").should == true
+
+ lambda {Couchdb.login(username = 'another_sample_user',password ='trusted')}.should raise_error(CouchdbException,"CouchDB: Error - unauthorized. Reason - Name or password is incorrect.")   
+
+ doc = {:database => '_users', :doc_id => 'org.couchdb.user:another_sample_user'}
+ hash = Couchdb.delete_doc doc,@@auth_session
+
+end
+
 it "should switch to default bind address" do
      data = {:section => "httpd",
               :key => "port",

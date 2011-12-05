@@ -11,6 +11,21 @@ end
 
 module Couchdb
 
+def self.salt
+ o =  [('a'..'z'),('A'..'Z')].map{|i| i.to_a}.flatten;  
+ salt  =  (0..50).map{ o[rand(o.length)]  }.join; 
+end
+
+#change non-admin user password
+def self.change_password(username, new_password,auth_session = "")
+ salty = salt()
+ password_sha = Digest::SHA1.hexdigest(new_password + salty) 
+ user_id = 'org.couchdb.user:' + username
+ data = {"salt" => salty,"password_sha" => password_sha}
+ doc = { :database => '_users', :doc_id => user_id, :data => data}   
+ update_doc doc,auth_session
+end
+
 #add a new user 
 def self.add_user(user, auth_session="")
   o =  [('a'..'z'),('A'..'Z')].map{|i| i.to_a}.flatten;  

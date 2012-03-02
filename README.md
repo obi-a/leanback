@@ -18,6 +18,8 @@ This project is still under development. Not complete by any means. I made this 
    + [Installation](http://www.whisperservers.com/leanback/leanback/installation/) 
  
    + [Basic CouchDB Operations](http://www.whisperservers.com/leanback/basic-couchdb-operations/)
+   
+   + [Find Documents by Key](http://www.whisperservers.com/leanback/find-documents-by-key/)
 
    + Working with [CouchDB Views](http://www.whisperservers.com/leanback/design-documents-and-permanent-views/)
 

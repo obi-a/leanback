@@ -11,7 +11,7 @@ This project is still under development. Not complete by any means. I made this 
 * provide a very easy way to persist and retrieve data
 
 ##Compatibility
-Build on CouchDB 1.0.1 not guaranteed to work on newer CouchDB versions. I plan to upgrade it to work with the 
+Built and tested on CouchDB 1.0.1 not guaranteed to work on newer CouchDB versions. I plan to upgrade it to work with the 
 latest version CouchDB version soon.
 
 ##Usage

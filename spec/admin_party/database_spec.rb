@@ -4,8 +4,9 @@ require 'spec_base.rb'
 
 describe "CouchDB admin party " do
 
+
 it "should create and delete a database" do
-  hash = Couchdb.create('staff')
+ hash = Couchdb.create('staff')
   hash.to_s.should == '{"ok"=>true}'
   hash = Couchdb.all
   hash.include?("staff").should == true
@@ -23,14 +24,15 @@ it "should create a database add a finder method to it and then delete the datab
    doc = {:database => 'mobsters', :doc_id => '_design/email_finder'}
    hash = Couchdb.view doc
    hash["_id"].should == '_design/email_finder'
-   Couchdb.delete 'mobsters' 
- end
+  Couchdb.delete 'mobsters' 
+end
+
 
 it "find items by key" do
-    docs = Couchdb.find_by({:database => 'contacts', :lastname => 'winner'})
+    docs = Couchdb.find_by({:database => 'friends', :lastname => 'winner'})
     d = docs[0]
     d["lastname"].should == "winner"
-    Couchdb.delete_doc({:database => 'contacts', :doc_id => '_design/lastname_finder'})
+    Couchdb.delete_doc({:database => 'friends', :doc_id => '_design/lastname_finder'})
 end
 
 it "should create and view document doc" do
@@ -40,17 +42,17 @@ it "should create and view document doc" do
         	 :email =>'james@mail.com',
                   :age =>'34',
                   :gender =>'male'}
-  doc = {:database => 'contacts', :doc_id => 'john', :data => data}
+  doc = {:database => 'friends', :doc_id => 'john', :data => data}
   Couchdb.create_doc doc
 
-  doc = {:database => 'contacts', :doc_id => 'john'}
+  doc = {:database => 'friends', :doc_id => 'john'}
   hash = Couchdb.view doc
   hash["_id"].should == 'john'
 end
 
 it "should query a permanent view that doesn't exist and handle exception" do
   begin
-     view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_user_email'}
+     view = { :database => "friends", :design_doc => 'more_views', :view => 'get_user_email'}
      Couchdb.find view 
     rescue CouchdbException => e
       e.to_s.should == "CouchDB: Error - not_found. Reason - deleted"
@@ -59,7 +61,7 @@ it "should query a permanent view that doesn't exist and handle exception" do
 end
 
 it "should query a permanent view and create the view on the fly, if it doesn't already exist" do
-    view = {:database => 'contacts',
+    view = {:database => 'friends',
          :design_doc => 'my_views',
           :view => 'get_emails',
            :json_doc => '/home/obi/bin/my_views.json'}
@@ -68,10 +70,10 @@ it "should query a permanent view and create the view on the fly, if it doesn't 
     docs[0].include?("Email").should == true
     docs[0].include?("Name").should == true
     #verify that the view was created
-    doc = {:database => 'contacts', :doc_id => '_design/my_views'}
+    doc = {:database => 'friends', :doc_id => '_design/my_views'}
     hash = Couchdb.view doc
     hash["_id"].should == '_design/my_views'
-    Couchdb.delete_doc({:database => 'contacts', :doc_id => '_design/my_views'}) 
+    Couchdb.delete_doc({:database => 'friends', :doc_id => '_design/my_views'}) 
 end
 
 it "should query a permanent view by key and create the view on the fly, if it doesn't already exist" do
@@ -93,57 +95,57 @@ it "should query a permanent view by key and create the view on the fly, if it d
 end
 
 it "should create a design doc/permanent view and query it" do
-   doc = { :database => 'contacts', :design_doc => 'more_views', :json_doc => '/home/obi/bin/leanback/test/my_views.json' }
+   doc = { :database => 'friends', :design_doc => 'more_views', :json_doc => '/home/obi/bin/leanback/test/my_views.json' }
    hash = Couchdb.create_design doc
    hash["id"].should == '_design/more_views'
    hash["ok"].should == true
 
-   view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_email'}
+   view = { :database => "friends", :design_doc => 'more_views', :view => 'get_email'}
    hash = Couchdb.find view 
    hash[0].has_key?("Firstname").should == true
    hash[0].has_key?("Lastname").should == true
    hash[0].has_key?("Email").should == true
 
-  doc = {:database => 'contacts', :doc_id => '_design/more_views'}
+  doc = {:database => 'friends', :doc_id => '_design/more_views'}
   hash = Couchdb.view doc
   hash["_id"].should == '_design/more_views'
-  Couchdb.delete_doc({:database => 'contacts', :doc_id => '_design/more_views'})
+  Couchdb.delete_doc({:database => 'friends', :doc_id => '_design/more_views'})
 end
 
 it "should return a list of all databases in the system" do
    databases = Couchdb.all
-   databases.include?("contacts").should == true 
+   databases.include?("friends").should == true 
 end
 
 it "should create a document" do
   data = {:firstname => 'Nancy', :lastname =>'Lee', :phone => '347-808-3734',:email =>'nancy@mail.com',:gender => 'female'}
-  doc = {:database => 'contacts', :doc_id => 'Nancy', :data => data}
+  doc = {:database => 'friends', :doc_id => 'Nancy', :data => data}
   hash = Couchdb.create_doc doc 
   hash["id"].should == 'Nancy'
   hash["ok"].should == true
 
-  doc = {:database => 'contacts', :doc_id => 'Nancy'}
+  doc = {:database => 'friends', :doc_id => 'Nancy'}
   hash = Couchdb.view doc 
   hash["_id"].should == 'Nancy'
   hash["firstname"].should == 'Nancy'
   hash["lastname"].should == 'Lee'
   hash["phone"].should == '347-808-3734'
-  Couchdb.delete_doc({:database => 'contacts', :doc_id => 'Nancy'})
+  Couchdb.delete_doc({:database => 'friends', :doc_id => 'Nancy'})
 end
 
 it "should update the document" do
    data = {:age => "41", :lastname => "Stevens" }
-   doc = { :database => 'contacts', :doc_id => 'john', :data => data}   
+   doc = { :database => 'friends', :doc_id => 'john', :data => data}   
    hash = Couchdb.update_doc doc 
    hash["id"].should == 'john'
    hash["ok"].should == true
 
-  doc = {:database => 'contacts', :doc_id => 'john'}
+  doc = {:database => 'friends', :doc_id => 'john'}
   hash = Couchdb.view doc
   hash["_id"].should == 'john'
   hash["age"].should == '41'
   hash["lastname"].should == 'Stevens'
-  Couchdb.delete_doc({:database => 'contacts', :doc_id => 'john'})
+  Couchdb.delete_doc({:database => 'friends', :doc_id => 'john'})
 end
 
 
@@ -153,15 +155,15 @@ it "should delete a document after creating it" do
        		 :phone => '212-234-1234',
         	 :email =>'james@mail.com'}
 
-    doc = {:database => 'contacts', :doc_id => 'Sun', :data => data}
+    doc = {:database => 'friends', :doc_id => 'Sun', :data => data}
     Couchdb.create_doc doc
     
-    doc = {:database => 'contacts', :doc_id => 'Sun'}
+    doc = {:database => 'friends', :doc_id => 'Sun'}
     hash = Couchdb.delete_doc doc
     hash["id"].should == 'Sun'
     hash["ok"].should == true
     begin
-     doc = {:database => 'contacts', :doc_id => 'Sun'}
+     doc = {:database => 'friends', :doc_id => 'Sun'}
      Couchdb.view doc
     rescue CouchdbException => e
      e.to_s.should == "CouchDB: Error - not_found. Reason - deleted"

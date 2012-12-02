@@ -15,25 +15,25 @@ Couchdb.port = "6980"
 describe "CouchDB " do
 
 it "should create and delete a database" do
-  hash = Couchdb.create('staff',@@auth_session)
+  hash = Couchdb.create('employees',@@auth_session)
   hash.to_s.should == '{"ok"=>true}'
   hash = Couchdb.all
-  hash.include?("staff").should == true
-  hash = Couchdb.delete 'staff',@@auth_session 
-  hash.include?("staff").should == false
+  hash.include?("employees").should == true
+  hash = Couchdb.delete 'employees',@@auth_session 
+  hash.include?("employees").should == false
 end
 
 it "should create a database add a finder method to it and then delete the database" do
-   Couchdb.create('mobsters',@@auth_session)
-   hash = Couchdb.add_finder({:database => 'mobsters', :key => 'email'},@@auth_session) 
+   Couchdb.create('wiseguys',@@auth_session)
+   hash = Couchdb.add_finder({:database => 'wiseguys', :key => 'email'},@@auth_session) 
    hash.include?("_design/email_finder").should == true
    hash.include?("true").should == true
    hash.include?("rev").should == true
    
-   doc = {:database => 'mobsters', :doc_id => '_design/email_finder'}
+   doc = {:database => 'wiseguys', :doc_id => '_design/email_finder'}
    hash = Couchdb.view doc
    hash["_id"].should == '_design/email_finder'
-   Couchdb.delete 'mobsters',@@auth_session 
+   Couchdb.delete 'wiseguys',@@auth_session 
  end
 
 it "find items by key" do

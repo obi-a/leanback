@@ -1,7 +1,7 @@
 require 'spec_base.rb'
 
 #a day in the life of the non-admin user
-hash = Couchdb.login(username = 'obiora',password ='trusted') 
+hash = Couchdb.login(username = 'david',password ='trusted') 
 @@auth_session =  hash["AuthSession"]
 
 hash = Couchdb.login(username = 'obi',password ='trusted') 

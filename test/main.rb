@@ -2,27 +2,89 @@ path = File.expand_path(File.dirname(__FILE__))
 
 require path + "/helper.rb"
 
-auth_session = "b2JpOjRFQzE5QThGOl1vWmoCx68CKvF2eJKrZnkCFv1c"
+#auth_session = "b2JpOjRFQzE5QThGOl1vWmoCx68CKvF2eJKrZnkCFv1c"
  
 
 data = {:section => "admins",
              :key => "obi",
                 :value => "trusted"}
-    #Couchdb.set_config data
 
-hash = Couchdb.login(username = 'obi',password ='trusted') 
+ #hash = Couchdb.delete 'staff'
+
 #puts hash.inspect
 
+hash = Couchdb.login(username = 'obi',password ='trusted') 
 auth_session =  hash["AuthSession"]
 
+#user = { :username => "david", :password => "trusted", :roles => []}
+#Couchdb.add_user(user, auth_session )
+
+hash = Couchdb.delete 'staff',auth_session
+
+#puts auth_session
+
+#Couchdb.create 'contacts',auth_session
+
+data = {:firstname => 'Linda', 
+        :lastname =>'smith', 
+        :phone => '212-234-1234',
+        :email =>'john@mail.com'}
+ 
+doc = {:database => 'contacts', :doc_id => 'Linda', :data => data}
+#Couchdb.create_doc doc,auth_session
+
+data = {:email => "linda@mail.com" }
+doc = { :database => 'contacts', :doc_id => 'Linda', :data => data}   
+#Couchdb.update_doc doc,auth_session
+
+
+doc = {:database => 'contacts', :doc_id => 'Linda'}
+#x= Couchdb.view doc,auth_session
+
+#puts x.inspect
+
+data = {:firstname => 'Linda', 
+        :lastname =>'smith', 
+        :email => 'linda@mail.com',
+        :gender=>'female',
+        :phone =>'718-245-5611',
+        :_rev=>'2-d663618eda3268b83f96140b8250bc9e'}
+ 
+doc = {:database => 'contacts', :doc_id => 'Linda', :data => data}
+#Couchdb.edit_doc doc,auth_session
+
+doc = {:database => 'contacts', :doc_id => 'Linda'}
+#x= Couchdb.view doc,auth_session
+
+
+
+#puts x.inspect
+
+#x = Couchdb.find_by({:database => 'contacts', :email => 'linda@mail.com'} , auth_session) 
+
+#puts x.inspect
+
+
+#Couchdb.delete 'contacts',auth_session
+
+    #Couchdb.set_config data
+
+#hash = Couchdb.login(username = 'obi',password ='trusted') 
+#puts hash.inspect
+
+#auth_session =  hash["AuthSession"]
+
+
+#hash = Couchdb.add_finder({:database => 'mobsters', :key => 'email'}) 
+
 new_password = 'ninja'
-puts new_password
-puts Couchdb.change_password(username = 'kent', new_password, auth_session)
+#puts new_password
+#puts Couchdb.change_password(username = 'kent', new_password, auth_session)
 
-hash = Couchdb.login(username ,new_password) 
-user_auth_session =  hash["AuthSession"]
+#hash = Couchdb.login(username ,new_password) 
+#user_auth_session =  hash["AuthSession"]
 
-puts user_auth_session
+#puts user_auth_session
 
 #data = {:section => "httpd",
 #              :key => "port"}

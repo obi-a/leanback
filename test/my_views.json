@@ -2,10 +2,7 @@
  "language" : "javascript",
  "views" :{
     "get_email" : {
-      "map" : "function(doc){
-         if(doc.lastname && doc.email)
-           emit(doc.id,{Firstname: doc.firstname, Lastname: doc.lastname, Email: doc.email});
-        }"
+      "map" : "function(doc){ if(doc.lastname && doc.email) emit(doc.id,{Firstname: doc.firstname, Lastname: doc.lastname, Email: doc.email}); }"
     }
  }
 }

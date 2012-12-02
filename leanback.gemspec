@@ -4,14 +4,14 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{leanback}
-  s.version = "0.3.1"
+  s.name = "leanback"
+  s.version = "0.3.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = [%q{Obi Akubue}]
-  s.date = %q{2011-12-05}
-  s.description = %q{lightweight Ruby interface to CouchDB}
-  s.email = %q{obioraakubue@yahoo.com}
+  s.authors = ["Obi Akubue"]
+  s.date = "2012-12-02"
+  s.description = "lightweight Ruby interface to CouchDB"
+  s.email = "obioraakubue@yahoo.com"
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.md"
@@ -36,11 +36,11 @@ Gem::Specification.new do |s|
     "test/my_views.json",
     "test/test_leanback.rb"
   ]
-  s.homepage = %q{http://github.com/obi-a/leanback}
-  s.licenses = [%q{MIT}]
-  s.require_paths = [%q{lib}]
-  s.rubygems_version = %q{1.8.5}
-  s.summary = %q{lightweight Ruby interface to CouchDB}
+  s.homepage = "http://github.com/obi-a/leanback"
+  s.licenses = ["MIT"]
+  s.require_paths = ["lib"]
+  s.rubygems_version = "1.8.24"
+  s.summary = "lightweight Ruby interface to CouchDB"
   s.test_files = [
     "spec/admin_party/database_spec.rb",
     "spec/no_admin_party/database_spec.rb",

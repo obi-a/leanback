@@ -10,6 +10,10 @@ This project is still under development. Not complete by any means. I made this 
 * Use a minimalist Ruby DSL to access CouchDB
 * provide a very easy way to persist and retrieve data
 
+##Compatibility
+Built and tested on CouchDB 1.0.1 not guaranteed to work on newer CouchDB versions. I plan to upgrade it to work with the 
+latest version CouchDB version soon.
+
 ##Usage
 
 

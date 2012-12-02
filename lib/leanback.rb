@@ -348,10 +348,7 @@ def self.add_finder(options,auth_session = "")
  "language" : "javascript",
  "views" :{
     "find_by_'+key+'" : {
-      "map" : "function(doc){
-         if(doc.'+key+')
-           emit(doc.'+key+',doc);
-        }"
+      "map" : "function(doc){ if(doc.'+key+') emit(doc.'+key+',doc);}"
     }
  }
 }'

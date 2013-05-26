@@ -28,14 +28,11 @@ it "should create a database add a finder method to it and then delete the datab
 end
 
 
-it "find items by key" do
-    docs = Couchdb.find_by({:database => 'friends', :lastname => 'winner'})
-    d = docs[0]
-    d["lastname"].should == "winner"
-    Couchdb.delete_doc({:database => 'friends', :doc_id => '_design/lastname_finder'})
-end
+
 
 it "should create and view document doc" do
+  Couchdb.create('friends')
+
   data = {:firstname => 'John', 
         	 :lastname =>'smith', 
        		 :phone => '202-234-1234',
@@ -50,12 +47,29 @@ it "should create and view document doc" do
   hash["_id"].should == 'john'
 end
 
+it "should count the lastnames named smith" do
+  count = Couchdb.count({:database => 'friends', :lastname => 'smith'})
+  count.should == 1
+end
+
+it "should count lastnames named brown" do
+  count = Couchdb.count({:database => 'friends', :lastname => 'brown'})
+  count.should == 0 
+end
+
+it "find items by key" do
+    docs = Couchdb.find_by({:database => 'friends', :lastname => 'smith'})
+    d = docs[0]
+    d["lastname"].should == "smith"
+    Couchdb.delete_doc({:database => 'friends', :doc_id => '_design/lastname_finder'})
+end
+
 it "should query a permanent view that doesn't exist and handle exception" do
   begin
      view = { :database => "friends", :design_doc => 'more_views', :view => 'get_user_email'}
      Couchdb.find view 
     rescue CouchdbException => e
-      e.to_s.should == "CouchDB: Error - not_found. Reason - deleted"
+      e.to_s.should == "CouchDB: Error - not_found. Reason - missing"
       e.error.should == "not_found"
     end  
 end
@@ -64,7 +78,7 @@ it "should query a permanent view and create the view on the fly, if it doesn't 
     view = {:database => 'friends',
          :design_doc => 'my_views',
           :view => 'get_emails',
-           :json_doc => '/home/obi/bin/my_views.json'}
+           :json_doc => '/home/obi/bin/leanback/test/my_view.json'}
      
     docs = Couchdb.find_on_fly(view)
     docs[0].include?("Email").should == true
@@ -77,21 +91,21 @@ it "should query a permanent view and create the view on the fly, if it doesn't 
 end
 
 it "should query a permanent view by key and create the view on the fly, if it doesn't already exist" do
-    view = { :database => 'contacts', 
+    view = { :database => 'friends', 
            :design_doc => 'the_view', 
             :view => 'age',
-             :json_doc => '/home/obi/bin/view_age.json'}
+             :json_doc => '/home/obi/bin/leanback/test/view_age.json'}
 
-    age = '36'
+    age = '34'
     docs = Couchdb.find_on_fly(view,"",key = age)
     docs[0].include?("age").should == true
     d = docs[0]
-    d["age"].should == '36'
+    d["age"].should == '34'
     #verify that the view was created
-    doc = {:database => 'contacts', :doc_id => '_design/the_view'}
+    doc = {:database => 'friends', :doc_id => '_design/the_view'}
     hash = Couchdb.view doc
     hash["_id"].should == '_design/the_view'
-    Couchdb.delete_doc({:database => 'contacts', :doc_id => '_design/the_view'})
+    Couchdb.delete_doc({:database => 'friends', :doc_id => '_design/the_view'})
 end
 
 it "should create a design doc/permanent view and query it" do
@@ -184,7 +198,8 @@ it "should set a config section, retrieve it and delete it" do
 
      Couchdb.get_config(data).should == "sample_value"
 
-     Couchdb.delete_config(data).should == "sample_value"
+     Couchdb.delete_config(data).should == "sample_value" 
+     Couchdb.delete 'friends' 
 
      lambda {Couchdb.get_config(data)}.should raise_error(CouchdbException,"CouchDB: Error - not_found. Reason - unknown_config_value")   
  end

@@ -36,14 +36,8 @@ it "should create a database add a finder method to it and then delete the datab
    Couchdb.delete 'wiseguys',@@auth_session 
  end
 
-it "find items by key" do
-    docs = Couchdb.find_by({:database => 'contacts', :lastname => 'winner'},@@auth_session)
-    d = docs[0]
-    d["lastname"].should == "winner"
-    Couchdb.delete_doc({:database => 'contacts', :doc_id => '_design/lastname_finder'},@@auth_session)
-end
-
 it "should create and view document doc" do
+  Couchdb.create('contacts',@@auth_session)
   data = {:firstname => 'John', 
         	 :lastname =>'smith', 
        		 :phone => '202-234-1234',
@@ -58,12 +52,33 @@ it "should create and view document doc" do
   hash["_id"].should == 'john'
 end
 
+it "should count the lastnames named smith" do
+  count = Couchdb.count({:database => 'contacts', :lastname => 'smith'},@@auth_session)
+  count.should == 1
+end
+
+it "should count lastnames named brown" do
+  count = Couchdb.count({:database => 'contacts', :lastname => 'brown'},@@auth_session)
+  count.should == 0 
+end
+
+
+it "find items by key" do
+    docs = Couchdb.find_by({:database => 'contacts', :lastname => 'smith'},@@auth_session)
+    d = docs[0]
+    d["lastname"].should == "smith"
+    Couchdb.delete_doc({:database => 'contacts', :doc_id => '_design/lastname_finder'},@@auth_session)
+end
+
+
+
+
 it "should query a permanent view that doesn't exist and handle exception" do
   begin
      view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_user_email'}
      Couchdb.find view,@@auth_session 
     rescue CouchdbException => e
-      e.to_s.should == "CouchDB: Error - not_found. Reason - deleted"
+      e.to_s.should == "CouchDB: Error - not_found. Reason - missing"
       e.error.should == "not_found"
     end  
 end
@@ -72,7 +87,7 @@ it "should query a permanent view and create the view on the fly, if it doesn't 
     view = {:database => 'contacts',
          :design_doc => 'my_views',
           :view => 'get_emails',
-           :json_doc => '/home/obi/bin/my_views.json'}
+           :json_doc => '/home/obi/bin/leanback/test/my_view.json'}
      
     docs = Couchdb.find_on_fly(view,@@auth_session)
     docs[0].include?("Email").should == true
@@ -88,13 +103,13 @@ it "should query a permanent view by key and create the view on the fly, if it d
     view = { :database => 'contacts', 
            :design_doc => 'the_view', 
             :view => 'age',
-             :json_doc => '/home/obi/bin/view_age.json'}
+             :json_doc => '/home/obi/bin/leanback/test/view_age.json'}
 
-    age = '36'
+    age = '34'
     docs = Couchdb.find_on_fly(view,@@auth_session,key = age)
     docs[0].include?("age").should == true
     d = docs[0]
-    d["age"].should == '36'
+    d["age"].should == '34'
     #verify that the view was created
     doc = {:database => 'contacts', :doc_id => '_design/the_view'}
     hash = Couchdb.view doc,@@auth_session
@@ -272,11 +287,16 @@ it "should non-admin user password, verify new password" do
 
 end
 
+it "should delete the database" do
+  Couchdb.delete 'contacts',@@auth_session
+end
+
 it "should switch to default bind address" do
      data = {:section => "httpd",
               :key => "port",
                 :value => "5984" }
-     Couchdb.set_config(data,@@auth_session) 
+     Couchdb.set_config(data,@@auth_session)
+  
     #Couchdb.address = nil
     #Couchdb.port = nil
     #Couchdb.all @@auth_session

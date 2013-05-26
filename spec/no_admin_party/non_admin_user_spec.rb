@@ -9,7 +9,9 @@ hash = Couchdb.login(username = 'obi',password ='trusted')
 
 #specs to ensure non-admin users function properly
 describe "non admin user" do
- it "should create a document, view, update and delete it" do
+ it "should create a document, view, update it" do
+  Couchdb.create('contacts',@@admin_auth_session)
+
   data = {:firstname => 'Nancy', :lastname =>'Lee', :phone => '347-808-3734',:email =>'nancy@mail.com',:gender => 'female'}
   doc = {:database => 'contacts', :doc_id => 'eeek', :data => data}
   hash = Couchdb.create_doc doc,@@auth_session 
@@ -23,16 +25,10 @@ describe "non admin user" do
   hash = Couchdb.update_doc doc,@@auth_session  
   hash["id"].should == 'eeek'
   hash["ok"].should == true    
-
-  Couchdb.delete_doc({:database => 'contacts', :doc_id => 'eeek'},@@auth_session)
-
-  hash["id"].should == 'eeek'
-  hash["ok"].should == true
-  doc = { :database => 'contacts', :doc_id => 'eeek'} 
- lambda {Couchdb.view(doc,@@auth_session)}.should raise_error(CouchdbException,"CouchDB: Error - not_found. Reason - deleted")  
 end
 
 it"should query a view" do
+  
  doc = { :database => 'contacts', :design_doc => 'more_views', :json_doc => '/home/obi/bin/leanback/test/my_views.json' }
    hash = Couchdb.create_design doc,@@admin_auth_session
 
@@ -42,11 +38,25 @@ it"should query a view" do
    
    view = { :database => "contacts", :design_doc => 'more_views', :view => 'get_email'}
    hash = Couchdb.find view,@@auth_session 
-
    hash[0].has_key?("Firstname").should == true
    hash[0].has_key?("Lastname").should == true
    hash[0].has_key?("Email").should == true
    Couchdb.delete_doc({:database => 'contacts', :doc_id => '_design/more_views'},@@admin_auth_session) 
+
+    
+end
+
+
+it "should delete document" do
+  hash = Couchdb.delete_doc({:database => 'contacts', :doc_id => 'eeek'},@@auth_session)
+  hash["id"].should == 'eeek'
+  hash["ok"].should == true
+  doc = { :database => 'contacts', :doc_id => 'eeek'} 
+ lambda {Couchdb.view(doc,@@auth_session)}.should raise_error(CouchdbException,"CouchDB: Error - not_found. Reason - deleted")  
+end
+
+it "should delete the database" do
+  Couchdb.delete 'contacts',@@admin_auth_session
 end
 
 end

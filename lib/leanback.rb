@@ -361,6 +361,53 @@ def self.add_finder(options,auth_session = "")
  end
 end
 
+#add a counter method to the database
+#this creates a count method that counts documents by key
+def self.add_counter(options,auth_session = "")
+ set_address 
+ db_name = options[:database]
+ key = options[:key] 
+ design_doc_name = key + '_counter'
+ 
+ view ='{
+ "language" : "javascript",
+ "views" :{
+    "count_'+key+'" : {
+      "map" : "function(doc){ if(doc.'+key+') emit(doc.'+key+',null);}", "reduce": "_count"   
+    }
+ }
+}'
+
+ begin  
+  response = RestClient.put 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name, view, {:cookies => {"AuthSession" => auth_session}}
+ rescue => e
+    hash = Yajl::Parser.parse(e.response.to_s)
+    raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
+ end
+end
+
+#count by key 
+def self.count(options,auth_session = "")
+ set_address 
+ db_name = options[:database]
+ index =  options.keys[1].to_s
+ search_term = options.values[1]
+ design_doc_name = index + '_counter'
+ view_name = 'count_' + index
+ 
+ begin 
+  view = { :database => db_name, :design_doc => design_doc_name, :view => view_name}
+  docs = find view,auth_session,search_term
+ rescue CouchdbException => e
+    #add a counter index if one doesn't already exist in the database
+    #then count_by_key
+    add_counter({:database => db_name, :key => index},auth_session)
+    docs = find view,auth_session,search_term
+ end
+  count = docs[0]
+ return count.to_i
+end
+
 #find by key 
 def self.find_by(options,auth_session = "")
  set_address 

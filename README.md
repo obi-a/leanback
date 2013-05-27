@@ -24,6 +24,8 @@ Upgraded and tested on CouchDB 1.2.0. CouchDB 1.0.1 should still work fine.
    
    + [Find Documents by Key](http://www.whisperservers.com/leanback/find-documents-by-key/)
 
+   + [Count Documents by Key](http://www.whisperservers.com/leanback/count-documents-by-key/)
+
    + Working with [CouchDB Views](http://www.whisperservers.com/leanback/design-documents-and-permanent-views/)
 
    + [Error Handling](http://www.whisperservers.com/leanback/error-handling/)

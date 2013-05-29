@@ -16,10 +16,21 @@ data = {:section => "admins",
 hash = Couchdb.login(username = 'obi',password ='trusted') 
 auth_session =  hash["AuthSession"]
 
+
+view = { :database => "monitors", 
+          :design_doc => 'tag_finder', 
+            :view => 'find_by_tag'}
+ 
+#hash = Couchdb.find view,auth_session,key='ralph', options = {:limit => 5, :skip => 1}
+
+hash = Couchdb.find view,auth_session,key='ralph', options = {:limit => 5}
+
+puts hash.inspect 
+
 #user = { :username => "david", :password => "trusted", :roles => []}
 #Couchdb.add_user(user, auth_session )
 
-hash = Couchdb.delete 'staff',auth_session
+#hash = Couchdb.delete 'staff',auth_session
 
 #puts auth_session
 

@@ -258,17 +258,39 @@ def self.view(doc,auth_session = "")
  end 
 end
 
+def self.get_params(options)
+ params = ""
+ if options.has_key?(:startkey)
+  params = "startkey=" + options[:startkey]
+ end
+ if options.has_key?(:endkey)
+  params = params + "&" + "endkey=" + options[:endkey]
+ end
+
+ if options.has_key?(:limit)
+  params = params + "&" + "limit=" + options[:limit].to_s
+ end
+
+ if options.has_key?(:skip)
+  params = params + "&" + "skip=" + options[:skip].to_s
+ end
+
+ return params
+end
+
 #query a permanent view
-def self.find(doc,auth_session = "",key=nil)
+def self.find(doc,auth_session = "", key=nil, options = {})
  set_address
  db_name = doc[:database]
  design_doc_name = doc[:design_doc]
  view_name = doc[:view]
+ params = get_params(options)
+   
    begin
     if key == nil
-     response = RestClient.get 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name + '/_view/' + view_name,{:cookies => {"AuthSession" => auth_session}}
+     response = RestClient.get 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name + '/_view/' + view_name + '?' + URI.escape(params),{:cookies => {"AuthSession" => auth_session}}
     else
-     response = RestClient.get 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name + '/_view/' + view_name + URI.escape('?key="' + key + '"'),{:cookies => {"AuthSession" => auth_session}}
+     response = RestClient.get 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name + '/_view/' + view_name + URI.escape('?key="' + key + '"') + '&' + URI.escape(params) ,{:cookies => {"AuthSession" => auth_session}}
     end
      hash = Yajl::Parser.parse(response.to_str)
      rows = hash["rows"]

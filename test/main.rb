@@ -23,9 +23,39 @@ view = { :database => "monitors",
  
 #hash = Couchdb.find view,auth_session,key='ralph', options = {:limit => 5, :skip => 1}
 
-hash = Couchdb.find view,auth_session,key='ralph', options = {:limit => 5}
+#hash = Couchdb.find view,auth_session,key='ralph', options = {:limit => 5}
 
-puts hash.inspect 
+
+#Couchdb.find_by({:database => 'zralph1369728249zeb1292e18b998352', :timestamp => 'Smith'},auth_session)
+
+#Couchdb.find_by({:database => 'monitors', :test => 'Smith'},auth_session)
+
+view = { :database => "zralph1369728249zeb1292e18b998352", 
+          :design_doc => 'timestamp_finder', 
+            :view => 'find_by_timestamp'}
+
+#hash = Couchdb.find view,auth_session,key=nil, options = {:startkey => "100", :endkey => "1369728370"}
+
+#hash = Couchdb.find view,auth_session,key="1369728370"
+
+#start 2013-05-29 20:22:07 -0400 1369873327 
+#end 2013-05-29 20:19:07 -0400 1369873147 
+
+view = { :database => "monitors", 
+          :design_doc => 'test_finder', 
+            :view => 'find_by_test'}
+#hash = Couchdb.find view,auth_session,key=nil, options = {:startkey => ["1000","UP"], :endkey => ["6000","UP"]}
+
+hash = Couchdb.find view,auth_session,key=nil, options = {:startkey => ["3300","UP"]}
+
+#hash = Couchdb.find view,auth_session,key= {:keys => ['3300','UP']}
+
+#hash = Couchdb.find view,auth_session,key= '?keys=%5B%228800%22,%22UP%22%5D'
+
+puts hash.inspect
+
+
+###END OF KEYS TESTING########
 
 #user = { :username => "david", :password => "trusted", :roles => []}
 #Couchdb.add_user(user, auth_session )

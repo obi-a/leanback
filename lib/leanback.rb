@@ -261,10 +261,18 @@ end
 def self.get_params(options)
  params = ""
  if options.has_key?(:startkey)
-  params = "startkey=" + options[:startkey]
+  if options[:startkey].is_a? String
+   params = 'startkey="' + options[:startkey] + '"'
+  else
+   params = 'startkey=' + options[:startkey].to_s # for complex keys
+  end
  end
  if options.has_key?(:endkey)
-  params = params + "&" + "endkey=" + options[:endkey]
+  if options[:endkey].is_a? String
+   params = params + '&endkey="' + options[:endkey] + '"'
+  else
+   params = params + '&endkey=' + options[:endkey].to_s  #for complex keys
+  end
  end
 
  if options.has_key?(:limit)
@@ -276,6 +284,16 @@ def self.get_params(options)
  end
 
  return params
+end
+
+#REMOVE LATER
+def self.get_key(key)
+ if key.is_a? String
+  key = '?key="' + key + '"'
+ else
+  key = Yajl::Encoder.encode(key)
+ end
+  return key
 end
 
 #query a permanent view
@@ -290,7 +308,14 @@ def self.find(doc,auth_session = "", key=nil, options = {})
     if key == nil
      response = RestClient.get 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name + '/_view/' + view_name + '?' + URI.escape(params),{:cookies => {"AuthSession" => auth_session}}
     else
-     response = RestClient.get 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name + '/_view/' + view_name + URI.escape('?key="' + key + '"') + '&' + URI.escape(params) ,{:cookies => {"AuthSession" => auth_session}}
+     if key.is_a? String
+      key = URI.escape('?key="' + key + '"')
+      response = RestClient.get 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name + '/_view/' + view_name + key + '&' + URI.escape(params) ,{:cookies => {"AuthSession" => auth_session}}
+     else
+      #REMOVE LATER
+      key = Yajl::Encoder.encode(key)
+      response = RestClient.post 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name + '/_view/' + view_name, key,:content_type => :json, :accept => :json, :cookies => {"AuthSession" => auth_session}
+     end
     end
      hash = Yajl::Parser.parse(response.to_str)
      rows = hash["rows"]
@@ -301,7 +326,6 @@ def self.find(doc,auth_session = "", key=nil, options = {})
      end
      return rows
    rescue => e
-    #puts e.inspect
     hash = Yajl::Parser.parse(e.response.to_s)
     raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
    end

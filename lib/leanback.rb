@@ -283,18 +283,13 @@ def self.get_params(options)
   params = params + "&" + "skip=" + options[:skip].to_s
  end
 
+  if options.has_key?(:descending)
+  params = params + "&" + "descending=true"
+ end
+
  return params
 end
 
-#REMOVE LATER
-def self.get_key(key)
- if key.is_a? String
-  key = '?key="' + key + '"'
- else
-  key = Yajl::Encoder.encode(key)
- end
-  return key
-end
 
 #query a permanent view
 def self.find(doc,auth_session = "", key=nil, options = {})
@@ -308,14 +303,8 @@ def self.find(doc,auth_session = "", key=nil, options = {})
     if key == nil
      response = RestClient.get 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name + '/_view/' + view_name + '?' + URI.escape(params),{:cookies => {"AuthSession" => auth_session}}
     else
-     if key.is_a? String
       key = URI.escape('?key="' + key + '"')
       response = RestClient.get 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name + '/_view/' + view_name + key + '&' + URI.escape(params) ,{:cookies => {"AuthSession" => auth_session}}
-     else
-      #REMOVE LATER
-      key = Yajl::Encoder.encode(key)
-      response = RestClient.post 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name + '/_view/' + view_name, key,:content_type => :json, :accept => :json, :cookies => {"AuthSession" => auth_session}
-     end
     end
      hash = Yajl::Parser.parse(response.to_str)
      rows = hash["rows"]
@@ -357,7 +346,7 @@ def self.create_design(doc,auth_session = "")
 end
 
 #Query view, create view on fly if it dosen't already exist
-def self.find_on_fly(doc,auth_session = "",key = nil)  
+def self.find_on_fly(doc,auth_session = "",key = nil, options = {})  
    db_name = doc[:database]
    design_doc = doc[:design_doc]
    view = doc[:view]
@@ -365,17 +354,17 @@ def self.find_on_fly(doc,auth_session = "",key = nil)
  
    begin 
       if( key == nil)
-       docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session) 
+       docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session,key=nil,options) 
       else
-       docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session,key) 
+       docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session,key,options) 
       end
      rescue CouchdbException => e
         document = { :database => db_name, :design_doc => design_doc, :json_doc => json_doc}
         create_design document,auth_session
         if( key == nil)
-          docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session) 
+          docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session,key=nil,options) 
         else
-          docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session,key) 
+          docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session,key,options) 
         end
       end
     return docs
@@ -455,7 +444,7 @@ def self.count(options,auth_session = "")
 end
 
 #find by key 
-def self.find_by(options,auth_session = "")
+def self.find_by(options,auth_session = "", params = {})
  set_address 
  db_name = options[:database]
  index =  options.keys[1].to_s
@@ -465,12 +454,12 @@ def self.find_by(options,auth_session = "")
  
  begin 
   view = { :database => db_name, :design_doc => design_doc_name, :view => view_name}
-  docs = find view,auth_session,search_term
+  docs = find view,auth_session,search_term,params
  rescue CouchdbException => e
     #add a finder/index if one doesn't already exist in the database
     #then find_by_key
     add_finder({:database => db_name, :key => index},auth_session)
-    docs = find view,auth_session,search_term
+    docs = find view,auth_session,search_term,params
  end
  return docs
 end

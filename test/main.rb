@@ -46,7 +46,9 @@ view = { :database => "monitors",
             :view => 'find_by_test'}
 #hash = Couchdb.find view,auth_session,key=nil, options = {:startkey => ["1000","UP"], :endkey => ["6000","UP"]}
 
-hash = Couchdb.find view,auth_session,key=nil, options = {:startkey => ["3300","UP"]}
+#hash = Couchdb.find view,auth_session,key=nil, options = {:startkey => ["3300","UP"],:descending => true}
+
+hash = Couchdb.find view,auth_session,key=nil, options = {:descending => true}
 
 #hash = Couchdb.find view,auth_session,key= {:keys => ['3300','UP']}
 

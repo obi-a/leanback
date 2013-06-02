@@ -1,3 +1,16 @@
+=0.3.3
+May 26, 2013
+* Added ability to count the number of documents in a database by a specified key.
+Example: 
+ Couchdb.count({:database => 'contacts', :gender => 'female'},auth_session) 
+ # => 8
+This will count the number of documents with gender = 'female'
+See README for details.
+
+=0.3.2
+December 01, 2012
+* Fixed issues with invalid JSON on CouchDB 1.2.0
+
 =Leanback 0.3.1
 December 5,2011
 * Added ability to change password for non-admin users.

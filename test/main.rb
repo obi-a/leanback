@@ -44,11 +44,11 @@ view = { :database => "zralph1369728249zeb1292e18b998352",
 view = { :database => "monitors", 
           :design_doc => 'test_finder', 
             :view => 'find_by_test'}
-#hash = Couchdb.find view,auth_session,key=nil, options = {:startkey => ["1000","UP"], :endkey => ["6000","UP"]}
+hash = Couchdb.find view,auth_session,key=nil, options = {:startkey => ["1000","UP"], :endkey => ["6000","UP"]}
 
 #hash = Couchdb.find view,auth_session,key=nil, options = {:startkey => ["3300","UP"],:descending => true}
 
-hash = Couchdb.find view,auth_session,key=nil, options = {:descending => true}
+#hash = Couchdb.find view,auth_session,key=nil, options = {:descending => true}
 
 #hash = Couchdb.find view,auth_session,key= {:keys => ['3300','UP']}
 

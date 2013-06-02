@@ -279,7 +279,7 @@ it "should test finder options" do
  h["firstname"].should == "john"
  hash.length.should == 2
  
- Couchdb.find_by({:database => 'fishes', :salary => '5000'},@@auth_session, options = {:startkey => "53000", :endkey => "99000",:limit => 2})
+ Couchdb.find_by({:database => 'fishes', :salary => ''},@@auth_session, options = {:startkey => "53000", :endkey => "99000",:limit => 2})
  h = hash[0]
  h["firstname"].should == "john"
  hash.length.should == 2

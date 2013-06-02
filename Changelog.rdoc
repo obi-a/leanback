@@ -1,3 +1,25 @@
+=0.3.4
+June 2, 2013
+* added options for manipulating query results, the options available are limit, skip, descending, startkey, endkey
+Example
+ options = {:skip => 10,:limit => 20}
+ Couchdb.find_by({:database => 'contacts', :gender => 'female'},auth_session, options)
+This will skip the first 10 results and return the next 20 that match the key :gender => 'female'
+
+Another example
+ options = {:startkey => "53000", :endkey => "99000",:limit => 20}
+ Couchdb.find_by({:database => 'employees', :salary => ''},auth_session, options)
+This will return all employees with salary between 53000 and 99000.
+
+Direct view query: 
+   view = { :database => "employees", 
+          :design_doc => 'salary_finder', 
+            :view => 'find_by_salary'}
+ options = {:startkey => "53000", :endkey => "99000"}
+ Couchdb.find view, auth_session,key=nil, options
+This will also return all employees with salary between 53000 and 99000.
+See leanback documentation for details.
+  
 =0.3.3
 May 26, 2013
 * Added ability to count the number of documents in a database by a specified key.
@@ -5,7 +27,7 @@ Example:
  Couchdb.count({:database => 'contacts', :gender => 'female'},auth_session) 
  # => 8
 This will count the number of documents with gender = 'female'
-See README for details.
+See leanback documentation for details.
 
 =0.3.2
 December 01, 2012

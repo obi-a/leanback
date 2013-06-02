@@ -185,6 +185,133 @@ it "should delete a document after creating it" do
     end
 end
 
+
+it "should test finder options" do
+
+  Couchdb.create('fishes')
+
+  data = {:firstname => 'aaron', :gender =>'male', :age => '28', :salary => '50000'}
+  doc = {:database => 'fishes', :doc_id => 'aaron', :data => data}
+  Couchdb.create_doc doc
+
+  data = {:firstname => 'john', :gender =>'male', :age => '28', :salary => '60000'}
+  doc = {:database => 'fishes', :doc_id => 'john', :data => data}
+  Couchdb.create_doc doc
+
+  data = {:firstname => 'peter', :gender =>'male', :age => '45', :salary => '78000'}
+  doc = {:database => 'fishes', :doc_id => 'peter', :data => data}
+  Couchdb.create_doc doc
+
+  data = {:firstname => 'sam', :gender =>'male', :age => '28', :salary => '97000'}
+  doc = {:database => 'fishes', :doc_id => 'sam', :data => data}
+  Couchdb.create_doc doc
+  
+  #create the design doc to be queryed in the test
+  Couchdb.find_by({:database => 'fishes', :gender => 'male'})
+
+
+  view = { :database => "fishes", 
+          :design_doc => 'gender_finder', 
+            :view => 'find_by_gender'}
+
+  hash = Couchdb.find view,"",key=nil, options = {:limit => 2, :skip => 1}
+  h = hash[0]
+  h["firstname"].should == "john"
+  hash.length.should == 2
+
+ Couchdb.find_by({:database => 'fishes', :gender => 'male'},"",options = {:limit => 2, :skip => 1})
+  h = hash[0]
+  h["firstname"].should == "john"
+  hash.length.should == 2
+
+ 
+
+ hash = Couchdb.find view,"",key='male', options = {:descending => true}
+ h = hash[0]
+ h["firstname"].should == "sam"
+
+ Couchdb.find_by({:database => 'fishes', :gender => 'male'},"", options = {:descending => true})
+ h = hash[0]
+ h["firstname"].should == "sam" 
+
+
+
+ hash = Couchdb.find view,"",key='male', options = {:limit => 3}
+ hash.length.should == 3
+
+ hash = Couchdb.find view,"",key=nil, options = {:skip => 2}
+ h = hash[0]
+ h["firstname"].should == "peter"
+ hash.length.should == 2
+
+ hash = Couchdb.find view,"",key='male', options = {:descending => true,:limit => 1}
+ h = hash[0]
+ h["firstname"].should == "sam"
+ hash.length.should == 1
+
+ Couchdb.find_by({:database => 'fishes', :gender => 'male'},"", options = {:descending => true,:limit => 1})
+ h = hash[0]
+ h["firstname"].should == "sam"
+ hash.length.should == 1
+
+ Couchdb.find_by({:database => 'fishes', :salary => '5000'})
+
+
+  view = { :database => "fishes", 
+          :design_doc => 'salary_finder', 
+            :view => 'find_by_salary'}
+
+ hash = Couchdb.find view, "",key=nil, options = {:startkey => "3000", :endkey => "65000"}
+ h = hash[0]
+ h["firstname"].should == "aaron"
+ hash.length.should == 2
+
+ hash = Couchdb.find view, "",key=nil, options = {:startkey => "53000", :endkey => "99000",:limit => 2}
+ h = hash[0]
+ h["firstname"].should == "john"
+ hash.length.should == 2
+ 
+ Couchdb.find_by({:database => 'fishes', :salary => '5000'},"", options = {:startkey => "53000", :endkey => "99000",:limit => 2})
+ h = hash[0]
+ h["firstname"].should == "john"
+ hash.length.should == 2
+
+    view = {:database => 'fishes',
+         :design_doc => 'my_views',
+          :view => 'age_gender',
+           :json_doc => '/home/obi/bin/leanback/test/start.json'}
+
+ options = {:startkey => ["28","male"], :endkey => ["28","male"], :limit => 2}
+     
+ hash = Couchdb.find_on_fly(view,"",key=nil, options)
+   h0 = hash[0]
+   h1 = hash[1]
+   h0["firstname"].should == "aaron"
+   h1["firstname"].should == "john"
+   hash.length.should == 2
+
+ options = {:startkey => ["28","male"], :endkey => ["28","male"], :skip => 1}
+
+  hash = Couchdb.find_on_fly(view,"",key=nil, options)
+   h0 = hash[0]
+   h1 = hash[1]
+   h0["firstname"].should == "john"
+   h1["firstname"].should == "sam"
+   hash.length.should == 2
+
+
+ options = {:startkey => ["28","male"], :endkey => ["28","male"]}
+
+  hash = Couchdb.find_on_fly(view,"",key=nil, options)
+   h0 = hash[0]
+   h1 = hash[1]
+   h0["firstname"].should == "aaron"
+   h1["firstname"].should == "john"
+   hash.length.should == 3
+
+ Couchdb.delete 'fishes'
+end
+
 #database: administration tasks
 
 it "should set a config section, retrieve it and delete it" do

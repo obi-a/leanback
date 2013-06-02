@@ -7,9 +7,9 @@ hash = Couchdb.login(username = 'obi',password ='trusted')
 data = {:section => "httpd",
               :key => "port",
                 :value => "6980" }
-#Couchdb.set_config(data,@@auth_session) 
+Couchdb.set_config(data,@@auth_session) 
 
-#Couchdb.port = "6980"
+Couchdb.port = "6980"
 
 
 describe "CouchDB " do
@@ -206,7 +206,7 @@ it "should test finder options" do
   doc = {:database => 'fishes', :doc_id => 'john', :data => data}
   Couchdb.create_doc doc,@@auth_session
 
-  data = {:firstname => 'peter', :gender =>'male', :age => '28', :salary => '78000'}
+  data = {:firstname => 'peter', :gender =>'male', :age => '45', :salary => '78000'}
   doc = {:database => 'fishes', :doc_id => 'peter', :data => data}
   Couchdb.create_doc doc,@@auth_session
 
@@ -232,7 +232,7 @@ it "should test finder options" do
   h["firstname"].should == "john"
   hash.length.should == 2
 
-
+ 
 
  hash = Couchdb.find view,@@auth_session,key='male', options = {:descending => true}
  h = hash[0]
@@ -283,6 +283,39 @@ it "should test finder options" do
  h = hash[0]
  h["firstname"].should == "john"
  hash.length.should == 2
+
+    view = {:database => 'fishes',
+         :design_doc => 'my_views',
+          :view => 'age_gender',
+           :json_doc => '/home/obi/bin/leanback/test/start.json'}
+
+ options = {:startkey => ["28","male"], :endkey => ["28","male"], :limit => 2}
+     
+ hash = Couchdb.find_on_fly(view,@@auth_session,key=nil, options)
+   h0 = hash[0]
+   h1 = hash[1]
+   h0["firstname"].should == "aaron"
+   h1["firstname"].should == "john"
+   hash.length.should == 2
+
+ options = {:startkey => ["28","male"], :endkey => ["28","male"], :skip => 1}
+
+  hash = Couchdb.find_on_fly(view,@@auth_session,key=nil, options)
+   h0 = hash[0]
+   h1 = hash[1]
+   h0["firstname"].should == "john"
+   h1["firstname"].should == "sam"
+   hash.length.should == 2
+
+
+ options = {:startkey => ["28","male"], :endkey => ["28","male"]}
+
+  hash = Couchdb.find_on_fly(view,@@auth_session,key=nil, options)
+   h0 = hash[0]
+   h1 = hash[1]
+   h0["firstname"].should == "aaron"
+   h1["firstname"].should == "john"
+   hash.length.should == 3
 
  Couchdb.delete 'fishes',@@auth_session
 end
@@ -388,7 +421,7 @@ it "should switch to default bind address" do
      data = {:section => "httpd",
               :key => "port",
                 :value => "5984" }
-     #Couchdb.set_config(data,@@auth_session)
+     Couchdb.set_config(data,@@auth_session)
   
     #Couchdb.address = nil
     #Couchdb.port = nil

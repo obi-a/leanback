@@ -14,7 +14,7 @@ This project is still under development. Not complete by any means. I made this 
 Upgraded and tested on CouchDB 1.2.0. CouchDB 1.0.1 should still work fine. 
 
 ##Changes
-(https://github.com/obi-a/leanback/blob/master/Changelog.rdoc)
+[Changelog](https://github.com/obi-a/leanback/blob/master/Changelog.rdoc)
 
 ##Usage
 

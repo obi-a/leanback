@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "leanback"
-  s.version = "0.3.3"
+  s.version = "0.3.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Obi Akubue"]
-  s.date = "2013-05-26"
+  s.date = "2013-06-02"
   s.description = "lightweight Ruby interface to CouchDB"
   s.email = "obioraakubue@yahoo.com"
   s.extra_rdoc_files = [
@@ -35,6 +35,7 @@ Gem::Specification.new do |s|
     "test/main.rb",
     "test/my_view.json",
     "test/my_views.json",
+    "test/start.json",
     "test/test_leanback.rb",
     "test/view_age.json"
   ]

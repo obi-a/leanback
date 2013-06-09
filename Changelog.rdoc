@@ -1,3 +1,18 @@
+=0.4.0
+June 9, 2013
+* added ability to find documents by multiple keys
+Example:
+ keys = {:gender => 'male',:age => '34'}
+ Couchdb.find_by_keys({:database => 'friends', :keys => keys})
+This will return all documents in the friends database with gender = male and age = 34
+* added the ability to count documents by multiple keys 
+Example:
+ keys = {:gender => 'male',:age => '40'}
+ count = Couchdb.count_by_keys({:database => 'friends', :keys => keys})
+This will return the number of documents in the friends database with gender = male and age = 40.
+See documentation for details.
+ 
+
 =0.3.4
 June 2, 2013
 * added options for manipulating query results, the options available are limit, skip, descending, startkey, endkey

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>CouchDB Security</title>
+
+<link rel="stylesheet" href="http://www.whisperservers.com/leanback/wp-content/themes/hybrid/style.css" type="text/css" media="all" />
+<link rel="profile" href="http://gmpg.org/xfn/11" />
+<link rel="pingback" href="http://www.whisperservers.com/leanback/xmlrpc.php" />
+
+<meta name="generator" content="WordPress 3.5.1 - really-static 0.5" />
+<meta name="template" content="Hybrid 1.0" />
+<meta name="robots" content="index,follow" />
+<meta name="author" content="admin" />
+<meta name="copyright" content="Copyright (c) November 2011" />
+<meta name="revised" content="Monday, December 3rd, 2012, 1:35 am" />
+<link rel="alternate" type="application/rss+xml" title="Leanback &raquo; Feed" href="http://www.whisperservers.com/leanback/wp-content/plugins/really-static/static/feed/" />
+
+<script type='text/javascript' src='http://www.whisperservers.com/leanback/wp-includes/js/jquery/jquery.js?ver=1.8.3'></script>
+<link rel='prev' title='CouchDB Configuration' href='http://www.whisperservers.com/leanback/wp-content/plugins/really-static/static/couchdb-configuration/' />
+<link rel='next' title='CouchDB Bind_Address &amp; Port' href='http://www.whisperservers.com/leanback/wp-content/plugins/really-static/static/setting-the-bind_address-port/' />
+<link rel='canonical' href='http://www.whisperservers.com/leanback/wp-content/plugins/really-static/static/couchdb-security/' />
+
+<link rel="stylesheet" href="http://www.whisperservers.com/leanback/wp-content/plugins/wp-syntax/wp-syntax.css" type="text/css" media="screen" />
+
+</head>
+
+<body class="wordpress ltr en_US parent-theme y2013 m06 d09 h16 sunday logged-out singular singular-page singular-page-97 page-template-default page-97 primary-active secondary-inactive subsidiary-inactive">
+
+
+<div id="body-container">
+
+	
+	<div id="header-container">
+
+		<div id="header">
+
+			<div id="site-title"><a href="http://www.whisperservers.com/leanback/wp-content/plugins/really-static/static/" title="Leanback" rel="home"><span>Leanback</span></a></div>
+			<div id="site-description"><span>Simple Ruby interface to CouchDB</span></div>
+
+		</div><!-- #header -->
+
+	</div><!-- #header-container -->
+
+	
+	<div id="container">
+
+		
+	<div id="content" class="hfeed content">
+
+		<div class="breadcrumb breadcrumbs"><div class="breadcrumb-trail"><span class="trail-before"><span class="breadcrumb-title">Browse:</span></span> <a href="http://www.whisperservers.com/leanback/wp-content/plugins/really-static/static/" title="Leanback" rel="home" class="trail-begin">Home</a> <span class="sep">/</span> <span class="trail-end">CouchDB Security</span></div></div>
+		
+			<div id="post-97" class="hentry page publish post-1 odd author-admin">
+
+				<h1 class="page-title entry-title"><a href="http://www.whisperservers.com/leanback/wp-content/plugins/really-static/static/couchdb-security/" title="CouchDB Security" rel="bookmark">CouchDB Security</a></h1>
+				<div class="entry-content">
+					<p><strong>Admin user</strong><br />
+To add an admin user to CouchDB, and end the admin party</p>
+
+<div class="wp_syntax"><div class="code"><pre class="ruby" style="font-family:monospace;"> data = <span style="color:#006600; font-weight:bold;">&#123;</span>:section <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#996600;">&quot;admins&quot;</span>,
+              <span style="color:#ff3333; font-weight:bold;">:key</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#996600;">&quot;james&quot;</span>,
+                <span style="color:#ff3333; font-weight:bold;">:value</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#996600;">&quot;abc123&quot;</span><span style="color:#006600; font-weight:bold;">&#125;</span>
+ Couchdb.<span style="color:#9900CC;">set_config</span> data</pre></div></div>
+
+<p>This is similar to sending a</p>
+
+<div class="wp_syntax"><div class="code"><pre class="plain" style="font-family:monospace;">PUT http://127.0.0.1:5984/_config/admins/james,'&quot;abc123&quot;'</pre></div></div>
+
+<p>If you check Futon&#8217;s Configuration section you would notice an admin &#8216;james&#8217; have been added to the admins section. The admin&#8217;s username is &#8216;james&#8217; and password is &#8216;abc123&#8242;.</p>
+<p>To login the admin user,</p>
+
+<div class="wp_syntax"><div class="code"><pre class="ruby" style="font-family:monospace;">hash = Couchdb.<span style="color:#9900CC;">login</span><span style="color:#006600; font-weight:bold;">&#40;</span>username = <span style="color:#996600;">'james'</span>,password =<span style="color:#996600;">'abc123'</span><span style="color:#006600; font-weight:bold;">&#41;</span> 
+<span style="color:#008000; font-style:italic;">#=&gt;{&quot;AuthSession&quot;=&gt;&quot;b2JpOjRFQzgyQ0U0OlA54YsdHNo8altYRIkLVVeyvwah&quot;,</span>
+<span style="color:#008000; font-style:italic;">#       &quot;Version&quot;=&gt;&quot;1&quot;, &quot;Path&quot;=&gt;&quot;%2F&quot;}</span></pre></div></div>
+
+<p>This is similar to sending a</p>
+
+<div class="wp_syntax"><div class="code"><pre class="plain" style="font-family:monospace;">POST 'http://127.0.0.1:5984/_session', 'name=james&amp;password=abc123'</pre></div></div>
+
+<p>Leanback uses CouchDB&#8217;s cookie authentication, see more details about it <a href="http://guide.couchdb.org/draft/security.html">here</a>. We need the AuthSession token for making future requests on behalf of the authenticated user.</p>
+<p>We retrieve the AuthSession token by following the login with this</p>
+
+<div class="wp_syntax"><div class="code"><pre class="ruby" style="font-family:monospace;">auth_session = hash<span style="color:#006600; font-weight:bold;">&#91;</span><span style="color:#996600;">&quot;AuthSession&quot;</span><span style="color:#006600; font-weight:bold;">&#93;</span></pre></div></div>
+
+<p>The complete login code will be</p>
+
+<div class="wp_syntax"><div class="code"><pre class="ruby" style="font-family:monospace;">hash = Couchdb.<span style="color:#9900CC;">login</span><span style="color:#006600; font-weight:bold;">&#40;</span>username = <span style="color:#996600;">'james'</span>,password =<span style="color:#996600;">'abc123'</span><span style="color:#006600; font-weight:bold;">&#41;</span>
+auth_session = hash<span style="color:#006600; font-weight:bold;">&#91;</span><span style="color:#996600;">&quot;AuthSession&quot;</span><span style="color:#006600; font-weight:bold;">&#93;</span></pre></div></div>
+
+<p>This authenticated admin user can add new admins to CouchDB</p>
+
+<div class="wp_syntax"><div class="code"><pre class="ruby" style="font-family:monospace;"> data = <span style="color:#006600; font-weight:bold;">&#123;</span>:section <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#996600;">&quot;admins&quot;</span>,
+              <span style="color:#ff3333; font-weight:bold;">:key</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#996600;">&quot;nancy&quot;</span>,
+                <span style="color:#ff3333; font-weight:bold;">:value</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#996600;">&quot;see78no&quot;</span><span style="color:#006600; font-weight:bold;">&#125;</span>
+ Couchdb.<span style="color:#9900CC;">set_config</span> data,auth_session</pre></div></div>
+
+<p>To delete the admin user</p>
+
+<div class="wp_syntax"><div class="code"><pre class="ruby" style="font-family:monospace;">data = <span style="color:#006600; font-weight:bold;">&#123;</span>:section <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#996600;">&quot;admins&quot;</span>,
+              <span style="color:#ff3333; font-weight:bold;">:key</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#996600;">&quot;nancy&quot;</span><span style="color:#006600; font-weight:bold;">&#125;</span>
+&nbsp;
+Couchdb.<span style="color:#9900CC;">delete_config</span><span style="color:#006600; font-weight:bold;">&#40;</span>data,auth_session<span style="color:#006600; font-weight:bold;">&#41;</span></pre></div></div>
+
+<p>If you delete all admin users CouchDB will switch to Admin Party.</p>
+<p><strong>Non-Admin Users</strong></p>
+<p>To add a non-admin user to CouchDB</p>
+
+<div class="wp_syntax"><div class="code"><pre class="ruby" style="font-family:monospace;">user = <span style="color:#006600; font-weight:bold;">&#123;</span> <span style="color:#ff3333; font-weight:bold;">:username</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#996600;">&quot;david&quot;</span>, <span style="color:#ff3333; font-weight:bold;">:password</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#996600;">&quot;trusted&quot;</span>, <span style="color:#ff3333; font-weight:bold;">:roles</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#006600; font-weight:bold;">&#91;</span><span style="color:#006600; font-weight:bold;">&#93;</span><span style="color:#006600; font-weight:bold;">&#125;</span>
+Couchdb.<span style="color:#9900CC;">add_user</span><span style="color:#006600; font-weight:bold;">&#40;</span>user, auth_session<span style="color:#006600; font-weight:bold;">&#41;</span></pre></div></div>
+
+<p>This adds a new user to CouchDB&#8217;s _users database, if you check the _users database, you will see that a new user with id &#8220;org.couchdb.user:david&#8221; has been added to the database.<br />
+The roles are left blank, since only admins can add roles. You can only assign roles to a user if you are making the request as an admin.</p>
+
+<div class="wp_syntax"><div class="code"><pre class="ruby" style="font-family:monospace;">user = <span style="color:#006600; font-weight:bold;">&#123;</span> <span style="color:#ff3333; font-weight:bold;">:username</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#996600;">&quot;david&quot;</span>, <span style="color:#ff3333; font-weight:bold;">:password</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#996600;">&quot;trusted&quot;</span>, <span style="color:#ff3333; font-weight:bold;">:roles</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#006600; font-weight:bold;">&#91;</span><span style="color:#996600;">&quot;staff&quot;</span><span style="color:#006600; font-weight:bold;">&#93;</span><span style="color:#006600; font-weight:bold;">&#125;</span>
+Couchdb.<span style="color:#9900CC;">add_user</span><span style="color:#006600; font-weight:bold;">&#40;</span>user,auth_session<span style="color:#006600; font-weight:bold;">&#41;</span></pre></div></div>
+
+<p>Leanback generates a random salt string for CouchDB&#8217;s user password encryption. If you want to generate your own salt you can use the create_user() method instead of add_user().</p>
+
+<div class="wp_syntax"><div class="code"><pre class="ruby" style="font-family:monospace;">user = <span style="color:#006600; font-weight:bold;">&#123;</span>:username <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#996600;">&quot;david&quot;</span>, 
+          <span style="color:#ff3333; font-weight:bold;">:password</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#996600;">&quot;trusted&quot;</span>, 
+              <span style="color:#ff3333; font-weight:bold;">:roles</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#006600; font-weight:bold;">&#91;</span><span style="color:#006600; font-weight:bold;">&#93;</span>, 
+               <span style="color:#ff3333; font-weight:bold;">:salt</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#996600;">&quot;random-salt-string&quot;</span><span style="color:#006600; font-weight:bold;">&#125;</span>
+&nbsp;
+Couchdb.<span style="color:#9900CC;">create_user</span><span style="color:#006600; font-weight:bold;">&#40;</span>user,auth_session<span style="color:#006600; font-weight:bold;">&#41;</span></pre></div></div>
+
+<p>To start a session for the non-admin user</p>
+
+<div class="wp_syntax"><div class="code"><pre class="ruby" style="font-family:monospace;">hash = Couchdb.<span style="color:#9900CC;">login</span><span style="color:#006600; font-weight:bold;">&#40;</span>username = <span style="color:#996600;">'david'</span>,password =<span style="color:#996600;">'trusted'</span><span style="color:#006600; font-weight:bold;">&#41;</span> 
+user_auth_session =  hash<span style="color:#006600; font-weight:bold;">&#91;</span><span style="color:#996600;">&quot;AuthSession&quot;</span><span style="color:#006600; font-weight:bold;">&#93;</span></pre></div></div>
+
+<p>Same method works for authenticating admin &#038; non-admin users. We can make requests on behalf of the user, using the AuthSession token we generated for them, in the login() method.</p>
+<p>To change password for the non-admin user</p>
+
+<div class="wp_syntax"><div class="code"><pre class="ruby" style="font-family:monospace;">Couchdb.<span style="color:#9900CC;">change_password</span><span style="color:#006600; font-weight:bold;">&#40;</span>username = <span style="color:#996600;">'david'</span>, new_password = <span style="color:#996600;">&quot;abc123&quot;</span>,auth_session<span style="color:#006600; font-weight:bold;">&#41;</span></pre></div></div>
+
+<p>This will change the password of user <em>david</em> to <em>abc123</em>. </p>
+<p><strong>Setting the Security Object of a database</strong><br />
+To set the Security Object of a database named &#8216;contacts&#8217;</p>
+
+<div class="wp_syntax"><div class="code"><pre class="ruby" style="font-family:monospace;">data = <span style="color:#006600; font-weight:bold;">&#123;</span> <span style="color:#ff3333; font-weight:bold;">:admins</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#006600; font-weight:bold;">&#123;</span><span style="color:#996600;">&quot;names&quot;</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#006600; font-weight:bold;">&#91;</span><span style="color:#996600;">&quot;david&quot;</span><span style="color:#006600; font-weight:bold;">&#93;</span>, <span style="color:#996600;">&quot;roles&quot;</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#006600; font-weight:bold;">&#91;</span><span style="color:#996600;">&quot;admin&quot;</span><span style="color:#006600; font-weight:bold;">&#93;</span><span style="color:#006600; font-weight:bold;">&#125;</span>,
+                   <span style="color:#ff3333; font-weight:bold;">:readers</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#006600; font-weight:bold;">&#123;</span><span style="color:#996600;">&quot;names&quot;</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#006600; font-weight:bold;">&#91;</span><span style="color:#996600;">&quot;david&quot;</span><span style="color:#006600; font-weight:bold;">&#93;</span>,<span style="color:#996600;">&quot;roles&quot;</span>  <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#006600; font-weight:bold;">&#91;</span><span style="color:#996600;">&quot;admin&quot;</span><span style="color:#006600; font-weight:bold;">&#93;</span><span style="color:#006600; font-weight:bold;">&#125;</span>
+                  <span style="color:#006600; font-weight:bold;">&#125;</span>
+&nbsp;
+Couchdb.<span style="color:#9900CC;">set_security</span><span style="color:#006600; font-weight:bold;">&#40;</span><span style="color:#996600;">&quot;contacts&quot;</span>,data,auth_session<span style="color:#006600; font-weight:bold;">&#41;</span></pre></div></div>
+
+<p>To retrieve the security object of a database named &#8216;contacts&#8217;</p>
+
+<div class="wp_syntax"><div class="code"><pre class="ruby" style="font-family:monospace;">Couchdb.<span style="color:#9900CC;">get_security</span><span style="color:#006600; font-weight:bold;">&#40;</span><span style="color:#996600;">&quot;contacts&quot;</span>,auth_session<span style="color:#006600; font-weight:bold;">&#41;</span>
+<span style="color:#008000; font-style:italic;">#=&gt;{&quot;admins&quot;=&gt;{&quot;names&quot;=&gt;[&quot;david&quot;], &quot;roles&quot;=&gt;[&quot;admin&quot;]}, </span>
+<span style="color:#008000; font-style:italic;">#        &quot;readers&quot;=&gt;{&quot;names&quot;=&gt;[&quot;david&quot;], &quot;roles&quot;=&gt;[&quot;admin&quot;]}}</span></pre></div></div>
+
+<p>To clear the security object</p>
+
+<div class="wp_syntax"><div class="code"><pre class="ruby" style="font-family:monospace;">data = <span style="color:#006600; font-weight:bold;">&#123;</span> <span style="color:#ff3333; font-weight:bold;">:admins</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#006600; font-weight:bold;">&#123;</span><span style="color:#996600;">&quot;names&quot;</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#006600; font-weight:bold;">&#91;</span><span style="color:#006600; font-weight:bold;">&#93;</span>, <span style="color:#996600;">&quot;roles&quot;</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#006600; font-weight:bold;">&#91;</span><span style="color:#006600; font-weight:bold;">&#93;</span><span style="color:#006600; font-weight:bold;">&#125;</span>,
+             <span style="color:#ff3333; font-weight:bold;">:readers</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#006600; font-weight:bold;">&#123;</span><span style="color:#996600;">&quot;names&quot;</span> <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#006600; font-weight:bold;">&#91;</span><span style="color:#006600; font-weight:bold;">&#93;</span>,<span style="color:#996600;">&quot;roles&quot;</span>  <span style="color:#006600; font-weight:bold;">=&gt;</span> <span style="color:#006600; font-weight:bold;">&#91;</span><span style="color:#006600; font-weight:bold;">&#93;</span><span style="color:#006600; font-weight:bold;">&#125;</span>
+               <span style="color:#006600; font-weight:bold;">&#125;</span>
+Couchdb.<span style="color:#9900CC;">set_security</span><span style="color:#006600; font-weight:bold;">&#40;</span><span style="color:#996600;">&quot;contacts&quot;</span>,data,auth_session<span style="color:#006600; font-weight:bold;">&#41;</span></pre></div></div>
+
+									</div><!-- .entry-content -->
+
+				
+			</div><!-- .hentry -->
+
+			
+			
+			
+		
+		
+	
+	</div><!-- .content .hfeed -->
+
+		
+	<div id="primary" class="sidebar aside">
+
+		
+		<div id="hybrid-nav-menu-3" class="widget nav-menu widget-nav-menu"><div class="widget-wrap widget-inside"><h3 class="widget-title">Leanback</h3><div class="menu-sidebar-container"><ul id="menu-sidebar" class="nav-menu"><li id="menu-item-13" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-13"><a href="http://www.whisperservers.com/leanback/wp-content/plugins/really-static/static/leanback/">Leanback</a><ul class="sub-menu"><li id="menu-item-14" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-14"><a href="http://www.whisperservers.com/leanback/wp-content/plugins/really-static/static/leanback/installation/">Install</a></li><li id="menu-item-15" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15"><a href="http://www.whisperservers.com/leanback/wp-content/plugins/really-static/static/basic-couchdb-operations/">Basic CouchDB Operations</a></li><li id="menu-item-41" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-41"><a href="http://www.whisperservers.com/leanback/wp-content/plugins/really-static/static/find-documents-by-key/">Find documents by key</a></li><li id="menu-item-167" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-167"><a href="http://www.whisperservers.com/leanback/wp-content/plugins/really-static/static/find-document-by-multiple-keys/">Find document by multiple Keys</a></li><li id="menu-item-140" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-140"><a href="http://www.whisperservers.com/leanback/wp-content/plugins/really-static/static/count-documents-by-key/">Count documents by key</a></li><li id="menu-item-175" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-175"><a href="http://www.whisperservers.com/leanback/wp-content/plugins/really-static/static/count-by-multiple-documents/">Count documents by multiple keys</a></li><li id="menu-item-45" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-45"><a href="http://www.whisperservers.com/leanback/wp-content/plugins/really-static/static/design-documents-and-permanent-views/">Working with CouchDB views</a></li><li id="menu-item-67" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-67"><a href="http://www.whisperservers.com/leanback/wp-content/plugins/really-static/static/error-handling/">Error handling</a></li><li id="menu-item-96" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-96"><a href="http://www.whisperservers.com/leanback/wp-content/plugins/really-static/static/couchdb-configuration/">CouchDB Configuration</a></li><li id="menu-item-102" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-97 current_page_item menu-item-102"><a href="http://www.whisperservers.com/leanback/wp-content/plugins/really-static/static/couchdb-security/">CouchDB Security</a></li><li id="menu-item-105" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-105"><a href="http://www.whisperservers.com/leanback/wp-content/plugins/really-static/static/setting-the-bind_address-port/">CouchDB Bind_Address &#038; Port</a></li></ul></li><li id="menu-item-142" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-142"><a href="https://github.com/obi-a/leanback/blob/master/Changelog.rdoc">Changes</a></li><li id="menu-item-78" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-78"><a href="https://github.com/obi-a/leanback">Source Code</a></li></ul></div></div></div>
+		
+	</div><!-- #primary .aside -->
+
+
+	</div><!-- #container -->
+
+	<div id="footer-container">
+
+		
+		<div id="footer">
+
+			<div class="footer-insert"><p class="copyright">Copyright &#169; 2013 <a href="http://obi-akubue.org">obi-akubue.org</a>.</p></div>
+		</div><!-- #footer -->
+
+		
+	</div><!-- #footer-container -->
+
+</div><!-- #body-container -->
+
+
+    <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-20190925-6']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+  })();
+</script>
+
+<a style='color:transparent;position:absolute;left:-99999px;z-index:-99999' href='http://www.wpdownloadmanager.com/' title='Premium Wordpress Plugin download manager'>Premium Wordpress Plugin</a>
+    <script type='text/javascript' src='http://www.whisperservers.com/leanback/wp-content/themes/hybrid/library/js/drop-downs.js?ver=20110705'></script>
+
+</body>
+</html>
+<!-- Dynamic page generated in 0.481 seconds. -->
+<!-- Cached page generated by WP-Super-Cache on 2013-06-09 16:29:36 -->
+
+<!-- super cache -->

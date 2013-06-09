@@ -64,6 +64,39 @@ it "find items by key" do
     Couchdb.delete_doc({:database => 'friends', :doc_id => '_design/lastname_finder'})
 end
 
+it "should find items by multiple keys" do
+ keys = {:gender => 'male',:age => '34'}
+ docs = Couchdb.find_by_keys({:database => 'friends', :keys => keys})
+ d = docs[0]
+ d["age"].should == "34"
+end
+
+it "should find items by multiple keys using a single key" do
+ keys = {:lastname => 'smith'}
+ docs = Couchdb.find_by_keys({:database => 'friends', :keys => keys})
+ d = docs[0]
+ d["lastname"].should == "smith"
+end
+
+it "should find items by multiple keys" do
+ keys = {:gender => 'male',:age => '40'}
+ docs = Couchdb.find_by_keys({:database => 'friends', :keys => keys})
+ docs.should == []
+end
+
+it "should count items by multiple keys" do
+ keys = {:gender => 'male',:age => '34'}
+ count = Couchdb.count_by_keys({:database => 'friends', :keys => keys})
+ count.should == 1
+end
+
+it "should count items by multiple keys" do
+ keys = {:gender => 'male',:age => '40'}
+ count = Couchdb.count_by_keys({:database => 'friends', :keys => keys})
+ count.should == 0
+end
+
+
 it "should query a permanent view that doesn't exist and handle exception" do
   begin
      view = { :database => "friends", :design_doc => 'more_views', :view => 'get_user_email'}
@@ -205,6 +238,13 @@ it "should test finder options" do
   data = {:firstname => 'sam', :gender =>'male', :age => '28', :salary => '97000'}
   doc = {:database => 'fishes', :doc_id => 'sam', :data => data}
   Couchdb.create_doc doc
+
+
+ keys = {:age =>'28', :gender => 'male'}
+ hash = Couchdb.find_by_keys({:database => 'fishes', :keys => keys},'', options = {:limit => 2, :skip => 1})
+ h = hash[0]
+ h["firstname"].should == "john"
+ hash.length.should == 2
   
   #create the design doc to be queryed in the test
   Couchdb.find_by({:database => 'fishes', :gender => 'male'})

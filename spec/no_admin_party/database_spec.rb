@@ -70,6 +70,37 @@ it "find items by key" do
     Couchdb.delete_doc({:database => 'contacts', :doc_id => '_design/lastname_finder'},@@auth_session)
 end
 
+it "should find items by multiple keys" do
+ keys = {:gender => 'male',:age => '34'}
+ docs = Couchdb.find_by_keys({:database => 'contacts', :keys => keys},@@auth_session)
+ d = docs[0]
+ d["age"].should == "34"
+end
+
+it "should find items by multiple keys using a single key" do
+ keys = {:lastname => 'smith'}
+ docs = Couchdb.find_by_keys({:database => 'contacts', :keys => keys},@@auth_session)
+ d = docs[0]
+ d["lastname"].should == "smith"
+end
+
+it "should find items by multiple keys" do
+ keys = {:gender => 'male',:age => '40'}
+ docs = Couchdb.find_by_keys({:database => 'contacts', :keys => keys},@@auth_session)
+ docs.should == []
+end
+
+it "should count items by multiple keys" do
+ keys = {:gender => 'male',:age => '34'}
+ count = Couchdb.count_by_keys({:database => 'contacts', :keys => keys},@@auth_session)
+ count.should == 1
+end
+
+it "should count items by multiple keys" do
+ keys = {:gender => 'male',:age => '40'}
+ count = Couchdb.count_by_keys({:database => 'contacts', :keys => keys},@@auth_session)
+ count.should == 0
+end
 
 
 
@@ -213,6 +244,13 @@ it "should test finder options" do
   data = {:firstname => 'sam', :gender =>'male', :age => '28', :salary => '97000'}
   doc = {:database => 'fishes', :doc_id => 'sam', :data => data}
   Couchdb.create_doc doc,@@auth_session
+
+
+ keys = {:age =>'28', :gender => 'male'}
+ hash = Couchdb.find_by_keys({:database => 'fishes', :keys => keys},@@auth_session, options = {:limit => 2, :skip => 1})
+ h = hash[0]
+ h["firstname"].should == "john"
+ hash.length.should == 2
   
   #create the design doc to be queryed in the test
   Couchdb.find_by({:database => 'fishes', :gender => 'male'},@@auth_session)
@@ -421,7 +459,7 @@ it "should switch to default bind address" do
      data = {:section => "httpd",
               :key => "port",
                 :value => "5984" }
-     Couchdb.set_config(data,@@auth_session)
+    Couchdb.set_config(data,@@auth_session)
   
     #Couchdb.address = nil
     #Couchdb.port = nil

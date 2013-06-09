@@ -27,7 +27,7 @@ View the [Changelog](https://github.com/obi-a/leanback/blob/master/Changelog.rdo
    
    + [Find Documents by Key](http://www.whisperservers.com/leanback/find-documents-by-key/)
     
-   + [Find Document By Multiple Keys] (http://www.whisperservers.com/leanback/find-document-by-multiple-keys/)
+   + [Find Documents By Multiple Keys] (http://www.whisperservers.com/leanback/find-document-by-multiple-keys/)
 
    + [Count Documents by Key](http://www.whisperservers.com/leanback/count-documents-by-key/)
 

@@ -44,7 +44,7 @@ view = { :database => "zralph1369728249zeb1292e18b998352",
 view = { :database => "monitors", 
           :design_doc => 'test_finder', 
             :view => 'find_by_test'}
-hash = Couchdb.find view,auth_session,key=nil, options = {:startkey => ["1000","UP"], :endkey => ["6000","UP"]}
+#hash = Couchdb.find view,auth_session,key=nil, options = {:startkey => ["1000","UP"], :endkey => ["6000","UP"]}
 
 #hash = Couchdb.find view,auth_session,key=nil, options = {:startkey => ["3300","UP"],:descending => true}
 
@@ -53,6 +53,33 @@ hash = Couchdb.find view,auth_session,key=nil, options = {:startkey => ["1000","
 #hash = Couchdb.find view,auth_session,key= {:keys => ['3300','UP']}
 
 #hash = Couchdb.find view,auth_session,key= '?keys=%5B%228800%22,%22UP%22%5D'
+
+#keys = {:tag =>'ralph', :via => 'ses' }
+#hash = Couchdb.find_by_keys({:database => 'monitors', :keys => keys},auth_session)
+
+#keys = {:tag =>'ralph', :via => 'ses' }
+#num = Couchdb.count_by_keys({:database => 'monitors', :keys => keys},auth_session)
+
+keys = {:tag =>'ralph', :via => 'ses', :every => '1m'}
+hash = Couchdb.find_by_keys({:database => 'monitors', :keys => keys},auth_session, options = {:limit => 1, :skip => 1})
+
+#keys = {:tag =>'ralph', :via => 'ses', :every => '1m'}
+#num = Couchdb.count_by_keys({:database => 'monitors', :keys => keys},auth_session)
+
+#keys = {:tag => 'ralph'}
+#hash = Couchdb.find_by_keys({:database => 'monitors', :keys => keys},auth_session)
+
+#keys = {:tag => 'ralph'}
+#num = Couchdb.count_by_keys({:database => 'monitors', :keys => keys},auth_session)
+
+
+#Couchdb.add_multiple_finder({:database => "monitors", :keys => ["tag","via"]},auth_session)
+
+#Couchdb.add_multiple_finder({:database => "monitors", :keys => ["tag","via","state"]},auth_session)
+
+#Couchdb.add_multiple_finder({:database => "monitors", :keys => ["tag"]},auth_session)
+
+#puts num.to_s
 
 puts hash.inspect
 

@@ -396,6 +396,62 @@ def self.add_finder(options,auth_session = "")
  end
 end
 
+#add a multiple finder method to the database
+#this creates a find by keys method
+def self.add_multiple_finder(options,auth_session = "")
+ set_address 
+ db_name = options[:database]
+ keys = options[:keys]
+ view_name = keys.join("_")
+ key = keys.join(",doc.")
+ condition = keys.join(" && doc.")
+ design_doc_name = view_name + '_keys_finder'
+
+ view = '{
+ "language" : "javascript",
+ "views" :{
+    "find_by_keys_'+view_name+'" : {
+      "map" : "function(doc){ if(doc.'+condition+') emit([doc.'+key+'],doc);}"
+    }
+ }
+}' 
+
+ begin  
+  response = RestClient.put 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name, view, {:cookies => {"AuthSession" => auth_session}}
+ rescue => e
+    hash = Yajl::Parser.parse(e.response.to_s)
+    raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
+ end
+end
+
+#add a multiple counter method to the database
+#this creates a count by keys method
+def self.add_multiple_counter(options,auth_session = "")
+ set_address 
+ db_name = options[:database]
+ keys = options[:keys]
+ view_name = keys.join("_")
+ key = keys.join(",doc.")
+ condition = keys.join(" && doc.")
+ design_doc_name = view_name + '_keys_counter'
+
+ view = '{
+ "language" : "javascript",
+ "views" :{
+    "count_by_keys_'+view_name+'" : {
+      "map" : "function(doc){ if(doc.'+condition+') emit([doc.'+key+'],doc);}", "reduce": "_count"
+    }
+ }
+}' 
+
+ begin  
+  response = RestClient.put 'http://' + @address + ':' + @port + '/' + db_name + '/_design/' + design_doc_name, view, {:cookies => {"AuthSession" => auth_session}}
+ rescue => e
+    hash = Yajl::Parser.parse(e.response.to_s)
+    raise CouchdbException.new(hash), "CouchDB: Error - " + hash.values[0] + ". Reason - "  + hash.values[1]
+ end
+end
+
 #add a counter method to the database
 #this creates a count method that counts documents by key
 def self.add_counter(options,auth_session = "")
@@ -443,6 +499,40 @@ def self.count(options,auth_session = "")
  return count.to_i
 end
 
+#count by keys
+#example: 
+#hash = {:firstname =>'john', :gender => 'male' }
+#Couchdb.count_by_keys({:database => 'contacts', :keys => hash},auth_session)
+def self.count_by_keys(options,auth_session = "", params = {})
+ set_address
+ db_name = options[:database]
+ keys = []
+ search_term = []
+ hash = options[:keys]
+
+ hash.each do |k,v|
+  keys << k
+  search_term << v
+ end
+ index = keys.join("_")
+ design_doc_name = index + '_keys_counter'
+ view_name = 'count_by_keys_' + index
+ params[:startkey] = search_term
+ params[:endkey] = search_term
+ 
+ begin 
+  view = { :database => db_name, :design_doc => design_doc_name, :view => view_name}
+  docs = find view,auth_session,key=nil,params
+ rescue CouchdbException => e
+    #add a finder/index if one doesn't already exist in the database
+    #then find_by_keys
+    add_multiple_counter({:database => db_name, :keys => keys},auth_session)
+    docs = find view,auth_session,key=nil,params
+ end
+ count = docs[0]
+ return count.to_i
+end
+
 #find by key 
 def self.find_by(options,auth_session = "", params = {})
  set_address 
@@ -460,6 +550,39 @@ def self.find_by(options,auth_session = "", params = {})
     #then find_by_key
     add_finder({:database => db_name, :key => index},auth_session)
     docs = find view,auth_session,search_term,params
+ end
+ return docs
+end
+
+#find by keys
+#example: 
+#hash = {:firstname =>'john', :gender => 'male' }
+#Couchdb.find_by_keys({:database => 'contacts', :keys => hash},auth_session)
+def self.find_by_keys(options,auth_session = "", params = {})
+ set_address
+ db_name = options[:database]
+ keys = []
+ search_term = []
+ hash = options[:keys]
+
+ hash.each do |k,v|
+  keys << k
+  search_term << v
+ end
+ index = keys.join("_")
+ design_doc_name = index + '_keys_finder'
+ view_name = 'find_by_keys_' + index
+ params[:startkey] = search_term
+ params[:endkey] = search_term
+ 
+ begin 
+  view = { :database => db_name, :design_doc => design_doc_name, :view => view_name}
+  docs = find view,auth_session,key=nil,params
+ rescue CouchdbException => e
+    #add a finder/index if one doesn't already exist in the database
+    #then find_by_keys
+    add_multiple_finder({:database => db_name, :keys => keys},auth_session)
+    docs = find view,auth_session,key=nil,params
  end
  return docs
 end

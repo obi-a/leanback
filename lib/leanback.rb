@@ -439,7 +439,7 @@ def self.add_multiple_counter(options,auth_session = "")
  "language" : "javascript",
  "views" :{
     "count_by_keys_'+view_name+'" : {
-      "map" : "function(doc){ if(doc.'+condition+') emit([doc.'+key+'],doc);}", "reduce": "_count"
+      "map" : "function(doc){ if(doc.'+condition+') emit([doc.'+key+'],null);}", "reduce": "_count"
     }
  }
 }' 

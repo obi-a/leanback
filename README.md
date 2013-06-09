@@ -26,8 +26,12 @@ View the [Changelog](https://github.com/obi-a/leanback/blob/master/Changelog.rdo
    + [Basic CouchDB Operations](http://www.whisperservers.com/leanback/basic-couchdb-operations/)
    
    + [Find Documents by Key](http://www.whisperservers.com/leanback/find-documents-by-key/)
+    
+   + [Find Document By Multiple Keys] (http://www.whisperservers.com/leanback/find-document-by-multiple-keys/)
 
    + [Count Documents by Key](http://www.whisperservers.com/leanback/count-documents-by-key/)
+
+   + [Count Documents by Multiple Keys] (http://www.whisperservers.com/leanback/count-by-multiple-documents/)
 
    + Working with [CouchDB Views](http://www.whisperservers.com/leanback/design-documents-and-permanent-views/)
 

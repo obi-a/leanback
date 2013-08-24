@@ -11,6 +11,7 @@ end
 
 module Couchdb
   def self.couch_error(e)
+    raise e if e.is_a? OpenSSL::SSL::SSLError
     hash = Yajl::Parser.parse(e.response.to_s)
     raise CouchdbException.new(hash), "CouchDB: Error - #{hash.values[0]}. Reason - #{hash.values[1]}" 
   end

@@ -1,3 +1,9 @@
+0.4.1
+August 23,2013
+* Changed bind address to require prefix (http:// or https://)
+Example: Couchdb.address = "http://whisperservers.cloudant.com" 
+See documentation for details
+
 =0.4.0
 June 9, 2013
 * added ability to find documents by multiple keys

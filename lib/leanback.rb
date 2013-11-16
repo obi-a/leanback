@@ -238,13 +238,13 @@ module Couchdb
   end
 
   ##view a document 
-  def self.view(doc,auth_session = "")
+  def self.view(doc,auth_session = "", options = {})
     set_address
     db_name = doc[:database]
     doc_id = doc[:doc_id]
     begin
       response = RestClient.get "#{@address}:#{@port}/#{db_name}/#{doc_id}",{:cookies => {"AuthSession" => auth_session}}
-      hash = Yajl::Parser.parse(response.to_str)
+      hash = Yajl::Parser.parse(response.to_str, symbolize_keys(options))
     rescue => e
       couch_error(e)
     end 
@@ -298,14 +298,16 @@ module Couchdb
         key = URI.escape('?key="' + key + '"')
         response = RestClient.get "#{@address}:#{@port}/#{db_name}/_design/#{design_doc_name}/_view/#{view_name}#{key}&#{URI.escape(params)}" ,{:cookies => {"AuthSession" => auth_session}}
       end
-      hash = Yajl::Parser.parse(response.to_str)
-      rows = hash["rows"]
-      count = 0
+      hash = Yajl::Parser.parse(response.to_str, symbolize_keys(options))
+      data = []
+      rows = hash["rows"] unless hash["rows"].nil?
+      rows = hash[:rows] unless hash[:rows].nil?
       rows.each do |row|
-        rows[count] = row["value"]
-        count += 1  
+        value = row["value"] unless row["value"].nil?
+        value = row[:value] unless row[:value].nil?
+        data << value 
       end
-      return rows
+      return data
      rescue => e
        couch_error(e)
      end
@@ -340,20 +342,20 @@ module Couchdb
     design_doc = doc[:design_doc]
     view = doc[:view]
     json_doc = doc[:json_doc]
- 
+    query_info = {:database => db_name, :design_doc => design_doc, :view => view}
     begin 
       if( key == nil)
-        docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session,key=nil,options) 
+        docs = find(query_info,auth_session,key=nil,options) 
       else
-        docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session,key,options) 
+        docs = find(query_info,auth_session,key,options) 
       end
     rescue CouchdbException => e
       document = { :database => db_name, :design_doc => design_doc, :json_doc => json_doc}
       create_design document,auth_session
       if( key == nil)
-        docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session,key=nil,options) 
+        docs = find(query_info,auth_session,key=nil,options) 
       else
-        docs = find({:database => db_name, :design_doc => design_doc, :view => view},auth_session,key,options) 
+        docs = find(query_info,auth_session,key,options) 
       end
    end
      return docs
@@ -588,7 +590,13 @@ module Couchdb
       couch_error(e)
     end  
   end
+  
+  def self.symbolize_keys(options)
+    return {symbolize_keys: true} if options[:symbolize_keys]
+    return {}
+  end
 
+  private_class_method :symbolize_keys
 
   class << self
     attr_accessor :address 

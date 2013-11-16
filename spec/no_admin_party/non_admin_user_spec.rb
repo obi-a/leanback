@@ -1,11 +1,14 @@
 require 'spec_base.rb'
 
+hash = Couchdb.login(username = 'obi',password ='trusted') 
+@@admin_auth_session =  hash["AuthSession"]
+
+user = { :username => "david", :password => "trusted", :roles => []}
+Couchdb.add_user(user, @@admin_auth_session)
+
 #a day in the life of the non-admin user
 hash = Couchdb.login(username = 'david',password ='trusted') 
 @@auth_session =  hash["AuthSession"]
-
-hash = Couchdb.login(username = 'obi',password ='trusted') 
-@@admin_auth_session =  hash["AuthSession"]
 
 #specs to ensure non-admin users function properly
 describe "non admin user" do
@@ -55,7 +58,9 @@ it "should delete document" do
  lambda {Couchdb.view(doc,@@auth_session)}.should raise_error(CouchdbException,"CouchDB: Error - not_found. Reason - deleted")  
 end
 
-it "should delete the database" do
+it "should delete the database and user" do
+  doc = {:database => '_users', :doc_id => 'org.couchdb.user:david'}
+  Couchdb.delete_doc doc,@@admin_auth_session
   Couchdb.delete 'contacts',@@admin_auth_session
 end
 

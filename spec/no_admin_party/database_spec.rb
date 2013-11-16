@@ -39,17 +39,23 @@ it "should create a database add a finder method to it and then delete the datab
 it "should create and view document doc" do
   Couchdb.create('contacts',@@auth_session)
   data = {:firstname => 'John', 
-        	 :lastname =>'smith', 
-       		 :phone => '202-234-1234',
-        	 :email =>'james@mail.com',
-                  :age =>'34',
-                  :gender =>'male'}
+        	:lastname =>'smith', 
+       		:phone => '202-234-1234',
+        	:email =>'james@mail.com',
+          :age =>'34',
+          :gender =>'male'}
+          
   doc = {:database => 'contacts', :doc_id => 'john', :data => data}
   Couchdb.create_doc doc,@@auth_session
 
   doc = {:database => 'contacts', :doc_id => 'john'}
   hash = Couchdb.view doc,@@auth_session
   hash["_id"].should == 'john'
+  
+  #view doc and return symbolized keys
+  doc = {:database => 'contacts', :doc_id => 'john'}
+  hash = Couchdb.view(doc,@@auth_session, {symbolize_keys: true})
+  hash.should include(data)  
 end
 
 it "should count the lastnames named smith" do
@@ -233,8 +239,8 @@ it "should test finder options" do
   doc = {:database => 'fishes', :doc_id => 'aaron', :data => data}
   Couchdb.create_doc doc,@@auth_session
 
-  data = {:firstname => 'john', :gender =>'male', :age => '28', :salary => '60000'}
-  doc = {:database => 'fishes', :doc_id => 'john', :data => data}
+  data_c = {:firstname => 'john', :gender =>'male', :age => '28', :salary => '60000'}
+  doc = {:database => 'fishes', :doc_id => 'john', :data => data_c}
   Couchdb.create_doc doc,@@auth_session
 
   data = {:firstname => 'peter', :gender =>'male', :age => '45', :salary => '78000'}
@@ -248,9 +254,12 @@ it "should test finder options" do
 
  keys = {:age =>'28', :gender => 'male'}
  hash = Couchdb.find_by_keys({:database => 'fishes', :keys => keys},@@auth_session, options = {:limit => 2, :skip => 1})
- h = hash[0]
- h["firstname"].should == "john"
+ hash.first["firstname"].should == "john"
  hash.length.should == 2
+ 
+  #return hash in symbolized keys for find_by_keys
+  hash = Couchdb.find_by_keys({:database => 'fishes', :keys => keys},@@auth_session, options = {:limit => 2, :skip => 1, :symbolize_keys => true}) 
+  hash.first.should include(data_c) 
   
   #create the design doc to be queryed in the test
   Couchdb.find_by({:database => 'fishes', :gender => 'male'},@@auth_session)
@@ -261,16 +270,25 @@ it "should test finder options" do
             :view => 'find_by_gender'}
 
   hash = Couchdb.find view,@@auth_session,key=nil, options = {:limit => 2, :skip => 1}
-  h = hash[0]
-  h["firstname"].should == "john"
+  hash.first["firstname"].should == "john"
+  hash.length.should == 2
+  
+  #return results in symbolized keys
+  hash = Couchdb.find view,@@auth_session,key=nil, options = {:limit => 2, :skip => 1, :symbolize_keys => true}
+  hash.first.should include(data_c)
+  
+  #it should not return symbolized keys
+  hash = Couchdb.find view,@@auth_session,key=nil, options = {:limit => 2, :skip => 1, :symbolize_keys => false}
+  hash.first.should_not include(data_c)
+  hash.first["firstname"].should == "john"
+
+  hash = Couchdb.find_by({:database => 'fishes', :gender => 'male'},@@auth_session,options = {:limit => 2, :skip => 1})
+  hash.first["firstname"].should == "john"
   hash.length.should == 2
 
- Couchdb.find_by({:database => 'fishes', :gender => 'male'},@@auth_session,options = {:limit => 2, :skip => 1})
-  h = hash[0]
-  h["firstname"].should == "john"
-  hash.length.should == 2
-
- 
+  #return symbolized results
+  hash = Couchdb.find_by({:database => 'fishes', :gender => 'male'},@@auth_session,options = {:limit => 2, :skip => 1, :symbolize_keys => true})
+  hash.first.should include(data_c)   
 
  hash = Couchdb.find view,@@auth_session,key='male', options = {:descending => true}
  h = hash[0]
@@ -344,7 +362,11 @@ it "should test finder options" do
    h0["firstname"].should == "john"
    h1["firstname"].should == "sam"
    hash.length.should == 2
-
+   
+   #return results as symbolized keys
+   options = {:startkey => ["28","male"], :endkey => ["28","male"], :skip => 1,:symbolize_keys => true}
+   hash = Couchdb.find_on_fly(view,@@auth_session,key=nil, options)
+   hash.first.should include(data_c)
 
  options = {:startkey => ["28","male"], :endkey => ["28","male"]}
 

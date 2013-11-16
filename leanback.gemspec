@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "leanback"
-  s.version = "0.4.1"
+  s.version = "0.4.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Obi Akubue"]
-  s.date = "2013-08-24"
+  s.date = "2013-11-16"
   s.description = "lightweight Ruby interface to CouchDB"
   s.email = "obioraakubue@yahoo.com"
   s.extra_rdoc_files = [

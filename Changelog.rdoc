@@ -1,7 +1,23 @@
+0.4.2
+November 16, 2013
+* Optionally return documents and query results as hashmaps with symbolized keys
+Example:
+ Couchdb.find_by({:database => 'contacts', :email => 'nancy@mail.com'} ,auth_session, symbolize_keys: true))  
+ # => [{:_id =>"Nancy", :_rev =>"1-d15a83d2a23b495c19df2595b636ecc8", :firstname =>"Nancy", :lastname =>"Lee",
+ #  :phone =>"347-808-3734", :email =>"nancy@mail.com", :gender =>"female"}]
+And
+ Couchdb.find_by({:database => 'contacts', :email => 'nancy@mail.com'} , auth_session, symbolize_keys: true)  
+
+ # => [{:_id=>"Nancy", :_rev=>"1-d15a83d2a23b495c19df2595b636ecc8", :firstname =>"Nancy", :lastname =>"Lee",
+ #  :phone =>"347-808-3734", :email =>"nancy@mail.com", :gender =>"female"}] 
+ 
+This works for view document results and also works for all finders and queries. See documentation for details. 
+
 0.4.1
 August 23,2013
 * Changed bind address to require prefix (http:// or https://)
-Example: Couchdb.address = "http://whisperservers.cloudant.com" 
+Example: 
+ Couchdb.address = "http://whisperservers.cloudant.com" 
 See documentation for details
 
 =0.4.0

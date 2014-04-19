@@ -87,13 +87,13 @@ describe "CouchDB Basic Operations" do
 
     it "can find documents that match multiple keys" do
       keys = {:gender => 'female', :firstname => 'linda', :lastname => 'smith'}
-      docs = Couchdb.find_by_keys({:database => 'contacts', :keys => keys}, @auth_session, symbolize_keys: true)
+      docs = Couchdb.where('contacts', keys, @auth_session, symbolize_keys: true)
       docs.first.should include(@data)
     end
 
     it "returns empty when no document matches all multiple keys" do
       keys = {:gender => 'female', :firstname => 'linda', :lastname => 'smith', :dont_exist => 'dont_exist'}
-      docs = Couchdb.find_by_keys({:database => 'contacts', :keys => keys}, @auth_session, symbolize_keys: true)
+      docs = Couchdb.where('contacts', keys, @auth_session, symbolize_keys: true)
       docs.should == []
     end
 

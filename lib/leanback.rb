@@ -522,10 +522,10 @@ module Couchdb
   #example:
   #hash = {:firstname =>'john', :gender => 'male' }
   #Couchdb.find_by_keys({:database => 'contacts', :keys => hash},auth_session)
-  def self.find_by_keys(options,auth_session = "", params = {})
+  def self.where(database, hash, auth_session= "", params = {})
+  #def self.find_by_keys(options,auth_session = "", params = {})
     set_address
-    db_name = options[:database]
-    hash = options[:keys]
+    db_name = database
     keys = hash.keys
     search_term = hash.values
     index = keys.join("_")
@@ -539,24 +539,6 @@ module Couchdb
     #then find_by_keys
     add_multiple_finder({database: db_name, keys: keys},auth_session)
     find view,auth_session,key=nil,params
-  end
-
-  #return a list of all docs in the database
-  def self.docs_from(database_name,auth_session = "")
-    set_address
-    begin
-      response = RestClient.get "#{@address}:#{@port}/#{URI.escape(database_name)}/_all_docs?include_docs=true",{:cookies => {"AuthSession" => auth_session}}
-      hash = Yajl::Parser.parse(response.to_str)
-      rows = hash["rows"]
-      count = 0
-      rows.each do |row|
-        rows[count] = row["doc"]
-        count += 1
-      end
-      return rows
-    rescue => e
-      couch_error(e)
-    end
   end
 
   def self.symbolize_keys(options)

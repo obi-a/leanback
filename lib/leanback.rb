@@ -13,43 +13,43 @@ module Couchdb
   def self.couch_error(e)
     raise e if e.is_a? OpenSSL::SSL::SSLError
     hash = Yajl::Parser.parse(e.response.to_s)
-    raise CouchdbException.new(hash), "CouchDB: Error - #{hash.values[0]}. Reason - #{hash.values[1]}" 
+    raise CouchdbException.new(hash), "CouchDB: Error - #{hash.values[0]}. Reason - #{hash.values[1]}"
   end
 
   def self.salt
-    o =  [('a'..'z'),('A'..'Z')].map{|i| i.to_a}.flatten;  
-    salt  =  (0..50).map{ o[rand(o.length)]  }.join; 
+    o =  [('a'..'z'),('A'..'Z')].map{|i| i.to_a}.flatten;
+    salt  =  (0..50).map{ o[rand(o.length)]  }.join;
   end
 
   #change non-admin user password
   def self.change_password(username, new_password,auth_session = "")
     salty = salt()
-    password_sha = Digest::SHA1.hexdigest(new_password + salty) 
+    password_sha = Digest::SHA1.hexdigest(new_password + salty)
     user_id = 'org.couchdb.user:' + username
     data = {"salt" => salty,"password_sha" => password_sha}
-    doc = { :database => '_users', :doc_id => user_id, :data => data}   
+    doc = { :database => '_users', :doc_id => user_id, :data => data}
     update_doc doc,auth_session
   end
 
-  #add a new user 
+  #add a new user
   def self.add_user(user, auth_session="")
-    o =  [('a'..'z'),('A'..'Z')].map{|i| i.to_a}.flatten;  
-    salt  =  (0..50).map{ o[rand(o.length)]  }.join; 
+    o =  [('a'..'z'),('A'..'Z')].map{|i| i.to_a}.flatten;
+    salt  =  (0..50).map{ o[rand(o.length)]  }.join;
     new_user = {:username => user[:username], :password => user[:password], :roles => user[:roles], :salt => salt}
     create_user(new_user,auth_session)
   end
 
-  #create a new user 
+  #create a new user
   def self.create_user(user,auth_session= "")
-    password_sha = Digest::SHA1.hexdigest(user[:password] + user[:salt])              
-  
+    password_sha = Digest::SHA1.hexdigest(user[:password] + user[:salt])
+
     user_hash = { :type => "user",
                   :name => user[:username],
                   :password_sha => password_sha,
                   :salt => user[:salt],
                   :roles => user[:roles]
                  }
-   
+
     str = Yajl::Encoder.encode(user_hash)
     set_address
     begin
@@ -57,7 +57,7 @@ module Couchdb
       hash = Yajl::Parser.parse(response.to_str)
     rescue => e
       couch_error(e)
-    end 
+    end
 
   end
 
@@ -70,9 +70,9 @@ module Couchdb
       hash = Yajl::Parser.parse(response.to_str)
     rescue => e
       couch_error(e)
-    end 
+    end
   end
-  
+
   #get security object
   def self.get_security(db_name, auth_session="")
     set_address
@@ -81,7 +81,7 @@ module Couchdb
       hash = Yajl::Parser.parse(response.to_str)
     rescue => e
       couch_error(e)
-    end 
+    end
   end
 
   #login to couchdb
@@ -97,9 +97,9 @@ module Couchdb
   end
 
   #couchdb configuration api
-  def self.set_config(data,auth_session = "") 
+  def self.set_config(data,auth_session = "")
     section = data[:section]
-    key = data[:key] 
+    key = data[:key]
     value = data[:value]
     json_data = Yajl::Encoder.encode(value)
     set_address
@@ -111,9 +111,9 @@ module Couchdb
     end
   end
 
-  def self.delete_config(data,auth_session = "") 
+  def self.delete_config(data,auth_session = "")
     section = data[:section]
-    key = data[:key] 
+    key = data[:key]
     set_address
     begin
       response = RestClient.delete "#{@address}:#{@port}/_config/#{URI.escape(section)}/#{URI.escape(key)}", {:cookies => {"AuthSession" => auth_session}}
@@ -124,9 +124,9 @@ module Couchdb
   end
 
 
-  def self.get_config(data,auth_session = "") 
+  def self.get_config(data,auth_session = "")
     section = data[:section]
-    key = data[:key] 
+    key = data[:key]
     set_address
     begin
       response = RestClient.get "#{@address}:#{@port}/_config/#{URI.escape(section)}/#{URI.escape(key)}", {:cookies => {"AuthSession" => auth_session}}
@@ -136,8 +136,8 @@ module Couchdb
     end
   end
 
-  #create a document 
-  def self.create_doc( doc,auth_session = "")  
+  #create a document
+  def self.create_doc( doc,auth_session = "")
     db_name =  doc[:database]
     doc_id = doc[:doc_id]
     data = doc[:data]
@@ -158,12 +158,10 @@ module Couchdb
     data = doc[:data]
     json_data = Yajl::Encoder.encode(data)
     set_address
-    begin
-      response = RestClient.put "#{@address}:#{@port}/#{URI.escape(db_name)}/#{URI.escape(doc_id)}", json_data, {:cookies => {"AuthSession" => auth_session}}
-      hash = Yajl::Parser.parse(response.to_str)
-    rescue => e
+    response = RestClient.put "#{@address}:#{@port}/#{URI.escape(db_name)}/#{URI.escape(doc_id)}", json_data, {:cookies => {"AuthSession" => auth_session}}
+    hash = Yajl::Parser.parse(response.to_str)
+  rescue => e
       couch_error(e)
-    end
   end
 
  #update a doc
@@ -172,14 +170,14 @@ module Couchdb
     doc_id = doc[:doc_id]
     data = doc[:data]
     doc = {:database => db_name, :doc_id => doc_id}
-    options = Couchdb.view doc,auth_session 
+    options = Couchdb.view doc,auth_session
     options = options.merge(data)
     doc = {:database => db_name, :doc_id => doc_id, :data => options}
     edit_doc doc,auth_session
   end
 
   #delete document
-  def self.delete_doc(doc,auth_session = "")  
+  def self.delete_doc(doc,auth_session = "")
     db_name = doc[:database]
     doc_id = doc[:doc_id]
     doc = {:database => db_name, :doc_id => doc_id}
@@ -195,7 +193,7 @@ module Couchdb
     doc_id = doc[:doc_id]
     rev = doc[:rev]
     set_address
-    begin 
+    begin
       response = RestClient.delete  "#{@address}:#{@port}/#{URI.escape(db_name)}/#{URI.escape(doc_id)}?rev=#{rev}", {:cookies => {"AuthSession" => auth_session}}
       hash = Yajl::Parser.parse(response.to_str)
     rescue => e
@@ -223,7 +221,7 @@ module Couchdb
       hash = Yajl::Parser.parse(response.to_str)
     rescue => e
       couch_error(e)
-    end 
+    end
   end
 
   #return a list of all databases
@@ -237,17 +235,15 @@ module Couchdb
     end
   end
 
-  ##view a document 
+  ##view a document
   def self.view(doc,auth_session = "", options = {})
     set_address
     db_name = doc[:database]
     doc_id = doc[:doc_id]
-    begin
-      response = RestClient.get "#{@address}:#{@port}/#{db_name}/#{doc_id}",{:cookies => {"AuthSession" => auth_session}}
-      hash = Yajl::Parser.parse(response.to_str, symbolize_keys(options))
-    rescue => e
-      couch_error(e)
-    end 
+    response = RestClient.get "#{@address}:#{@port}/#{db_name}/#{doc_id}",{:cookies => {"AuthSession" => auth_session}}
+    hash = Yajl::Parser.parse(response.to_str, symbolize_keys(options))
+  rescue => e
+    couch_error(e)
   end
 
   def self.get_params(options)
@@ -290,7 +286,7 @@ module Couchdb
     design_doc_name = doc[:design_doc]
     view_name = doc[:view]
     params = get_params(options)
-   
+
     begin
       if key == nil
         response = RestClient.get "#{@address}:#{@port}/#{db_name}/_design/#{design_doc_name}/_view/#{view_name}?#{URI.escape(params)}",{:cookies => {"AuthSession" => auth_session}}
@@ -305,7 +301,7 @@ module Couchdb
       rows.each do |row|
         value = row["value"] unless row["value"].nil?
         value = row[:value] unless row[:value].nil?
-        data << value 
+        data << value
       end
       return data
      rescue => e
@@ -337,25 +333,25 @@ module Couchdb
   end
 
   #Query view, create view on fly if it dosen't already exist
-  def self.find_on_fly(doc,auth_session = "",key = nil, options = {})  
+  def self.find_on_fly(doc,auth_session = "",key = nil, options = {})
     db_name = doc[:database]
     design_doc = doc[:design_doc]
     view = doc[:view]
     json_doc = doc[:json_doc]
     query_info = {:database => db_name, :design_doc => design_doc, :view => view}
-    begin 
+    begin
       if( key == nil)
-        docs = find(query_info,auth_session,key=nil,options) 
+        docs = find(query_info,auth_session,key=nil,options)
       else
-        docs = find(query_info,auth_session,key,options) 
+        docs = find(query_info,auth_session,key,options)
       end
     rescue CouchdbException => e
       document = { :database => db_name, :design_doc => design_doc, :json_doc => json_doc}
       create_design document,auth_session
       if( key == nil)
-        docs = find(query_info,auth_session,key=nil,options) 
+        docs = find(query_info,auth_session,key=nil,options)
       else
-        docs = find(query_info,auth_session,key,options) 
+        docs = find(query_info,auth_session,key,options)
       end
    end
      return docs
@@ -364,12 +360,12 @@ module Couchdb
 
   #add a finder method to the database
   #this creates a find by key method
-  def self.add_finder(options,auth_session = "")
-    set_address 
-    db_name = options[:database]
-    key = options[:key] 
+  def self.add_finder(database, index, auth_session = "")
+    set_address
+    db_name = database
+    key = index
     design_doc_name = key + '_finder'
- 
+
     view ='{
     "language" : "javascript",
     "views" :{
@@ -379,7 +375,7 @@ module Couchdb
     }
    }'
 
-   begin  
+   begin
      response = RestClient.put "#{@address}:#{@port}/#{db_name}/_design/#{design_doc_name}", view, {:cookies => {"AuthSession" => auth_session}}
     rescue => e
       couch_error(e)
@@ -389,7 +385,7 @@ module Couchdb
   #add a multiple finder method to the database
   #this creates a find by keys method
   def self.add_multiple_finder(options,auth_session = "")
-    set_address 
+    set_address
     db_name = options[:database]
     keys = options[:keys]
     view_name = keys.join("_")
@@ -404,9 +400,9 @@ module Couchdb
          "map" : "function(doc){ if(doc.'+condition+') emit([doc.'+key+'],doc);}"
        }
      }
-    }' 
+    }'
 
-    begin  
+    begin
       response = RestClient.put "#{@address}:#{@port}/#{db_name}/_design/#{design_doc_name}", view, {:cookies => {"AuthSession" => auth_session}}
     rescue => e
       couch_error(e)
@@ -416,7 +412,7 @@ module Couchdb
   #add a multiple counter method to the database
   #this creates a count by keys method
   def self.add_multiple_counter(options,auth_session = "")
-    set_address 
+    set_address
     db_name = options[:database]
     keys = options[:keys]
     view_name = keys.join("_")
@@ -430,9 +426,9 @@ module Couchdb
       "map" : "function(doc){ if(doc.'+condition+') emit([doc.'+key+'],null);}", "reduce": "_count"
          }
        }
-     }' 
+     }'
 
-    begin  
+    begin
       response = RestClient.put "#{@address}:#{@port}/#{db_name}/_design/#{design_doc_name}", view, {:cookies => {"AuthSession" => auth_session}}
     rescue => e
       couch_error(e)
@@ -442,37 +438,37 @@ module Couchdb
   #add a counter method to the database
   #this creates a count method that counts documents by key
   def self.add_counter(options,auth_session = "")
-    set_address 
+    set_address
     db_name = options[:database]
-    key = options[:key] 
+    key = options[:key]
     design_doc_name = key + '_counter'
- 
+
     view ='{
     "language" : "javascript",
     "views" :{
        "count_'+key+'" : {
-          "map" : "function(doc){ if(doc.'+key+') emit(doc.'+key+',null);}", "reduce": "_count"   
+          "map" : "function(doc){ if(doc.'+key+') emit(doc.'+key+',null);}", "reduce": "_count"
               }
            }
         }'
 
-    begin  
+    begin
       response = RestClient.put "#{@address}:#{@port}/#{db_name}/_design/#{design_doc_name}", view, {:cookies => {"AuthSession" => auth_session}}
     rescue => e
       couch_error(e)
     end
   end
 
-  #count by key 
+  #count by key
   def self.count(options,auth_session = "")
-    set_address 
+    set_address
     db_name = options[:database]
     index =  options.keys[1].to_s
     search_term = options.values[1]
     design_doc_name = "#{index}_counter"
     view_name = "count_#{index}"
- 
-    begin 
+
+    begin
       view = { :database => db_name, :design_doc => design_doc_name, :view => view_name}
       docs = find view,auth_session,search_term
     rescue CouchdbException => e
@@ -486,7 +482,7 @@ module Couchdb
   end
 
   #count by keys
-  #example: 
+  #example:
   #hash = {:firstname =>'john', :gender => 'male' }
   #Couchdb.count_by_keys({:database => 'contacts', :keys => hash},auth_session)
   def self.count_by_keys(options,auth_session = "", params = {})
@@ -505,8 +501,8 @@ module Couchdb
    view_name = "count_by_keys_#{index}"
    params[:startkey] = search_term
    params[:endkey] = search_term
- 
-   begin 
+
+   begin
      view = { :database => db_name, :design_doc => design_doc_name, :view => view_name}
      docs = find view,auth_session,key=nil,params
    rescue CouchdbException => e
@@ -519,58 +515,46 @@ module Couchdb
      return count.to_i
   end
 
-  #find by key 
-  def self.find_by(options,auth_session = "", params = {})
-    set_address 
-    db_name = options[:database]
-    index =  options.keys[1].to_s
-    search_term = options.values[1]
+  #find by key
+  def self.find_by(database, keypair, auth_session, params = {})
+    set_address
+    db_name = database
+    index = keypair.keys[0].to_s
+    search_term = keypair.values[0]
     design_doc_name = "#{index}_finder"
     view_name = "find_by_#{index}"
- 
-    begin 
-      view = { :database => db_name, :design_doc => design_doc_name, :view => view_name}
-      docs = find view,auth_session,search_term,params
-    rescue CouchdbException => e
-      #add a finder/index if one doesn't already exist in the database
-      #then find_by_key
-      add_finder({:database => db_name, :key => index},auth_session)
-      docs = find view,auth_session,search_term,params
-    end
-    return docs
+
+    view = { :database => db_name, :design_doc => design_doc_name, :view => view_name}
+    find view,auth_session,search_term,params
+   #refactor later to only rescue document not found exception
+  rescue CouchdbException => e
+    #add a finder/index if one doesn't already exist in the database
+    #then find_by_key
+    add_finder(db_name, index, auth_session)
+    find view, auth_session, search_term, params
   end
 
   #find by keys
-  #example: 
+  #example:
   #hash = {:firstname =>'john', :gender => 'male' }
   #Couchdb.find_by_keys({:database => 'contacts', :keys => hash},auth_session)
   def self.find_by_keys(options,auth_session = "", params = {})
     set_address
     db_name = options[:database]
-    keys = []
-    search_term = []
     hash = options[:keys]
-
-    hash.each do |k,v|
-      keys << k
-      search_term << v
-    end
+    keys = hash.keys
+    search_term = hash.values
     index = keys.join("_")
-    design_doc_name = "#{index}_keys_finder"
-    view_name = "find_by_keys_#{index}"
     params[:startkey] = search_term
     params[:endkey] = search_term
- 
-    begin 
-      view = { :database => db_name, :design_doc => design_doc_name, :view => view_name}
-      docs = find view,auth_session,key=nil,params
-    rescue CouchdbException => e
-      #add a finder/index if one doesn't already exist in the database
-      #then find_by_keys
-      add_multiple_finder({:database => db_name, :keys => keys},auth_session)
-      docs = find view,auth_session,key=nil,params
-    end
-    return docs
+    view = { database: db_name, design_doc: "#{index}_keys_finder", view: "find_by_keys_#{index}"}
+    find view,auth_session,key=nil,params
+  #TODO: rescue only design view not found exception
+  rescue CouchdbException => e
+    #add a finder/index if one doesn't already exist in the database
+    #then find_by_keys
+    add_multiple_finder({database: db_name, keys: keys},auth_session)
+    find view,auth_session,key=nil,params
   end
 
   #return a list of all docs in the database
@@ -580,7 +564,7 @@ module Couchdb
       response = RestClient.get "#{@address}:#{@port}/#{URI.escape(database_name)}/_all_docs?include_docs=true",{:cookies => {"AuthSession" => auth_session}}
       hash = Yajl::Parser.parse(response.to_str)
       rows = hash["rows"]
-      count = 0 
+      count = 0
       rows.each do |row|
         rows[count] = row["doc"]
         count += 1
@@ -588,27 +572,26 @@ module Couchdb
       return rows
     rescue => e
       couch_error(e)
-    end  
+    end
   end
-  
+
   def self.symbolize_keys(options)
-    return {symbolize_keys: true} if options[:symbolize_keys]
-    return {}
+    options[:symbolize_keys] ? {symbolize_keys: true} : {}
   end
 
   private_class_method :symbolize_keys
 
   class << self
-    attr_accessor :address 
-    attr_accessor :port 
+    attr_accessor :address
+    attr_accessor :port
 
     def set_address()
-      if @address == nil 
+      if @address == nil
         @address = 'http://127.0.0.1'
       end
       if @port == nil
         @port = '5984'
-      end 
+      end
     end
   end
 end

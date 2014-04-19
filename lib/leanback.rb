@@ -278,7 +278,6 @@ module Couchdb
     return params
   end
 
-
   #query a permanent view
   def self.find(doc,auth_session = "", key=nil, options = {})
     set_address
@@ -286,27 +285,17 @@ module Couchdb
     design_doc_name = doc[:design_doc]
     view_name = doc[:view]
     params = get_params(options)
-
-    begin
-      if key == nil
-        response = RestClient.get "#{@address}:#{@port}/#{db_name}/_design/#{design_doc_name}/_view/#{view_name}?#{URI.escape(params)}",{:cookies => {"AuthSession" => auth_session}}
-      else
-        key = URI.escape('?key="' + key + '"')
-        response = RestClient.get "#{@address}:#{@port}/#{db_name}/_design/#{design_doc_name}/_view/#{view_name}#{key}&#{URI.escape(params)}" ,{:cookies => {"AuthSession" => auth_session}}
-      end
-      hash = Yajl::Parser.parse(response.to_str, symbolize_keys(options))
-      data = []
-      rows = hash["rows"] unless hash["rows"].nil?
-      rows = hash[:rows] unless hash[:rows].nil?
-      rows.each do |row|
-        value = row["value"] unless row["value"].nil?
-        value = row[:value] unless row[:value].nil?
-        data << value
-      end
-      return data
-     rescue => e
-       couch_error(e)
-     end
+    if key == nil
+      response = RestClient.get "#{@address}:#{@port}/#{db_name}/_design/#{design_doc_name}/_view/#{view_name}?#{URI.escape(params)}",{:cookies => {"AuthSession" => auth_session}}
+    else
+      key = URI.escape('?key="' + key + '"')
+      response = RestClient.get "#{@address}:#{@port}/#{db_name}/_design/#{design_doc_name}/_view/#{view_name}#{key}&#{URI.escape(params)}" ,{:cookies => {"AuthSession" => auth_session}}
+    end
+    hash = Yajl::Parser.parse(response.to_str, symbolize_keys(options))
+    rows = hash[:rows] || hash["rows"]
+    rows.map { |row| row[:value] || row["value"]}
+  rescue => e
+    couch_error(e)
   end
 
   #create a design document with views
@@ -488,31 +477,26 @@ module Couchdb
   def self.count_by_keys(options,auth_session = "", params = {})
     set_address
     db_name = options[:database]
-    keys = []
-    search_term = []
     hash = options[:keys]
-
-    hash.each do |k,v|
-      keys << k
-      search_term << v
-    end
-   index = keys.join("_")
-   design_doc_name = "#{index}_keys_counter"
-   view_name = "count_by_keys_#{index}"
-   params[:startkey] = search_term
-   params[:endkey] = search_term
+    keys = hash.keys
+    search_term = hash.values
+    index = keys.join("_")
+    design_doc_name = "#{index}_keys_counter"
+    view_name = "count_by_keys_#{index}"
+    params[:startkey] = search_term
+    params[:endkey] = search_term
 
    begin
-     view = { :database => db_name, :design_doc => design_doc_name, :view => view_name}
-     docs = find view,auth_session,key=nil,params
+    view = { :database => db_name, :design_doc => design_doc_name, :view => view_name}
+    docs = find view,auth_session,key=nil,params
    rescue CouchdbException => e
-     #add a finder/index if one doesn't already exist in the database
-     #then find_by_keys
-     add_multiple_counter({:database => db_name, :keys => keys},auth_session)
-     docs = find view,auth_session,key=nil,params
+    #add a finder/index if one doesn't already exist in the database
+    #then find_by_keys
+    add_multiple_counter({:database => db_name, :keys => keys},auth_session)
+    docs = find view,auth_session,key=nil,params
    end
-     count = docs[0]
-     return count.to_i
+    count = docs[0]
+    return count.to_i
   end
 
   #find by key

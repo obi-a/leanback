@@ -8,8 +8,8 @@ Simple Ruby Interface to CouchDB.
 4-24-14: New API specifications
 ```ruby
 #JSON result keys are automatically symoblized:
-#returns data directly as couchdb returns them
-c = Leanback.new db_name, {username: xxxxx, password: xxxx, address: xxxxx, port: xxxxx, create_db: true }
+#returns data directly as couchdb returns them unaltered as ruby hash
+c = Leanback::Couchdb.new database_name, username: xxxxx, password: xxxx, address: xxxxx, port: xxxxx
 
 c.create
 c.delete

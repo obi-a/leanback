@@ -36,6 +36,7 @@ GEM
       rake
       rdoc
     json (1.8.1)
+    json_pure (1.8.1)
     jwt (0.1.11)
       multi_json (>= 1.5)
     method_source (0.8.2)
@@ -73,7 +74,6 @@ GEM
     thread_safe (0.3.1)
       atomic (>= 1.1.7, < 2)
     tzinfo (0.3.38)
-    yajl-ruby (0.8.2)
 
 PLATFORMS
   ruby
@@ -82,7 +82,7 @@ DEPENDENCIES
   activesupport
   bundler
   jeweler (~> 1.8.7)
+  json_pure
   pry
   rest-client
   rspec
-  yajl-ruby

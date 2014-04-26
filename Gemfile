@@ -4,7 +4,7 @@ source "http://gemcutter.org"
 # Example:
     gem "activesupport"
     gem "rest-client"
-    gem "yajl-ruby"
+    gem "json_pure"
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.

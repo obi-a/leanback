@@ -2,54 +2,42 @@
 
 Simple Ruby Interface to CouchDB.
 
-This project is still under development. Not complete by any means. I made this Gem to use in my projects. I will expose more CouchDB features soon.
-
-4-19-2014: I hope i can refactor most of the code. It is dated and needs it.
-
-##Goals
-* To create a simple Ruby Interface to CouchDB
-* Expose the features of CouchDB to the Ruby Lang.,
-* Use a minimalist Ruby DSL to access CouchDB
-* provide a very easy way to persist and retrieve data
-
-##Compatibility
-Upgraded and tested on CouchDB 1.4.0. and 1.5.0.
-
-##Changes
-View the [Changelog](https://github.com/obi-a/leanback/blob/master/Changelog.rdoc)
-
-##Usage
 
 
-* [Leanback](http://www.whisperservers.com/leanback/leanback/)
+##Specifications for v0.5.0:
+4-24-14: New API specifications
+```ruby
+#JSON result keys are automatically symoblized:
+#returns data directly as couchdb returns them unaltered as ruby hash
+c = Leanback::Couchdb.new database_name, username: xxxxx, password: xxxx, address: xxxxx, port: xxxxx
 
-   + [Installation](http://www.whisperservers.com/leanback/leanback/installation/)
+c.create
+c.delete
+c.create_doc id, {data}
+c.delete_doc id, rev
+c.delete_doc! id
+c.edit_doc id, rev, {}
+c.edit_doc! id, {}
+c.get_doc id
 
-   + [Basic CouchDB Operations](http://www.whisperservers.com/leanback/basic-couchdb-operations/)
+options = { limit: x, key: x, start_key: x, end_key: x, skip: x, descending: x}
+c.view design_doc_name, viewname, options
+c.where hash, options
 
-   + [Find Documents by Key](http://www.whisperservers.com/leanback/find-documents-by-key/)
+c.create_design_doc, design_doc_name, path_to_json_doc
+c.set_security security_object
+```
 
-   + [Find Documents By Multiple Keys] (http://www.whisperservers.com/leanback/find-document-by-multiple-keys/)
+Target systems jruby-19mode, MRI 1.9.3 - 2.x
 
-   + [Count Documents by Key](http://www.whisperservers.com/leanback/count-documents-by-key/)
+##Currently re-writing...
 
-   + [Count Documents by Multiple Keys] (http://www.whisperservers.com/leanback/count-by-multiple-documents/)
+Old documentation: [Leanback](http://www.whisperservers.com/leanback/leanback/)
 
-   + Working with [CouchDB Views](http://www.whisperservers.com/leanback/design-documents-and-permanent-views/)
-
-   + [Error Handling](http://www.whisperservers.com/leanback/error-handling/)
-
-   + [CouchDB Configuration](http://www.whisperservers.com/leanback/couchdb-configuration/)
-
-   + [CouchDB Security](http://www.whisperservers.com/leanback/couchdb-security/)
-
-   + [CouchDB Bind_Address & Port](http://www.whisperservers.com/leanback/setting-the-bind_address-port/)
 
 ##License
 MIT License.
 
 ##Copyright
 
-Copyright (c) 2013 Obi Akubue.
-
-
+Copyright (c) 2014 Obi Akubue.

@@ -2,6 +2,12 @@ require 'rest_client'
 require 'json/pure'
 
 module Leanback
+  class CouchdbException < StandardError
+    attr_reader :response
+    def initialize(response)
+      @response = response
+    end
+  end
   class Couchdb
     attr_reader :address
     attr_reader :port
@@ -52,7 +58,7 @@ module Leanback
       response = yield
       parse_json(response)
     rescue => e
-      handle_error(e)
+      raise_error(e)
     end
     def doc_uri(doc_id)
       URI.escape(doc_id)
@@ -75,8 +81,13 @@ module Leanback
     def generate_json(data)
       JSON.generate(data)
     end
-    def handle_error(exeception)
-      exeception.respond_to?('response') ? parse_json(exeception.response) : raise(exeception)
+    def raise_error(exeception)
+      if exeception.respond_to?('response')
+        response = parse_json(exeception.response)
+        raise(CouchdbException.new(response), response)
+      else
+        raise(exeception)
+      end
     end
     def auth_session
       return "" if @username.nil? && @password.nil?

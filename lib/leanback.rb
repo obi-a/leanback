@@ -1,5 +1,6 @@
 require 'rest_client'
 require 'json/pure'
+require 'active_support/all'
 
 module Leanback
   class CouchdbException < StandardError
@@ -50,8 +51,11 @@ module Leanback
         document_with_rev = document.merge(data)
         edit_doc(doc_id, document_with_rev)
       else
-        document
+        #raise unknownerror
       end
+    end
+    def view(design_doc_name, view_name, options = {})
+      api_request { RestClient.get "#{address_port}/#{db_uri}/_design/#{URI.escape(design_doc_name)}/_view/#{URI.escape(view_name)}?#{options.to_query}", cookies }
     end
   private
     def api_request

@@ -20,11 +20,22 @@ c.edit_doc id, rev, {}
 c.edit_doc! id, {}
 c.get_doc id
 
+#query a view
 options = { limit: x, key: x, start_key: x, end_key: x, skip: x, descending: x}
 c.view design_doc_name, viewname, options
 c.where hash, options
 
-c.create_design_doc, design_doc_name, path_to_json_doc
+#create a design doc
+design_doc = {
+ language: "javascript",
+ views: {
+   get_emails: {
+     map: "function(doc){ if(doc.firstname && doc.email) emit(doc.id,{Name: doc.firstname, Email: doc.email}); }"
+   }
+ }
+}
+c.create_doc "_design/my_doc", design_doc
+
 c.set_security security_object
 ```
 

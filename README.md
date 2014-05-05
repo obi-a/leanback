@@ -23,6 +23,8 @@ c.get_doc id
 #query a view
 options = { limit: x, key: x, start_key: x, end_key: x, skip: x, descending: x}
 c.view design_doc_name, viewname, options
+
+options = { limit: x, skip: x, descending: x}
 c.where hash, options
 
 #create a design doc

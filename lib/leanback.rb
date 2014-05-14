@@ -55,7 +55,7 @@ module Leanback
       end
     end
     def view(design_doc_name, view_name, options = {})
-      api_request { RestClient.get "#{address_port}/#{db_uri}/_design/#{URI.escape(design_doc_name)}/_view/#{URI.escape(view_name)}?#{options.to_query}", cookies }
+      api_request { RestClient.get "#{address_port}/#{db_uri}/#{URI.escape(design_doc_name)}/_view/#{URI.escape(view_name)}?#{options.to_query}", cookies }
     end
     def where(hash, options = {})
       search_term = hash.values
@@ -70,6 +70,12 @@ module Leanback
       result = view(design_doc_name, view_name, options)
       rows = result[:rows]
       rows.map { |row| row[:value] }
+    end
+    def security_object=(security_settings)
+      api_request { RestClient.put "#{address_port}/#{db_uri}/_security/", generate_json(security_settings), cookies }
+    end
+    def security_object
+      api_request { RestClient.get "#{address_port}/#{db_uri}/_security/", cookies }
     end
   private
     def add_multiple_finder(keys)

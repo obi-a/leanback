@@ -20,10 +20,6 @@ c.edit_doc id, rev, {}
 c.edit_doc! id, {}
 c.get_doc id
 
-#query a view
-options = { limit: x, key: x, start_key: x, end_key: x, skip: x, descending: x}
-c.view design_doc_name, viewname, options
-
 options = { limit: x, skip: x, descending: x}
 c.where hash, options
 
@@ -38,7 +34,21 @@ design_doc = {
 }
 c.create_doc "_design/my_doc", design_doc
 
-c.set_security security_object
+#query a view
+options = { limit: x, key: x, start_key: x, end_key: x, skip: x, descending: x}
+design_doc_name = "_design/my_doc"
+view_name = "get_emails"
+c.view design_doc_name, view_name, options
+
+security_settings = { admins: {names: ["david"], roles: ["admin"]},
+                    readers: {names: ["david"],roles: ["admin"]}
+                  }
+
+c.security_object = security_settings
+
+c.security_object
+#=> {:admins=>{:names=>["david"], :roles=>["admin"]},
+#    :readers=>{:names=>["david"], :roles=>["admin"]}}
 ```
 
 Target systems jruby-19mode, MRI 1.9.3 - 2.x

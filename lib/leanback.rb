@@ -15,9 +15,8 @@ module Leanback
     attr_reader :username
     attr_reader :password
     attr_reader :database
-    def initialize(database, args = {})
-      raise "Invalid database name: #{database.inspect}"  unless database.is_a? String
-      @database = database
+    def initialize(args = {})
+      @database = args.fetch(:database, nil)
       @address = args.fetch(:address, 'http://127.0.0.1')
       @port = args.fetch(:port, '5984')
       @username = args.fetch(:username, nil)
@@ -77,6 +76,13 @@ module Leanback
     def security_object
       api_request { RestClient.get "#{address_port}/#{db_uri}/_security/", cookies }
     end
+    def set_config(section, key, value)
+      RestClient.put "#{address_port}/_config/#{URI.escape(section)}/#{URI.escape(key)}", value, cookies
+    end
+    def get_config(section, key)
+    end
+    def delete_config(section, key)
+    end
   private
     def add_multiple_finder(keys)
       view_name = keys.join("_")
@@ -102,6 +108,7 @@ module Leanback
       URI.escape(doc_id)
     end
     def db_uri
+      raise "Invalid database name" unless @database.is_a?(String)
       URI.escape(@database)
     end
     def content_type
@@ -134,7 +141,7 @@ module Leanback
       hash = response.cookies
       hash["AuthSession"]
     rescue => e
-      handle_error(e)
+      raise_error(e)
     end
   end
 end

@@ -9,7 +9,7 @@ Simple Ruby Interface to CouchDB.
 ```ruby
 #JSON result keys are automatically symoblized:
 #returns data directly as couchdb returns them unaltered as ruby hash
-c = Leanback::Couchdb.new database_name, username: xxxxx, password: xxxx, address: xxxxx, port: xxxxx
+c = Leanback::Couchdb.new database: xxxxx, username: xxxxx, password: xxxx, address: xxxxx, port: xxxxx
 
 c.create
 c.delete
@@ -49,6 +49,9 @@ c.security_object = security_settings
 c.security_object
 #=> {:admins=>{:names=>["david"], :roles=>["admin"]},
 #    :readers=>{:names=>["david"], :roles=>["admin"]}}
+
+c = Leanback::Couchdb.new
+c.set_config("couch_httpd_auth", "timeout", '"900"')
 ```
 
 Target systems jruby-19mode, MRI 1.9.3 - 2.x

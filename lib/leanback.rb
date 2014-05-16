@@ -80,8 +80,14 @@ module Leanback
       RestClient.put "#{address_port}/_config/#{URI.escape(section)}/#{URI.escape(key)}", value, cookies
     end
     def get_config(section, key)
+      RestClient.get "#{address_port}/_config/#{URI.escape(section)}/#{URI.escape(key)}", cookies
+    rescue => e
+      raise_error(e)
     end
     def delete_config(section, key)
+      RestClient.delete "#{address_port}/_config/#{URI.escape(section)}/#{URI.escape(key)}", cookies
+    rescue => e
+      raise_error(e)
     end
   private
     def add_multiple_finder(keys)

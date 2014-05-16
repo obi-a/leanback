@@ -52,6 +52,9 @@ c.security_object
 
 c = Leanback::Couchdb.new
 c.set_config("couch_httpd_auth", "timeout", '"900"')
+c.get_config("couch_httpd_auth", "timeout")
+#=> "\"900\"\n"
+c.delete_config("section", "option")
 ```
 
 Target systems jruby-19mode, MRI 1.9.3 - 2.x

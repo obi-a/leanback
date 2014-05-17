@@ -31,8 +31,14 @@ describe "CouchDB" do
       mytestdb.delete
     end
     it "raises an exception when deleting a database that don't exist" do
+      #raises a Leanback::CouchdbException when exception is a couchdb issue
       mydatabase  = Leanback::Couchdb.new db_settings("mydatabase")
       expect{ mydatabase.delete }.to raise_error(Leanback::CouchdbException)
+    end
+    it "raises an exception when it cannot connect to database" do
+      #raises the exception when it is from a non couchdb issue
+      a_database  = Leanback::Couchdb.new  database: "adatabase", port: 9999
+      expect{ a_database.create }.to raise_error(Errno::ECONNREFUSED)
     end
   end
 

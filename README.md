@@ -4,8 +4,10 @@ Simple Ruby Interface to CouchDB.
 
 
 
-##Specifications for v0.5.0:
+##Specifications for New API v0.5.0:
 4-24-14: New API specifications
+
+[![Build Status](https://travis-ci.org/obi-a/leanback.svg?branch=master)](https://travis-ci.org/obi-a/leanback)
 ```ruby
 #JSON result keys are automatically symoblized:
 #returns data directly as couchdb returns them unaltered as ruby hash

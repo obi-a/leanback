@@ -3,6 +3,7 @@ require 'json/pure'
 require 'active_support/all'
 
 module Leanback
+  class InvalidDatabaseName < StandardError; end
   class CouchdbException < StandardError
     attr_reader :response
     def initialize(response)
@@ -114,7 +115,10 @@ module Leanback
       URI.escape(doc_id)
     end
     def db_uri
-      raise "Invalid database name" unless @database.is_a?(String)
+      error_message = "Invalid database name"
+      unless @database.is_a?(String)
+        raise(Leanback::InvalidDatabaseName.new(error_message), error_message)
+      end
       URI.escape(@database)
     end
     def content_type

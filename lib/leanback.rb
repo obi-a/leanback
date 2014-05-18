@@ -4,6 +4,7 @@ require 'active_support/all'
 
 module Leanback
   class InvalidDatabaseName < StandardError; end
+  class InvalidDocumentID < StandardError; end
   class CouchdbException < StandardError
     attr_reader :response
     def initialize(response)
@@ -112,13 +113,13 @@ module Leanback
       raise_error(e)
     end
     def doc_uri(doc_id)
+      error_message = "Invalid Document ID: #{doc_id}"
+      raise(Leanback::InvalidDocumentID.new(error_message), error_message) unless doc_id.is_a?(String)
       URI.escape(doc_id)
     end
     def db_uri
-      error_message = "Invalid database name"
-      unless @database.is_a?(String)
-        raise(Leanback::InvalidDatabaseName.new(error_message), error_message)
-      end
+      error_message = "Invalid database name: #{@database}"
+      raise(Leanback::InvalidDatabaseName.new(error_message), error_message) unless @database.is_a?(String)
       URI.escape(@database)
     end
     def content_type

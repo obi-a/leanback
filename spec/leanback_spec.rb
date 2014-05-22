@@ -8,8 +8,8 @@ def db_settings(database_name)
 end
 
 describe "CouchDB" do
-  describe "Create database" do
-    it "creates a database and deletes a database" do
+  describe "#create" do
+    it "creates a database" do
       testdb  = Leanback::Couchdb.new db_settings("testdb")
       testdb.create.should == {ok: true}
       testdb.delete.should == {ok: true}
@@ -34,8 +34,8 @@ describe "CouchDB" do
       expect{ a_database.create }.to raise_error(Errno::ECONNREFUSED)
     end
   end
-  describe "Delete Database" do
-    it "should delete a database" do
+  describe "#delete" do
+    it "deletes a database" do
       testdb  = Leanback::Couchdb.new db_settings("testdb#{Time.now.to_i}")
       testdb.create
       testdb.delete.should include(ok: true)
@@ -46,7 +46,7 @@ describe "CouchDB" do
       expect{ mydatabase.delete }.to raise_error(Leanback::CouchdbException)
     end
   end
-  describe "Create Documents" do
+  describe "#create_doc" do
     before(:each) do
       @contacts  = Leanback::Couchdb.new db_settings("contacts")
       @contacts.create
@@ -65,47 +65,81 @@ describe "CouchDB" do
     after(:each) do
       @contacts.delete
     end
-    describe "Delete Document" do
-      before(:each) do
-        @testdb  = Leanback::Couchdb.new db_settings("testdb#{Time.now.to_i}")
-        @testdb.create
-      end
-      it "deletes a document with revision" do
-        created_doc_hash = @testdb.create_doc "john", {}
-        deleted_doc_hash = @testdb.delete_doc "john", created_doc_hash[:rev]
-        deleted_doc_hash.should include(ok: true, id: "john")
-        deleted_doc_hash.include?(:rev).should == true
-      end
-      it "deletes a doc with no revision" do
-        @testdb.create_doc "john", {}
-        deleted_doc_hash = @testdb.delete_doc! "john"
-        deleted_doc_hash.should include(ok: true, id: "john")
-        deleted_doc_hash.include?(:rev).should == true
-      end
-      it "raises an exception when document cannot be found" do
-        expect{ @testdb.delete_doc("not_found", "something") }.to raise_error(Leanback::CouchdbException)
-        expect{ @testdb.delete_doc!("not_found") }.to raise_error(Leanback::CouchdbException)
-      end
-      after(:each) do
-        @testdb.delete
-      end
+  end
+  describe "#delete_doc" do
+    before(:each) do
+      @testdb  = Leanback::Couchdb.new db_settings("testdb#{Time.now.to_i}")
+      @testdb.create
     end
-    describe "Get Document" do
-      before(:each) do
-        @testdb  = Leanback::Couchdb.new db_settings("testdb#{Time.now.to_i}")
-        @testdb.create
-        @testdb.create_doc("james", {lastname: "smith"})
-      end
-      it "get a document" do
-        doc = @testdb.get_doc "james"
-        doc.should == {_id: "james", _rev: doc[:_rev], lastname: "smith"}
-      end
-      it "raises an exception when trying to get document that dont exist" do
-        expect{ @testdb.get_doc "dont_exist" }.to raise_error(Leanback::CouchdbException)
-      end
-      after(:each) do
-       @testdb.delete
-      end
+    it "deletes a document with revision" do
+      created_doc_hash = @testdb.create_doc "john", {}
+      deleted_doc_hash = @testdb.delete_doc "john", created_doc_hash[:rev]
+      deleted_doc_hash.should include(ok: true, id: "john")
+      deleted_doc_hash.include?(:rev).should == true
+    end
+    it "deletes a doc with no revision" do
+      @testdb.create_doc "john", {}
+      deleted_doc_hash = @testdb.delete_doc! "john"
+      deleted_doc_hash.should include(ok: true, id: "john")
+      deleted_doc_hash.include?(:rev).should == true
+    end
+    it "raises an exception when document cannot be found" do
+      expect{ @testdb.delete_doc("not_found", "something") }.to raise_error(Leanback::CouchdbException)
+      expect{ @testdb.delete_doc!("not_found") }.to raise_error(Leanback::CouchdbException)
+    end
+    after(:each) do
+      @testdb.delete
+    end
+  end
+  describe "#get_doc" do
+    before(:each) do
+      @testdb  = Leanback::Couchdb.new db_settings("testdb#{Time.now.to_i}")
+      @testdb.create
+      @testdb.create_doc("james", {lastname: "smith"})
+    end
+    it "get a document" do
+      doc = @testdb.get_doc "james"
+      doc.should == {_id: "james", _rev: doc[:_rev], lastname: "smith"}
+    end
+    it "raises an exception when trying to get document that dont exist" do
+      expect{ @testdb.get_doc "dont_exist" }.to raise_error(Leanback::CouchdbException)
+    end
+    after(:each) do
+     @testdb.delete
+    end
+  end
+  describe "#edit_doc" do
+    before(:each) do
+      @testdb  = Leanback::Couchdb.new db_settings("testdb#{Time.now.to_i}")
+      @testdb.create
+      doc = @testdb.create_doc("kevin",{firstname: "kevin"})
+      @rev = doc[:rev]
+      @doc_id = "kevin"
+    end
+    it "edits a document using a revision" do
+      new_firstname = "martin"
+      new_doc = @testdb.edit_doc @doc_id, _rev: @rev, firstname: new_firstname
+      new_doc.should include(ok: true, id: @doc_id)
+      doc = @testdb.get_doc @doc_id
+      doc[:firstname].should == "martin"
+    end
+    it "raises an exception when revision is not found" do
+      expect{ @testdb.edit_doc @doc_id, _rev: "wrongrev", firstname: "mark" }.to raise_error(Leanback::CouchdbException)
+    end
+    it "creates a new document when no doc has the provided id" do
+      result = @testdb.edit_doc "notfound", _rev: @rev, firstname: "mark"
+      result.should include(ok: true, id: "notfound" )
+      result.include?(:rev).should == true
+    end
+    it "edits a document without a revision" do
+      new_firstname = "nancy"
+      new_doc = @testdb.edit_doc! @doc_id, firstname: new_firstname
+      new_doc.should include(ok: true, id: @doc_id)
+      doc = @testdb.get_doc @doc_id
+      doc[:firstname].should == "nancy"
+    end
+    after(:each) do
+      @testdb.delete
     end
   end
 end

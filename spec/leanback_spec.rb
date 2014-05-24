@@ -186,4 +186,31 @@ describe "CouchDB" do
       @testdb.delete
     end
   end
+  describe "#security_object" do
+    before(:each) do
+      @testdb  = Leanback::Couchdb.new db_settings("testdb#{Time.now.to_i}")
+      @testdb.create
+      @security_settings = { admins: {names: ["david"], roles: ["admin"]},
+                            readers: {names: ["david"],roles: ["admin"]}
+                          }
+      #sets security object
+      @testdb.security_object = @security_settings
+    end
+    it "sets security object for database" do
+      @testdb.security_object.should == @security_settings
+    end
+    it "sets security object with only admins access control settings" do
+      only_admins = { admins: {names: ["david"], roles: ["admin"]}
+                          }
+      @testdb.security_object = only_admins
+      @testdb.security_object.should == only_admins
+    end
+    it "clears security object" do
+      @testdb.security_object = {}
+      @testdb.security_object.should == {}
+    end
+    after(:each) do
+      @testdb.delete
+    end
+  end
 end

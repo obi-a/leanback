@@ -18,7 +18,7 @@ c.delete
 c.create_doc id, {data}
 c.delete_doc id, rev
 c.delete_doc! id
-c.edit_doc id, rev, {}
+c.update_doc id, {} #hash includes rev
 c.edit_doc! id, {}
 c.get_doc id
 

@@ -70,12 +70,33 @@ describe "CouchDB" do
     before(:each) do
       @testdb  = Leanback::Couchdb.new db_settings("testdb#{Time.now.to_i}")
       @testdb.create
+      @doc_id = "john"
+      created_doc_hash = @testdb.create_doc @doc_id, {}
+      @rev = created_doc_hash[:rev]
     end
     it "deletes a document with revision" do
-      created_doc_hash = @testdb.create_doc "john", {}
-      deleted_doc_hash = @testdb.delete_doc "john", created_doc_hash[:rev]
-      deleted_doc_hash.should include(ok: true, id: "john")
+      deleted_doc_hash = @testdb.delete_doc @doc_id, @rev
+      deleted_doc_hash.should include(ok: true, id: @doc_id)
       deleted_doc_hash.include?(:rev).should == true
+    end
+    it "raises an exception when revision is not found" do
+      wrongrev = "5-d5e25dea1ae936b802392bade1de7d93"
+      expect{ @testdb.delete_doc @doc_id, wrongrev }.to raise_error(Leanback::CouchdbException)
+    end
+    it "raises an exception when revision is in wrong format" do
+      expect{ @testdb.delete_doc @doc_id, "wrongformat" }.to raise_error(Leanback::CouchdbException)
+    end
+    it "raises an exception when document cannot be found" do
+      expect{ @testdb.delete_doc("not_found", "something") }.to raise_error(Leanback::CouchdbException)
+    end
+    after(:each) do
+      @testdb.delete
+    end
+  end
+  describe "#delete_doc!" do
+    before(:each) do
+      @testdb  = Leanback::Couchdb.new db_settings("testdb#{Time.now.to_i}")
+      @testdb.create
     end
     it "deletes a doc with no revision" do
       @testdb.create_doc "john", {}
@@ -84,7 +105,6 @@ describe "CouchDB" do
       deleted_doc_hash.include?(:rev).should == true
     end
     it "raises an exception when document cannot be found" do
-      expect{ @testdb.delete_doc("not_found", "something") }.to raise_error(Leanback::CouchdbException)
       expect{ @testdb.delete_doc!("not_found") }.to raise_error(Leanback::CouchdbException)
     end
     after(:each) do
@@ -108,7 +128,7 @@ describe "CouchDB" do
      @testdb.delete
     end
   end
-  describe "#edit_doc" do
+  describe "#update_doc" do
     before(:each) do
       @testdb  = Leanback::Couchdb.new db_settings("testdb#{Time.now.to_i}")
       @testdb.create
@@ -116,27 +136,51 @@ describe "CouchDB" do
       @rev = doc[:rev]
       @doc_id = "kevin"
     end
-    it "edits a document using a revision" do
+    it "updates a document using a revision" do
       new_firstname = "martin"
-      new_doc = @testdb.edit_doc @doc_id, _rev: @rev, firstname: new_firstname
+      new_doc = @testdb.update_doc @doc_id, _rev: @rev, firstname: new_firstname
       new_doc.should include(ok: true, id: @doc_id)
       doc = @testdb.get_doc @doc_id
       doc[:firstname].should == "martin"
     end
-    it "raises an exception when revision is not found" do
-      expect{ @testdb.edit_doc @doc_id, _rev: "wrongrev", firstname: "mark" }.to raise_error(Leanback::CouchdbException)
+    it "raises an exception when revision is in wrong format" do
+      expect{ @testdb.update_doc @doc_id, _rev: "wrongformat", firstname: "mark" }.to raise_error(Leanback::CouchdbException)
     end
-    it "creates a new document when no doc has the provided id" do
-      result = @testdb.edit_doc "notfound", _rev: @rev, firstname: "mark"
+    it "raises an exception when revision is not found" do
+      wrongrev = "5-d5e25dea1ae936b802392bade1de7d93"
+      expect{ @testdb.update_doc @doc_id, _rev: wrongrev, firstname: "mark" }.to raise_error(Leanback::CouchdbException)
+    end
+    it "creates a new document when provided doc_id is not found" do
+      result = @testdb.update_doc "notfound", _rev: @rev, firstname: "mark"
       result.should include(ok: true, id: "notfound" )
       result.include?(:rev).should == true
     end
-    it "edits a document without a revision" do
+    after(:each) do
+      @testdb.delete
+    end
+  end
+  describe "#edit_doc!" do
+    before(:each) do
+      @testdb  = Leanback::Couchdb.new db_settings("testdb#{Time.now.to_i}")
+      @testdb.create
+      doc = @testdb.create_doc("kevin",{firstname: "kevin"})
+      @doc_id = "kevin"
+    end
+    it "edits a document's existing data" do
       new_firstname = "nancy"
       new_doc = @testdb.edit_doc! @doc_id, firstname: new_firstname
       new_doc.should include(ok: true, id: @doc_id)
       doc = @testdb.get_doc @doc_id
       doc[:firstname].should == "nancy"
+    end
+    it "edits a document adding new data" do
+      lastname = "smith"
+      @testdb.edit_doc!(@doc_id, lastname: lastname)
+      doc = @testdb.get_doc(@doc_id)
+      doc.should include(_id: @doc_id, firstname: "kevin", lastname: lastname)
+    end
+    it "raises an exception when document cannot be found" do
+      expect{ @testdb.edit_doc!("notfound", firstname: "jackson") }.to raise_error(Leanback::CouchdbException)
     end
     after(:each) do
       @testdb.delete

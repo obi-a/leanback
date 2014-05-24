@@ -38,22 +38,18 @@ module Leanback
     end
     def delete_doc!(doc_id)
       document = get_doc(doc_id)
-      (document[:_id] && document[:_rev]) ? delete_doc(document[:_id], document[:_rev]) : document
+      delete_doc(document[:_id], document[:_rev])
     end
     def get_doc(doc_id)
       api_request { RestClient.get "#{address_port}/#{@database}/#{doc_id}", cookies }
     end
-    def edit_doc(doc_id, data)
+    def update_doc(doc_id, data)
       api_request { RestClient.put "#{address_port}/#{db_uri}/#{doc_uri(doc_id)}", generate_json(data), cookies }
     end
     def edit_doc!(doc_id, data)
       document = get_doc(doc_id)
-      if (document[:_id] && document[:_rev])
-        document_with_rev = document.merge(data)
-        edit_doc(doc_id, document_with_rev)
-      else
-        #raise unknownerror
-      end
+      document_with_rev = document.merge(data)
+      update_doc(doc_id, document_with_rev)
     end
     def view(design_doc_name, view_name, options = {})
       api_request { RestClient.get "#{address_port}/#{db_uri}/#{URI.escape(design_doc_name)}/_view/#{URI.escape(view_name)}?#{options.to_query}", cookies }

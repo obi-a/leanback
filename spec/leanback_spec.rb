@@ -213,4 +213,34 @@ describe "CouchDB" do
       @testdb.delete
     end
   end
+  describe "config" do
+    before(:each) do
+      @c = Leanback::Couchdb.new
+    end
+    it "sets and gets a config setting" do
+      @c.set_config("couch_httpd_auth", "timeout", '"1600"').should == true
+      @c.get_config("couch_httpd_auth", "timeout").should ==  "\"1600\"\n"
+    end
+    it "cannot get a config setting that doesnt exist" do
+      expect{ @c.get_config("dont_exist", "dont_exist") }.to raise_error(Leanback::CouchdbException)
+    end
+    it "deletes a config setting" do
+      @c.set_config("section", "option", '"value"').should == true
+      @c.delete_config("section", "option").should == true
+    end
+    it "cannot delete a config setting that don't exist" do
+      expect{ @c.delete_config("dont_exist", "dont_exist") }.to raise_error(Leanback::CouchdbException)
+    end
+    it "config setting's value must be set in correct format" do
+      @c.set_config("section", "option", '"value"').should == true
+      @c.set_config("section", "option", '"true"').should == true
+      @c.set_config("section", "option", '"900"').should == true
+      @c.set_config("section", "option", '"value"').should == true
+      @c.set_config("section", "option", '"[1]"').should  == true
+      @c.delete_config("section", "option").should == true
+    end
+    it "config setting's value cannot be in the wrong format" do
+      expect{ @c.set_config("section", "option", "value") }.to raise_error
+    end
+  end
 end

@@ -75,7 +75,7 @@ module Leanback
       api_request { RestClient.get "#{address_port}/#{db_uri}/_security/", cookies }
     end
     def set_config(section, key, value)
-      RestClient.put "#{address_port}/_config/#{URI.escape(section)}/#{URI.escape(key)}", value, cookies
+      !!(RestClient.put "#{address_port}/_config/#{URI.escape(section)}/#{URI.escape(key)}", value, cookies)
     end
     def get_config(section, key)
       RestClient.get "#{address_port}/_config/#{URI.escape(section)}/#{URI.escape(key)}", cookies
@@ -83,7 +83,7 @@ module Leanback
       raise_error(e)
     end
     def delete_config(section, key)
-      RestClient.delete "#{address_port}/_config/#{URI.escape(section)}/#{URI.escape(key)}", cookies
+      !!(RestClient.delete "#{address_port}/_config/#{URI.escape(section)}/#{URI.escape(key)}", cookies)
     rescue => e
       raise_error(e)
     end

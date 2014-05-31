@@ -58,10 +58,10 @@ module Leanback
       search_term = hash.values
       index = hash.keys.join("_")
       new_options = options.merge({startkey: search_term, endkey: search_term})
-      view!("#{index}_keys_finder", "find_by_keys_#{index}", new_options)
+      view!("_design/#{index}_keys_finder", "find_by_keys_#{index}", new_options)
     rescue CouchdbException => e
       add_multiple_finder(hash.keys)
-      view!("#{index}_keys_finder", "find_by_keys_#{index}", new_options)
+      view!("_design/#{index}_keys_finder", "find_by_keys_#{index}", new_options)
     end
     def view!(design_doc_name, view_name, options = {})
       result = view(design_doc_name, view_name, options)
@@ -91,12 +91,13 @@ module Leanback
     def add_multiple_finder(keys)
       view_name = keys.join("_")
       condition = keys.join(" && doc.")
+      key = keys.join(",doc.")
       design_doc_name = "#{view_name}_keys_finder"
       design_doc = {
                       language: "javascript",
                       views: {
                                 "find_by_keys_#{view_name}" => {
-                                  map: "function(doc){ if(doc.#{condition}) emit([doc.id],doc);}"
+                                  map: "function(doc){ if(doc.#{condition}) emit([doc.#{key}],doc);}"
                                 }
                              }
                    }

@@ -213,9 +213,96 @@ describe "CouchDB" do
       @testdb.delete
     end
   end
+  describe "queries" do
+    before(:each) do
+      @db = Leanback::Couchdb.new db_settings("testdb#{Time.now.to_i}")
+      @db.create
+      @db.create_doc "christina", firstname: "christina", state: "new york", gender: "female", city: "bronx", age: 22
+      @db.create_doc "james", firstname: "james", state: "new york", gender: "male", city: "manhattan", age: 23
+      @db.create_doc "kevin", firstname: "kevin", state: "new york", gender: "male", city: "bronx", age: 37
+      @db.create_doc "lisa", firstname: "lisa", state: "new york", gender: "female", city: "manhattan", age: 31
+      @db.create_doc "martin", firstname: "martin", state: "new york", gender: "male", city: "manhattan", age: 29
+      @db.create_doc "nancy", firstname: "nancy", state: "new york", gender: "female", city: "bronx", age: 25
+      @db.create_doc "susan", firstname: "susan", state: "new york", gender: "female", age: 35, fullname: {firstname: "susan", lastname: "Lee"}
+      design_doc = {
+         language: "javascript",
+         views: {
+           by_gender: {
+             map: "function(doc){ if(doc.gender) emit(doc.gender, doc); }"
+           }
+         }
+        }
+      @db.create_doc "_design/my_doc", design_doc
+    end
+      describe "#view" do
+        it "can query a permanent view" do
+          result = @db.view("_design/my_doc", "by_gender")
+          result[:rows].count.should == 7
+          result[:rows].first.should include(id: "christina", key: "female")
+        end
+        it "can query a view by key" do
+          result =  @db.view("_design/my_doc", "by_gender", key: '"male"')
+          result[:rows].count.should == 3
+          result[:rows].first.should include(id: "james", key: "male")
+        end
+        it "can return query results in descending order" do
+          result =  @db.view("_design/my_doc", "by_gender", key: '"male"', descending: true)
+          result[:rows].first.should include(id: "martin", key: "male")
+        end
+        it "can limit the number of documents returned by query" do
+          limit =  4
+          result = @db.view("_design/my_doc", "by_gender", limit: limit)
+          result[:rows].count.should == limit
+        end
+        it "can skip some docs in a query result" do
+          result = @db.view("_design/my_doc", "by_gender", skip: 2)
+          result[:rows].count.should == 5
+        end
+        it "raises an exception when view is not found" do
+          expect{ @db.view("_design/my_doc", "not_found") }.to raise_error(Leanback::CouchdbException)
+        end
+        it "raises an exception when design_doc is not found" do
+          expect{ @db.view("_design/not_found", "by_gender") }.to raise_error(Leanback::CouchdbException)
+        end
+        it "can query views by startkey to endkey" do
+          #return only people in their twenties
+            design_doc = {
+             language: "javascript",
+             views: {
+               people_by_age: {
+                 map: "function(doc){ if(doc.age) emit(doc.age, doc); }"
+               }
+             }
+            }
+          @db.create_doc "_design/ages", design_doc
+          result = @db.view("_design/ages", "people_by_age", startkey: 20, endkey: 29)
+          result[:rows].count.should == 4
+          result[:rows].first.should include(id: "christina", key: 22)
+
+          #return only people 31 and above
+          result = @db.view("_design/ages", "people_by_age", startkey: 31)
+          result[:rows].count.should == 3
+          result[:rows].first.should include(id: "lisa", key: 31)
+        end
+        it "can query startkey to endkey as a string" do
+          result = @db.view("_design/my_doc", "by_gender", startkey: '"female"', endkey: '"female"')
+          result[:rows].count.should == 4
+        end
+        #TODO: adding querying complex keys
+      end
+      describe "#where" do
+        it "returns documents that match specified attributes" do
+          #results = @db.where state: "new york", gender: "female"
+          #puts results.inspect
+        end
+      end
+    after(:each) do
+      @db.delete
+    end
+  end
   describe "config" do
     before(:each) do
-      @c = Leanback::Couchdb.new
+      @c = Leanback::Couchdb.new db_settings("")
     end
     it "sets and gets a config setting" do
       @c.set_config("couch_httpd_auth", "timeout", '"1600"').should == true

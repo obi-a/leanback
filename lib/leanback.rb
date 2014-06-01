@@ -57,16 +57,11 @@ module Leanback
     def where(hash, options = {})
       search_term = hash.values
       index = hash.keys.join("_")
-      new_options = options.merge({startkey: search_term, endkey: search_term})
+      new_options = options.merge({startkey: search_term.to_s, endkey: search_term.to_s})
       view!("_design/#{index}_keys_finder", "find_by_keys_#{index}", new_options)
     rescue CouchdbException => e
       add_multiple_finder(hash.keys)
       view!("_design/#{index}_keys_finder", "find_by_keys_#{index}", new_options)
-    end
-    def view!(design_doc_name, view_name, options = {})
-      result = view(design_doc_name, view_name, options)
-      rows = result[:rows]
-      rows.map { |row| row[:value] }
     end
     def security_object=(security_settings)
       api_request { RestClient.put "#{address_port}/#{db_uri}/_security/", generate_json(security_settings), cookies }
@@ -88,6 +83,12 @@ module Leanback
       raise_error(e)
     end
   private
+    def view!(design_doc_name, view_name, options = {})
+      new_options = options.merge({include_docs: true})
+      result = view(design_doc_name, view_name, new_options)
+      rows = result[:rows]
+      rows.map { |row| row[:doc] }
+    end
     def add_multiple_finder(keys)
       view_name = keys.join("_")
       condition = keys.join(" && doc.")
@@ -97,7 +98,7 @@ module Leanback
                       language: "javascript",
                       views: {
                                 "find_by_keys_#{view_name}" => {
-                                  map: "function(doc){ if(doc.#{condition}) emit([doc.#{key}],doc);}"
+                                  map: "function(doc){ if(doc.#{condition}) emit([doc.#{key}]);}"
                                 }
                              }
                    }

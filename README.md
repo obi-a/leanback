@@ -41,7 +41,6 @@ options = { limit: x, key: x, start_key: x, end_key: x, skip: x, descending: x, 
 design_doc_name = "_design/my_doc"
 view_name = "get_emails"
 c.view design_doc_name, view_name, options
-c.view! design_doc_name, view_name, options
 
 security_settings = { admins: {names: ["david"], roles: ["admin"]},
                     readers: {names: ["david"],roles: ["admin"]}

@@ -223,12 +223,12 @@ describe "CouchDB" do
       @db.create_doc "lisa", firstname: "lisa", state: "new york", gender: "female", city: "manhattan", age: 31
       @db.create_doc "martin", firstname: "martin", state: "new york", gender: "male", city: "manhattan", age: 29
       @db.create_doc "nancy", firstname: "nancy", state: "new york", gender: "female", city: "bronx", age: 25
-      @db.create_doc "susan", firstname: "susan", state: "new york", gender: "female", age: 35, fullname: {firstname: "susan", lastname: "Lee"}
+      @db.create_doc "susan", firstname: "susan", state: "new york", gender: "female", age: 35, fullname: ["susan", "Lee"]
       design_doc = {
          language: "javascript",
          views: {
            by_gender: {
-             map: "function(doc){ if(doc.gender) emit(doc.gender, doc); }"
+             map: "function(doc){ if(doc.gender) emit(doc.gender); }"
            }
          }
         }
@@ -270,7 +270,7 @@ describe "CouchDB" do
              language: "javascript",
              views: {
                people_by_age: {
-                 map: "function(doc){ if(doc.age) emit(doc.age, doc); }"
+                 map: "function(doc){ if(doc.age) emit(doc.age); }"
                }
              }
             }
@@ -288,12 +288,35 @@ describe "CouchDB" do
           result = @db.view("_design/my_doc", "by_gender", startkey: '"female"', endkey: '"female"')
           result[:rows].count.should == 4
         end
-        #TODO: adding querying complex keys
+        it "can query with compound startkey and endkeys" do
+          design_doc = {
+           language: "javascript",
+           views: {
+             people_by_gender_and_city: {
+               map: "function(doc){ if(doc.gender && doc.city && doc.age) emit([doc.gender, doc.city, doc.age]);}"
+             }
+           }
+          }
+         @db.create_doc "_design/gender_city", design_doc
+         result = @db.view("_design/gender_city", "people_by_gender_and_city", startkey: ["female", "bronx", 25].to_s, endkey: ["female", "bronx", 25].to_s)
+         result[:rows].count.should == 1
+         result[:rows].first.should include(id: "nancy", key: ["female", "bronx", 25])
+        end
       end
       describe "#where" do
         it "returns documents that match specified attributes" do
-          #results = @db.where state: "new york", gender: "female"
-          #puts results.inspect
+          docs = @db.where state: "new york", gender: "female"
+          docs.count.should == 4
+
+          new_docs = @db.where state: "new york", fullname: ["susan", "Lee"]
+          new_docs.first.should include(_id: "susan")
+
+          other_docs =  @db.where city: "manhattan", age: 29
+          other_docs.first.should include(_id: "martin")
+        end
+        it "returns an empty array when no matching attributes is found" do
+          docs = @db.where notfound: "not found", something: "something"
+          docs.should == []
         end
       end
     after(:each) do

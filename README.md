@@ -1,8 +1,8 @@
 ###Leanback
 
-Simple Ruby Interface to CouchDB.
-
 [![Build Status](https://travis-ci.org/obi-a/leanback.svg?branch=master)](https://travis-ci.org/obi-a/leanback)
+
+Simple Ruby Interface to CouchDB. This current version is a complete re-write with a new API.
 
 ### Installation:
 ```
@@ -21,7 +21,7 @@ my_database = Leanback::Couchdb.new(database: "my_database")
 # @port="5984",
 # @username=nil>
 ```
-The means my_database object will perform operations on the couchDB database named "my_database". The above example assumes that the database is in admin party mode, since no username or password was provided.
+TIn the above code, my_database object will be used to perform operations on the couchDB database named "my_database". The above example assumes that the database is in admin party mode, since no username or password was provided.
 
 If there is no admin party then a username and password is required to perform the operations.
 A username and password can be included during initialization:
@@ -74,7 +74,7 @@ The created document inside couchDB will be:
 }
 ```
 
-Delete the document with a revision
+Delete the document with it's latest revision
 ```ruby
 my_database.delete_doc("linda", rev = "1-ff286690ab5b446a727840ce7420843a")
 #=> {:ok=>true, :id=>"linda", :rev=>"2-d689d9b5b9f2ded6a2157fc9cc84a00f"}
@@ -101,7 +101,7 @@ Update the document
 my_database.update_doc("linda", firstname: "nancy", lastname: "drew", _rev: "5-74894db03ef6d22e6a0e4ef90b5a85fb")
 #=> {:ok=>true, :id=>"linda", :rev=>"6-950d16c8c39daa77fad11de85b9467fc"}
 ```
-update_doc replaces the old document with the new data. A revision (_rev) must be provided the data.  The resulting document will be
+update_doc replaces the old document with the new data. A revision (_rev) must be provided in the data.  The resulting document after the update will be
 ```javascript
 {
    "_id": "linda",
@@ -116,7 +116,7 @@ Edit parts of a document
 my_database.edit_doc!("linda", lastname: "brown", phone: "777-777-7777")
 #=> {:ok=>true, :id=>"linda", :rev=>"7-e44206dd09d2740171576e5867fff7a1"}
 ```
-The document is now:
+The edited version of the document is now:
 ```javascript
 {
    "_id": "linda",
@@ -128,8 +128,183 @@ The document is now:
 
 ```
 
-currently updating...
+###Working with Desgin Documents and views
 
+Create a design document
+```ruby
+design_doc = {
+ language: "javascript",
+ views: {
+   by_gender: {
+     map: "function(doc){ if(doc.gender) emit(doc.gender); }"
+   }
+ }
+}
+my_database.create_doc "_design/my_doc", design_doc
+#=> {:ok=>true, :id=>"_design/my_doc", :rev=>"1-4939535c4d51fb5bcbc9b32e2f58e755"}
+```
+
+Query a permanent view
+```ruby
+my_database.view("_design/my_doc", "by_gender")
+#=> {:total_rows=>7,
+# :offset=>0,
+# :rows=>
+#  [{:id=>"christina", :key=>"female", :value=>nil},
+#  {:id=>"lisa", :key=>"female", :value=>nil},
+#  {:id=>"nancy", :key=>"female", :value=>nil},
+#  {:id=>"susan", :key=>"female", :value=>nil},
+#  {:id=>"james", :key=>"male", :value=>nil},
+#  {:id=>"kevin", :key=>"male", :value=>nil},
+# {:id=>"martin", :key=>"male", :value=>nil}]}
+```
+The view() method is used to query a parmanent view. It takes the design document name and view name as parameters. It can also optionally take the following CouchDB query options in a hash: key, limit, skip, descending, include_docs, reduce, startkey, starkey_docid, endkey, endkey_docid, inclusive_end, stale, group, group_level.
+
+To query a permanent view by key
+```ruby
+my_database.view("_design/my_doc", "by_gender", key: '"male"')
+#=> {:total_rows=>7,
+# :offset=>4,
+# :rows=>
+#  [{:id=>"james", :key=>"male", :value=>nil},
+#   {:id=>"kevin", :key=>"male", :value=>nil},
+#   {:id=>"martin", :key=>"male", :value=>nil}]}
+```
+The above example sends a query to the view using the key "male".
+
+To include actual documents in the query results, we can add include_docs to the query options
+```ruby
+my_database.view("_design/my_doc", "by_gender", key: '"male"', include_docs: true)
+#=> {:total_rows=>7,
+# :offset=>4,
+# :rows=>
+#  [{:id=>"james",
+#    :key=>"male",
+#    :value=>nil,
+#    :doc=>
+#     {:_id=>"james",
+#      :_rev=>"1-56ff4f73369bdf8350615a58e12e4c3b",
+#      :firstname=>"james",
+#      :state=>"new york",
+#      :gender=>"male",
+#      :city=>"manhattan",
+#      :age=>23}},
+#   {:id=>"kevin",
+#    :key=>"male",
+#    :value=>nil,
+#    :doc=>
+#     {:_id=>"kevin",
+#      :_rev=>"1-3c6381603d9f15cb966948eb29218cf7",
+#      :firstname=>"kevin",
+#      :state=>"new york",
+#      :gender=>"male",
+#      :city=>"bronx",
+#      :age=>37}},
+#   {:id=>"martin",
+#    :key=>"male",
+#    :value=>nil,
+#    :doc=>
+#     {:_id=>"martin",
+#      :_rev=>"1-41956cd527d75643171919731abd97c0",
+#      :firstname=>"martin",
+#      :state=>"new york",
+#      :gender=>"male",
+#      :city=>"manhattan",
+#      :age=>29}}]}
+```
+
+To return results in descending order:
+```ruby
+my_database.view("_design/my_doc", "by_gender", key: '"male"', descending: true)
+#=> {:total_rows=>7,
+# :offset=>0,
+# :rows=>
+#  [{:id=>"martin", :key=>"male", :value=>nil},
+#   {:id=>"kevin", :key=>"male", :value=>nil},
+#   {:id=>"james", :key=>"male", :value=>nil}]}
+```
+
+To limit the number of documents returned from the query
+```ruby
+my_database.view("_design/my_doc", "by_gender", limit: 4)
+#=> {:total_rows=>7,
+# :offset=>0,
+# :rows=>
+#  [{:id=>"christina", :key=>"female", :value=>nil},
+#   {:id=>"lisa", :key=>"female", :value=>nil},
+#   {:id=>"nancy", :key=>"female", :value=>nil},
+#   {:id=>"susan", :key=>"female", :value=>nil}]}
+```
+
+Skip some documents in the query
+```ruby
+my_database.view("_design/my_doc", "by_gender", skip: 2)
+#=> {:total_rows=>7,
+# :offset=>2,
+# :rows=>
+#  [{:id=>"nancy", :key=>"female", :value=>nil},
+#   {:id=>"susan", :key=>"female", :value=>nil},
+#   {:id=>"james", :key=>"male", :value=>nil},
+#   {:id=>"kevin", :key=>"male", :value=>nil},
+#   {:id=>"martin", :key=>"male", :value=>nil}]}
+```
+
+Query views by startkey and endkey
+```ruby
+design_doc = {
+ language: "javascript",
+ views: {
+   people_by_age: {
+     map: "function(doc){ if(doc.age) emit(doc.age); }"
+   }
+ }
+}
+my_database.create_doc "_design/ages", design_doc
+
+my_database.view("_design/ages", "people_by_age", startkey: 20, endkey: 29)
+#=> {:total_rows=>7,
+# :offset=>0,
+# :rows=>
+#  [{:id=>"christina", :key=>22, :value=>nil},
+#   {:id=>"james", :key=>23, :value=>nil},
+#   {:id=>"nancy", :key=>25, :value=>nil},
+#   {:id=>"martin", :key=>29, :value=>nil}]}
+```
+The above returns documents with age between 20 and 29.
+
+Another example to return documents with age 31 and over
+```ruby
+my_database.view("_design/ages", "people_by_age", startkey: 31)
+#=> {:total_rows=>7,
+# :offset=>4,
+# :rows=>
+#  [{:id=>"lisa", :key=>31, :value=>nil},
+#   {:id=>"susan", :key=>35, :value=>nil},
+#   {:id=>"kevin", :key=>37, :value=>nil}]}
+
+my_database.view("_design/my_doc", "by_gender", startkey: '"female"', endkey: '"female"')
+#=> {:total_rows=>7,
+# :offset=>0,
+# :rows=>
+#  [{:id=>"christina", :key=>"female", :value=>nil},
+#   {:id=>"lisa", :key=>"female", :value=>nil},
+#   {:id=>"nancy", :key=>"female", :value=>nil},
+#   {:id=>"susan", :key=>"female", :value=>nil}]}
+```
+
+Working with compound startkey and endkey
+```ruby
+my_database.view("_design/gender_city", "people_by_gender_and_city", startkey: ["female", "bronx", 25].to_s, endkey: ["female", "bronx", 25].to_s)
+#=> {:total_rows=>6,
+# :offset=>1,
+# :rows=>[{:id=>"nancy", :key=>["female", "bronx", 25], :value=>nil}]}
+```
+
+Dynamic queries can be performed on documents using the where() helper method
+```ruby
+```
+
+Currently updating...
 
 ##API Specification
 
@@ -140,7 +315,7 @@ c = Leanback::Couchdb.new database: xxxxx, username: xxxxx, password: xxxx, addr
 
 c.create
 c.delete
-c.create_doc id, {data}
+c.create_doc id, {}
 c.delete_doc id, rev
 c.delete_doc! id
 c.update_doc id, {} #hash includes rev

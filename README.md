@@ -1,8 +1,9 @@
 ###Leanback
 
 [![Build Status](https://travis-ci.org/obi-a/leanback.svg?branch=master)](https://travis-ci.org/obi-a/leanback)
+[![Gem Version](https://badge.fury.io/rb/leanback.svg)](http://badge.fury.io/rb/leanback)
 
-Simple Ruby Interface to CouchDB. This current version is a complete re-write with a new API.
+Simple Ruby Interface to CouchDB. This current version is a complete re-write with a new API. I wrote this to use in my projects, I hope you find it useful.
 
 ### Installation:
 ```

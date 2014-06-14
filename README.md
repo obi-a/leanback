@@ -21,7 +21,7 @@ my_database = Leanback::Couchdb.new(database: "my_database")
 # @port="5984",
 # @username=nil>
 ```
-TIn the above code, my_database object will be used to perform operations on the couchDB database named "my_database". The above example assumes that the database is in admin party mode, since no username or password was provided.
+In the above code, my_database object will be used to perform operations on the couchDB database named "my_database". The above example assumes that the database is in admin party mode, since no username or password was provided.
 
 If there is no admin party then a username and password is required to perform the operations.
 A username and password can be included during initialization:
@@ -35,7 +35,7 @@ my_database = Leanback::Couchdb.new(database: "my_database", username: "obi", pa
 # @username="obi">
 
 ```
-By default, Leanback uses couchDB's default http address and port (http://127.0.0.1:5984), to use a different address and port, include in the initialization:
+By default, Leanback uses couchDB's default http address and port (http://127.0.0.1:5984), to use a different address and port, include it in the initialization:
 ```ruby
 my_database = Leanback::Couchdb.new(database: "my_database", address: "https://obi.iriscouch.com", port: "6984")
 #=> #<Leanback::Couchdb:0x000000033ab5d0
@@ -84,7 +84,7 @@ Delete the document without providing a revision
 my_database.delete_doc!("linda")
 #=> {:ok=>true, :id=>"linda", :rev=>"4-5d1a6851ec7562378caa4ce4adef9ee4"}
 ```
-delete_doc! with the bang, first fetches the document, retrieves it's latest revision and then, deletes the document using the latest revision.
+delete_doc! with the bang, first fetches the document with the provided id, retrieves it's latest revision and then, deletes the document using the latest revision.
 
 Fetch the document using its id
 ```ruby
@@ -158,7 +158,7 @@ my_database.view("_design/my_doc", "by_gender")
 #  {:id=>"kevin", :key=>"male", :value=>nil},
 # {:id=>"martin", :key=>"male", :value=>nil}]}
 ```
-The view() method is used to query a parmanent view. It takes the design document name and view name as parameters. It can also optionally take the following CouchDB query options in a hash: key, limit, skip, descending, include_docs, reduce, startkey, starkey_docid, endkey, endkey_docid, inclusive_end, stale, group, group_level.
+The view() method is used to query parmanent views. It takes the design document name and view name as arguments. It can also optionally take the following CouchDB query options in a hash as arguments: key, limit, skip, descending, include_docs, reduce, startkey, starkey_docid, endkey, endkey_docid, inclusive_end, stale, group, group_level.
 
 To query a permanent view by key
 ```ruby
@@ -170,7 +170,7 @@ my_database.view("_design/my_doc", "by_gender", key: '"male"')
 #   {:id=>"kevin", :key=>"male", :value=>nil},
 #   {:id=>"martin", :key=>"male", :value=>nil}]}
 ```
-The above example sends a query to the view using the key "male".
+The above example sends a query to the view using the key "male" and returns all documents with "gender" equal to  "male".
 
 To include actual documents in the query results, we can add include_docs to the query options
 ```ruby
@@ -281,15 +281,6 @@ my_database.view("_design/ages", "people_by_age", startkey: 31)
 #  [{:id=>"lisa", :key=>31, :value=>nil},
 #   {:id=>"susan", :key=>35, :value=>nil},
 #   {:id=>"kevin", :key=>37, :value=>nil}]}
-
-my_database.view("_design/my_doc", "by_gender", startkey: '"female"', endkey: '"female"')
-#=> {:total_rows=>7,
-# :offset=>0,
-# :rows=>
-#  [{:id=>"christina", :key=>"female", :value=>nil},
-#   {:id=>"lisa", :key=>"female", :value=>nil},
-#   {:id=>"nancy", :key=>"female", :value=>nil},
-#   {:id=>"susan", :key=>"female", :value=>nil}]}
 ```
 
 Working with compound startkey and endkey
@@ -299,12 +290,136 @@ my_database.view("_design/gender_city", "people_by_gender_and_city", startkey: [
 # :offset=>1,
 # :rows=>[{:id=>"nancy", :key=>["female", "bronx", 25], :value=>nil}]}
 ```
-
-Dynamic queries can be performed on documents using the where() helper method
+###Dynamic Queries
+Dynamic queries can be performed on documents using the where() helper method, example to fetch all documents that match the key/value pairs {city: "bronx", gender: "female"}
 ```ruby
+my_database.where(city: "bronx", gender: "female")
+#=> [{:_id=>"christina",
+#  :_rev=>"1-e9782aa92f7d88eb5dc5e1a878c8e193",
+#  :firstname=>"christina",
+#  :state=>"new york",
+#  :gender=>"female",
+#  :city=>"bronx",
+#  :age=>22},
+# {:_id=>"nancy",
+#  :_rev=>"1-44ac471d9e6433eaa6e67607c7a175c9",
+#  :firstname=>"nancy",
+#  :state=>"new york",
+#  :gender=>"female",
+#  :city=>"bronx",
+#  :age=>25}]
+```
+To fetch all documents that match the key/value pairs {state: "new york", fullname: ["susan", "Lee"]}
+```ruby
+my_database.where(state: "new york", fullname: ["susan", "Lee"])
+#=> [{:_id=>"susan",
+#  :_rev=>"1-11b05eacc247b8541fa6c659f26447de",
+#  :firstname=>"susan",
+#  :state=>"new york",
+#  :gender=>"female",
+#  :age=>35,
+#  :fullname=>["susan", "Lee"]}]
+```
+Similar to view(), the where() method also supports options skip, limit, descending. Example to return documents in descending order;
+```ruby
+my_database.where({city: "bronx", gender: "female"}, descending: true)
+#=> [{:_id=>"nancy",
+#  :_rev=>"1-44ac471d9e6433eaa6e67607c7a175c9",
+#  :firstname=>"nancy",
+#  :state=>"new york",
+#  :gender=>"female",
+#  :city=>"bronx",
+#  :age=>25},
+# {:_id=>"christina",
+#  :_rev=>"1-e9782aa92f7d88eb5dc5e1a878c8e193",
+#  :firstname=>"christina",
+#  :state=>"new york",
+#  :gender=>"female",
+#  :city=>"bronx",
+#  :age=>22}]
+```
+Limit to one result
+```ruby
+my_database.where({city: "bronx", gender: "female"}, limit: 1)
+#=> [{:_id=>"christina",
+#  :_rev=>"1-e9782aa92f7d88eb5dc5e1a878c8e193",
+#  :firstname=>"christina",
+#  :state=>"new york",
+#  :gender=>"female",
+#  :city=>"bronx",
+#  :age=>22}]
+```
+Calling the where() method, for the first time creates a view in the database for provided keys. Subsequent calls to where() will simply query the previously created view and return the documents. For example calling the method below:
+```ruby
+my_database.where(city: "bronx", gender: "female")
+```
+Will add the following document to the database,
+```javascript
+{
+   "_id": "_design/city_gender_keys_finder",
+   "_rev": "1-41fb3b17c8b99be176928e3ea5588935",
+   "language": "javascript",
+   "views": {
+       "find_by_keys_city_gender": {
+           "map": "function(doc){ if(doc.city && doc.gender) emit([doc.city,doc.gender]);}"
+       }
+   }
+}
+```
+And then query it with:
+```
+/_design/city_gender_keys_finder/_view/find_by_keys_city_gender?endkey=["bronx", "female"]&include_docs=true&startkey=["bronx", "female"]
+```
+Subsequent method calls will simply query the view and return the documents. where() is just a convienient helper method.
+
+###Security Object:
+To set the security object for the database:
+```ruby
+security_settings = { admins: {names: ["david"], roles: ["admin"]},
+                      readers: {names: ["david"],roles: ["admin"]}
+                    }
+
+my_database.security_object = security_settings
+#=> {:admins=>{:names=>["david"], :roles=>["admin"]},
+# :readers=>{:names=>["david"], :roles=>["admin"]}}
 ```
 
-Currently updating...
+To retrieve the security object at anytime:
+```ruby
+my_database.security_object
+#=> {:admins=>{:names=>["david"], :roles=>["admin"]},
+# :readers=>{:names=>["david"], :roles=>["admin"]}}
+```
+
+###CouchDB Configuration
+CouchDB's configuration settings can be set using the set_config() method:
+```ruby
+config = Leanback::Couchdb.new
+config.set_config("section", "option", '"value"')
+```
+For example to set couchDB's couch_httpd_auth timeout value:
+```ruby
+config.set_config("couch_httpd_auth", "timeout", '"1600"')
+#=> true
+```
+This sets the CouchDB auth timeout to 1600 seconds.
+
+To retrieve the configuration:
+```ruby
+config.get_config("couch_httpd_auth", "timeout")
+#=> "\"1600\"\n"
+```
+To delete a configuration:
+```ruby
+config.delete_config("section", "option")
+#=> true
+```
+A more useful example to add an admin user to couchDB with username and password;
+```ruby
+config.set_config("admins", username = "james", password = '"abc123"')
+#=> true
+```
+This will add a CouchDB admin with username james, and password abc123. If couchDB was in admin party mode, this would end the party.
 
 ##API Specification
 
@@ -323,7 +438,7 @@ c.edit_doc! id, {}
 c.get_doc id
 
 options = { limit: x, skip: x, descending: x}
-c.where hash, options
+c.where {}, options
 
 #create a design doc
 design_doc = {

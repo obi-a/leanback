@@ -1,8 +1,0 @@
-{
- "language" : "javascript",
- "views" :{
-    "age_gender" : {
-      "map" : "function(doc){ if(doc.age && doc.gender) emit([doc.age, doc.gender],doc); }"
-    }
- }
-}

@@ -1,8 +1,0 @@
-{
- "language" : "javascript",
- "views" :{
-   "get_emails" : {
-     "map" : "function(doc){ if(doc.firstname && doc.email) emit(doc.id,{Name: doc.firstname, Email: doc.email}); }"
-   }
- }
-}

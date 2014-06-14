@@ -474,10 +474,8 @@ c.get_config("couch_httpd_auth", "timeout")
 c.delete_config("section", "option")
 ```
 
-Target systems jruby-19mode, MRI 1.9.3 - 2.x
-
-Old documentation: [Leanback](http://www.whisperservers.com/leanback/leanback/)
-
+##Supported Rubies
+jruby-19mode, MRI 1.9.3 - 2.x
 
 ##License
 MIT License.

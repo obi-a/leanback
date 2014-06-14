@@ -1,8 +1,0 @@
-{
- "language" : "javascript",
- "views" :{
-    "age" : {
-      "map" : "function(doc){ if(doc.age) emit(doc.age,doc); }"
-    }
- }
-}

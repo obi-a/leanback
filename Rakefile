@@ -15,8 +15,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "leanback"
   gem.homepage = "http://github.com/obi-a/leanback"
   gem.license = "MIT"
-  gem.summary = %Q{lightweight Ruby interface to CouchDB}
-  gem.description = %Q{lightweight Ruby interface to CouchDB}
+  gem.summary = %Q{Simple Ruby interface to CouchDB}
+  gem.description = %Q{Simple Ruby interface to CouchDB}
   gem.email = "obioraakubue@yahoo.com"
   gem.authors = ["Obi Akubue"]
   # Include your dependencies below. Runtime dependencies are required when using your gem,

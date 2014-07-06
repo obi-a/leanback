@@ -376,9 +376,10 @@ Subsequent method calls will simply query the view and return the documents. whe
 ###Security Object:
 To set the security object for the database:
 ```ruby
-security_settings = { admins: {names: ["david"], roles: ["admin"]},
-                      readers: {names: ["david"],roles: ["admin"]}
-                    }
+security_settings = {
+  admins: {names: ["david"], roles: ["admin"]},
+  readers: {names: ["david"],roles: ["admin"]}
+}
 
 my_database.security_object = security_settings
 #=> {:admins=>{:names=>["david"], :roles=>["admin"]},
@@ -422,6 +423,21 @@ config.set_config("admins", username = "james", password = '"abc123"')
 ```
 This will add a CouchDB admin with username james, and password abc123. If couchDB was in admin party mode, this would end the party.
 
+##Exception handling
+For CouchDB errors Leanback raises a Leanback::Exception object. This object has a response attribute which is a hash that contains the details of the error response from CouchDB. See an example below
+```ruby
+begin
+  my_database.get_doc('dontexist')
+rescue Leanback::CouchdbException => e
+  puts e.response.inspect
+#=> {:error=>"not_found", :reason=>"missing"}
+  puts e.response[:error].inspect
+#=> "not_found"
+  puts e.response[:reason].inspect
+#=> "missing"
+end
+```
+
 ##API Specification
 
 ```ruby
@@ -458,9 +474,10 @@ design_doc_name = "_design/my_doc"
 view_name = "get_emails"
 c.view design_doc_name, view_name, options
 
-security_settings = { admins: {names: ["david"], roles: ["admin"]},
-                    readers: {names: ["david"],roles: ["admin"]}
-                  }
+security_settings = {
+  admins: {names: ["david"], roles: ["admin"]},
+  readers: {names: ["david"],roles: ["admin"]}
+}
 
 c.security_object = security_settings
 

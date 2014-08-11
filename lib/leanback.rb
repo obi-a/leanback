@@ -135,12 +135,12 @@ module Leanback
     def generate_json(data)
       JSON.generate(data)
     end
-    def raise_error(exeception)
-      if exeception.respond_to?('response')
-        response = parse_json(exeception.response)
+    def raise_error(exception)
+      if exception.respond_to?('response')
+        response = parse_json(exception.response) rescue exception.response
         raise(CouchdbException.new(response), response)
       else
-        raise(exeception)
+        raise(exception)
       end
     end
     def auth_session

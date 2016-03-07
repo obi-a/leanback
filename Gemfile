@@ -4,7 +4,7 @@ source "http://gemcutter.org"
 # Example:
     gem "activesupport"
     gem "rest-client"
-    gem "json_pure"
+    gem "json_pure", "~> 1.8.3"
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.

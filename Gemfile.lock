@@ -35,8 +35,8 @@ GEM
       nokogiri (= 1.5.10)
       rake
       rdoc
-    json (1.8.1)
-    json_pure (1.8.1)
+    json (1.8.3)
+    json_pure (1.8.3)
     jwt (0.1.11)
       multi_json (>= 1.5)
     method_source (0.8.2)
@@ -82,7 +82,10 @@ DEPENDENCIES
   activesupport
   bundler
   jeweler (~> 1.8.7)
-  json_pure
+  json_pure (~> 1.8.3)
   pry
   rest-client
   rspec
+
+BUNDLED WITH
+   1.11.2

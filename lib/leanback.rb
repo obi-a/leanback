@@ -1,6 +1,5 @@
 require 'rest_client'
 require 'json/pure'
-require 'active_support/all'
 
 module Leanback
   class InvalidDatabaseName < StandardError; end
@@ -52,7 +51,7 @@ module Leanback
       update_doc(doc_id, document_with_rev)
     end
     def view(design_doc_name, view_name, options = {})
-      api_request { RestClient.get "#{address_port}/#{db_uri}/#{URI.escape(design_doc_name)}/_view/#{URI.escape(view_name)}?#{options.to_query}", cookies }
+      api_request { RestClient.get "#{address_port}/#{db_uri}/#{URI.escape(design_doc_name)}/_view/#{URI.escape(view_name)}?#{URI.encode_www_form(options)}", cookies }
     end
     def where(hash, options = {})
       search_term = hash.values

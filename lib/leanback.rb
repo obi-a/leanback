@@ -1,5 +1,5 @@
 require 'rest_client'
-require 'json/pure'
+require 'multi_json'
 
 module Leanback
   class InvalidDatabaseName < StandardError; end
@@ -129,10 +129,10 @@ module Leanback
       "#{@address}:#{@port}"
     end
     def parse_json(json_doc)
-      JSON.parse(json_doc, symbolize_names: true)
+      MultiJson.load(json_doc, symbolize_names: true)
     end
     def generate_json(data)
-      JSON.generate(data)
+      MultiJson.dump(data)
     end
     def raise_error(exception)
       if exception.respond_to?('response')

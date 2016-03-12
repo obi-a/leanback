@@ -1,7 +1,7 @@
 source "http://rubygems.org"
 
 gem "rest-client"
-gem "json_pure", "~> 1.8.3"
+gem "multi_json"
 
 group :development do
   gem "pry"

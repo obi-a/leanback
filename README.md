@@ -1,4 +1,4 @@
-###Leanback
+### Leanback
 
 [![Build Status](https://travis-ci.org/obi-a/leanback.svg?branch=master)](https://travis-ci.org/obi-a/leanback)
 [![Gem Version](https://badge.fury.io/rb/leanback.svg)](http://badge.fury.io/rb/leanback)
@@ -291,7 +291,7 @@ my_database.view("_design/gender_city", "people_by_gender_and_city", startkey: [
 # :offset=>1,
 # :rows=>[{:id=>"nancy", :key=>["female", "bronx", 25], :value=>nil}]}
 ```
-###Dynamic Queries
+### Dynamic Queries
 Dynamic queries can be performed on documents using the where() helper method, example to fetch all documents that match the key/value pairs {city: "bronx", gender: "female"}
 ```ruby
 my_database.where(city: "bronx", gender: "female")
@@ -373,8 +373,8 @@ And then query it with:
 ```
 Subsequent method calls will simply query the view and return the documents. where() is just a convienient helper method.
 
-###Security Object:
-To set the security object for the database:
+### Security Object:
+Please note that this does not work with CouchDB 2, only works with CouchDB v1.6.1 and less. To set the security object for the database:
 ```ruby
 security_settings = {
   admins: {names: ["david"], roles: ["admin"]},
@@ -393,8 +393,8 @@ my_database.security_object
 # :readers=>{:names=>["david"], :roles=>["admin"]}}
 ```
 
-###CouchDB Configuration
-CouchDB's configuration settings can be set using the set_config() method:
+### CouchDB Configuration
+Please note that this does not work with CouchDB 2, only works with CouchDB v1.6.1 and less. CouchDB's configuration settings can be set using the set_config() method:
 ```ruby
 config = Leanback::Couchdb.new
 config.set_config("section", "option", '"value"')
@@ -423,7 +423,7 @@ config.set_config("admins", username = "james", password = '"abc123"')
 ```
 This will add a CouchDB admin with username james, and password abc123. If couchDB was in admin party mode, this would end the party.
 
-##Exception handling
+## Exception handling
 For CouchDB errors Leanback raises a Leanback::Exception object. This object has a response attribute which is a hash that contains the details of the error response from CouchDB. See an example below
 ```ruby
 begin
@@ -438,7 +438,7 @@ rescue Leanback::CouchdbException => e
 end
 ```
 
-##API Specification
+## API Specification
 
 ```ruby
 #JSON result keys are automatically symoblized:
@@ -492,7 +492,7 @@ c.get_config("couch_httpd_auth", "timeout")
 c.delete_config("section", "option")
 ```
 
-##Supported Rubies
+## Supported Rubies
 jruby-19mode, MRI 1.9.3 - 2.x
 
 ##License

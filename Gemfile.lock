@@ -88,10 +88,10 @@ PLATFORMS
 DEPENDENCIES
   bundler
   jeweler (~> 2.3.7)
-  multi_json
+  multi_json (~> 1.11.2)
   pry
-  rest-client
-  rspec
+  rest-client (~> 1.8.0)
+  rspec (~> 3.4.0)
 
 BUNDLED WITH
    1.14.6

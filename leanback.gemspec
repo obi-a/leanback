@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.authors = ["Obi Akubue".freeze]
   s.date = "2018-02-10"
   s.description = "Simple Ruby interface to CouchDB".freeze
-  s.email = "obioraakubue@yahoo.com".freeze
+  s.email = "obi.akubue@gmail.com".freeze
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.md"

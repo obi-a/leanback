@@ -491,6 +491,11 @@ c.get_config("couch_httpd_auth", "timeout")
 #=> "\"900\"\n"
 c.delete_config("section", "option")
 ```
+## Development Mode
+### Running Tests
+```
+docker-compose run --entrypoint "bundle exec rspec -fd spec/leanback_spec.rb" leanback
+```
 
 ## Supported Rubies
 jruby-19mode, MRI 1.9.3 - 2.x

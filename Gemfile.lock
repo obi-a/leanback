@@ -55,7 +55,7 @@ GEM
       method_source (~> 0.8.1)
       slop (~> 3.4)
     psych (3.0.2)
-    rack (2.0.4)
+    rack (2.0.6)
     rake (12.3.0)
     rdoc (6.0.1)
     rest-client (2.0.2)
@@ -94,4 +94,4 @@ DEPENDENCIES
   rspec (~> 3.4)
 
 BUNDLED WITH
-   1.14.6
+   1.15.4

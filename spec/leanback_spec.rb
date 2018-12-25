@@ -1,9 +1,11 @@
 require 'spec_base'
 
 def db_settings(database_name)
-  db_credentials = { username: ENV["COUCHDB_ADMIN_USERNAME"],
-                     password: ENV["COUCHDB_ADMIN_PASSWORD"]
-                    }
+  db_credentials = {
+    username: ENV["COUCHDB_ADMIN_USERNAME"],
+    password: ENV["COUCHDB_ADMIN_PASSWORD"],
+    address: ENV["COUCHDB_ADDRESS"] || "http://127.0.0.1"
+  }
   db_credentials.merge({database: database_name})
 end
 
